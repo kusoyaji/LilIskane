@@ -86,6 +86,16 @@ export type MediaRef = {
 };
 
 /**
+ * A `MediaRef` whose alt has already been resolved to one language.
+ *
+ * Alt text here is a full descriptive sentence, so carrying both languages
+ * into a client bundle costs real bytes for a string that will never be read.
+ * The search list projects to this shape instead — see `src/data/list.ts`.
+ * `Figure` accepts either, so nothing else has to change.
+ */
+export type ResolvedMediaRef = Omit<MediaRef, "alt"> & { alt: string };
+
+/**
  * A render paired with a photograph of the same space in a delivered programme.
  * This is the site's central device, so it is a first-class CMS field rather
  * than something assembled in a component.

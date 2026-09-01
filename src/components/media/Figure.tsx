@@ -1,10 +1,15 @@
 import Image from "next/image";
 import { media } from "@/data/media.generated";
-import type { MediaRef } from "@/data/types";
+import type { MediaRef, ResolvedMediaRef } from "@/data/types";
 import type { Locale } from "@/i18n/config";
 
 type Props = {
-  ref_: MediaRef;
+  /**
+   * Either a full `MediaRef` or one whose alt is already resolved to a single
+   * language. The search list uses the latter so the inactive language never
+   * reaches the browser; everything else passes the full ref unchanged.
+   */
+  ref_: MediaRef | ResolvedMediaRef;
   locale: Locale;
   /** Real value, not a guess — this is what decides which file the phone downloads. */
   sizes: string;
@@ -40,7 +45,7 @@ export function Figure({
   return (
     <Image
       src={asset.src}
-      alt={ref_.alt[locale]}
+      alt={typeof ref_.alt === "string" ? ref_.alt : ref_.alt[locale]}
       width={asset.width}
       height={asset.height}
       sizes={sizes}
