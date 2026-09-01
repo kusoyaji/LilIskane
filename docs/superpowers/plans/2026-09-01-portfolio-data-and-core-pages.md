@@ -135,16 +135,18 @@ git commit -m "fix(data): align segments with the client's own taxonomy"
 
 ---
 
-### Task 2: Wire the four uncaptured Matterport tours
+### Task 2: Wire the three uncaptured Matterport tours
 
 **Files:**
-- Modify: `src/data/projects.ts` (4 `tours` arrays)
+- Modify: `src/data/projects.ts` (3 `tours` arrays)
 
 **Interfaces:**
 - Consumes: the `VirtualTour` type from `src/data/types.ts`
-- Produces: `tours.length > 0` on `assalam-tg`, `dyar-al-bahia-2`, `bougainvillier`, `riad-garden-i`
+- Produces: `tours.length > 0` on `assalam-tg`, `dyar-al-bahia-2`, `bougainvillier`
 
-These four programmes have live Matterport tours on liliskane.com that the dataset models as `tours: []`. No component work is needed — `VirtualTour` and the ~700px on-approach observer already exist.
+These three programmes have live Matterport tours on liliskane.com that the dataset models as `tours: []`. No component work is needed — `TourCards` already renders any non-empty `tours` array, gated at `page.tsx:115`.
+
+**Corrected during execution: three, not four.** `riad-garden-i` was listed as missing `LdA3dxyG6dA`; it already carries it as its `livre-2` tour alongside `aRgKUGQrgkF`. The original sweep read `riad-garden-ii`'s tour array and misattributed the result. The portfolio-wide figure is therefore **10 programmes with tours**, not 9: two already modelled, three added here, five more in the blocked import.
 
 `ofDelivered` must be honest. It means *this tour walks a delivered unit, not a show flat*. The proof argument rests on the distinction, so where the source does not make it clear, set `false` — under-claiming is the safe direction.
 
@@ -170,21 +172,9 @@ tours: [
 For `dyar-al-bahia-2`, the same shape with `matterportId: "hiNnb5TZFkM"`.
 For `bougainvillier`, the same shape with `matterportId: "B5HfsowjF9b"`.
 
-For `riad-garden-i`, which is `status: "livre"` and therefore genuinely delivered:
+**All three carry `gallery: []`,** so there is no gallery entry to draw a poster from. Each uses its own `hero` `MediaRef` instead — `th_assalam_tg` (2560×1440), `th_bougainvillier` (2560×1707), `th_dyar_al_bahia` (1304×904). All three are large enough for a card poster. The consequence is that the poster and the programme hero are the same image, which is honest but repetitive; a still framed at each tour's opening camera position should be requested from the client and recorded in `MEDIA-REQUESTS.md`.
 
-```ts
-tours: [
-  {
-    id: "livre",
-    label: { fr: "Appartement livré", ar: "شقة مُسلَّمة" },
-    matterportId: "LdA3dxyG6dA",
-    poster: /* <gallery entry> */,
-    ofDelivered: true,
-  },
-],
-```
-
-Note `aRgKUGQrgkF` is already modelled as a tour on `riad-garden-ii` (the "delivered Riad Garden I" comparison tour). Do not duplicate it here.
+**All three are `ofDelivered: false`, and that is correct rather than merely cautious.** An *appartement témoin* is a show flat by definition, and `dyar-al-bahia-2` is still `en-lancement`, so nothing in it is delivered at all.
 
 - [ ] **Step 2: Typecheck**
 
@@ -193,15 +183,19 @@ Expected: no errors. A wrong `MediaKey` fails here — that is the guard working
 
 - [ ] **Step 3: Verify in the browser**
 
-Run `npm run dev`, then open `/fr/projets/bougainvillier`. Confirm the tour section appears, the poster shows, and the Matterport iframe loads on approach rather than on click.
+**Before starting the dev server, confirm the session's working directory is `C:\dev\ChaabiLilIskane`.** The stale OneDrive copy carries its own `.claude/launch.json` with an identically named `"chaabi"` configuration, so `preview_start` will happily run the wrong codebase and every check will be meaningless. That copy has no `TourCards.tsx` at all. This cost real time during execution — verify `pwd` first.
 
-**Critically:** confirm only one WebGL context is ever live. Open DevTools, scroll through a project page with a tour, and check that navigating away tears the iframe down. Eight more pages can now mount a tour; three live contexts at 10–15 MB each is the failure mode this guards against.
+Open `/fr/projets/bougainvillier`. Confirm the `.tours` section renders, three cards appear across the three programmes, and each card shows its poster.
+
+**The iframe is click-gated by design — do not expect it on approach.** `TourCards` superseded the full-bleed `VirtualTour`, and its contract is different: on approach it only issues `preconnect`/`dns-prefetch` for Matterport's origins, and the iframe (and therefore the WebGL context) is created only when a card is opened. `DIRECTION.md`'s "no button, you simply end up inside the apartment" describes the superseded component and is now out of date.
+
+So verify: (a) scrolling near the section adds the `preconnect` links but **no** iframe; (b) clicking a card opens the FLIP panel and creates exactly one iframe; (c) closing it removes that iframe. One live context at a time is the property under test — five more programmes can now mount a tour.
 
 - [ ] **Step 4: Commit**
 
 ```bash
 git add src/data/projects.ts
-git commit -m "feat(data): wire four previously uncaptured Matterport tours"
+git commit -m "feat(data): wire three previously uncaptured Matterport tours"
 ```
 
 ---
@@ -603,12 +597,35 @@ Every `facetCount(...)` call in this file needs `items` as its final argument.
 
 Then fix the render sites that read localised fields. Because `ProjectListItem` is already resolved to one language, `project.name[locale]` becomes `project.name`, and `getCity(project.cityId).name[locale]` becomes `project.cityName`. **Remove the now-unused `getCity` import** if nothing else in the file uses it.
 
-- [ ] **Step 3: Typecheck**
+- [ ] **Step 3: Hide zero-count segment facets**
+
+*Added during execution.* Task 1 emptied the `economique` facet — `izdihar` moved to
+moyen-standing under the client's taxonomy and its only other member, `assafa`, is in the
+blocked import. `SEGMENTS.map(...)` renders all six segments regardless of count, so
+"Économique" would appear as a selectable filter that returns nothing and fires the
+relaxation notice.
+
+This also fixes a pre-existing wart: `commercial` and `bureaux` contain no programmes and
+have *always* rendered as dead filter options.
+
+Filter the segment list by whether anything matches, using the count already being computed
+for the facet label:
+
+```tsx
+{SEGMENTS.filter((segment) =>
+  facetCount(filters, "segments", (p) => p.segment === segment, items) > 0,
+).map((segment) => {
+```
+
+Scope: segment facets only. Amenity and status facets keep their current behaviour — widening
+this further was considered and declined as beyond SP1.
+
+- [ ] **Step 4: Typecheck**
 
 Run: `npm run typecheck`
 Expected: no errors. Anywhere still doing `project.name[locale]` will fail here — that is the type system finding every render site for you.
 
-- [ ] **Step 4: Verify the payload actually shrank**
+- [ ] **Step 5: Verify the payload actually shrank**
 
 Stop any running dev server first (see Global Constraints), then:
 
@@ -626,11 +643,11 @@ cd /c/dev/ChaabiLilIskane && grep -rl "رياض غاردن" .next/static/chunks/
 
 Expected: **no matches.** Arabic project names appearing in a client chunk on a French route means the full dataset is still crossing the boundary.
 
-- [ ] **Step 5: Verify the search still works**
+- [ ] **Step 6: Verify the search still works**
 
 Run `npm run dev`, open `/fr/projets`. Check: the list renders all 14 programmes; the map plots pins; changing a facet updates results and the URL; a deliberately impossible combination shows the relaxation notice rather than an empty state; the back button restores the previous filter set. Then repeat on `/ar/projets` and confirm RTL layout and Arabic names.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add "src/app/[locale]/projets/page.tsx" src/components/search/SearchExplorer.tsx
@@ -890,7 +907,7 @@ Run: `npm run typecheck`, then `npm run dev` and open `/fr/mentions-legales` and
 
 Add a row to `MEDIA-PLACEHOLDERS.md` noting that legal body text is awaiting the client, so it is tracked with the placeholder imagery rather than forgotten.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add src/data/legal.ts src/components/legal "src/app/[locale]/mentions-legales" "src/app/[locale]/donnees-personnelles" MEDIA-PLACEHOLDERS.md
@@ -1188,7 +1205,7 @@ All nine are `unit: "total"`. Summaries are written fresh in the house voice, no
 - [ ] **Step 3: Extend `src/lib/filter.test.ts`** — assert 23 programmes, and that `economique` now returns `assafa`
 - [ ] **Step 4: Update the price floor.** `assafa` at 250 000 DH breaks the 485K–2.45M range `RangeArgument` argues from and `Qualifier` bounds assume. Update both, in FR and AR. This changes what the section *claims*, so confirm the new wording rather than only swapping the numeral.
 - [ ] **Step 5:** `npm test`, `npm run typecheck`, `npm run build`
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add src/data/projects.ts src/lib/filter.test.ts src/components/home src/i18n
@@ -1206,7 +1223,7 @@ git commit -m "feat(data): import the nine missing programmes"
 | §1.1 Nine programmes imported | 13 (blocked) |
 | §1.2 Segment reconciliation | 1 |
 | §1.2 `Segment` union needs no change | 1 — verified, no type edit |
-| §1.3 Nine Matterport tours | 2 (four uncaptured) + 13 (five new, blocked) |
+| §1.3 Matterport tours | 2 (three uncaptured; riad-garden-i was already done) + 13 (five new, blocked) |
 | §1.4 Bundle fix | 3, 4, 5 |
 | §1.5 Price floor moves | 13 step 4 — depends on `assafa` landing |
 | §2.1 `/a-propos` | 8 |

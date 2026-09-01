@@ -105,12 +105,32 @@ shot of the finished, occupied programme would be worth more than any render.
 
 ## 6. Matterport gaps
 
-Chaabi has three tours across two Riad Garden phases. Nothing else in the
-portfolio has one. Priority order for capture, by likely conversion value:
+**Corrected 2026-09-01.** This section previously said Chaabi had three tours
+across two Riad Garden phases and nothing else. That was wrong — it described
+what the dataset modelled, not what exists. liliskane.com publishes tours for
+**ten** programmes. Dyar Al Bahia 2, listed below as a capture priority, has had
+one all along (`hiNnb5TZFkM`).
+
+Now wired: Riad Garden I and II, plus Assalam TG, Bougainvillier and Dyar Al
+Bahia 2. Five more arrive with the blocked nine-programme import (Assafa,
+Jasmin, Jnane Souss, Massylia, Patio Verde).
+
+Genuinely still without a tour, in priority order by likely conversion value:
 
 1. **Izdihar, Essaouira** — the entry-price programme. The audience least able
    to travel to a show flat is the one that most needs to walk through it.
 2. **Odyssée Studios, Mohammedia** — small surfaces are the hardest thing to
    sell from a plan; 38 m² feels very different standing in it.
-3. **Dyar Al Bahia 2, Témara** — coastal, and a large share of buyers are MRE
-   who will not see it before signing.
+3. **Odyssée and Amaïa** — both haut standing, both currently selling from
+   renders alone.
+
+## 7. Tour poster stills
+
+Assalam TG, Bougainvillier and Dyar Al Bahia 2 carry no gallery imagery, so
+their tour cards reuse the programme hero as the card poster. It is honest but
+repetitive — the same photograph appears twice on one page.
+
+Requested: **one still per tour, framed at that tour's opening camera
+position.** The card should show the room you are about to be standing in.
+Any resolution at or above 1600 px on the long edge is sufficient; these are
+rendered at roughly 42vw.

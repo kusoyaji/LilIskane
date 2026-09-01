@@ -728,7 +728,26 @@ export const projects: Project[] = [
     },
     gallery: [],
     proof: [],
-    tours: [],
+    tours: [
+      {
+        id: "temoin",
+        label: { fr: "Appartement témoin", ar: "شقة نموذجية" },
+        matterportId: "9oWTZCGuoXG",
+        poster: {
+          key: "th_assalam_tg",
+          nature: "photograph",
+          alt: {
+            fr: "Appartement témoin d'Assalam à Tanger : séjour meublé, sol clair et grande baie vitrée.",
+            ar: "شقة نموذجية بالسلام طنجة: صالون مؤثث، أرضية فاتحة، ونافذة زجاجية كبيرة.",
+          },
+        },
+        // An "appartement témoin" is a show flat, so this is not a tour of a
+        // delivered unit. There is no still framed at the tour's opening
+        // camera position yet, so the programme hero stands in — requested in
+        // MEDIA-REQUESTS.md.
+        ofDelivered: false,
+      },
+    ],
     typologies: [],
     nearby: [],
   },
@@ -767,7 +786,24 @@ export const projects: Project[] = [
     },
     gallery: [],
     proof: [],
-    tours: [],
+    tours: [
+      {
+        id: "temoin",
+        label: { fr: "Appartement témoin", ar: "شقة نموذجية" },
+        matterportId: "B5HfsowjF9b",
+        poster: {
+          key: "th_bougainvillier",
+          nature: "photograph",
+          alt: {
+            fr: "Résidence Bougainvillier à Mohammedia : façades claires en R+4 ordonnées autour d'espaces verts plantés.",
+            ar: "إقامة بوغانفيلي بالمحمدية: واجهات فاتحة من أربعة طوابق منتظمة حول مساحات خضراء مغروسة.",
+          },
+        },
+        // Show flat, not a delivered unit. Poster is the programme hero for
+        // want of an opening-frame still — requested in MEDIA-REQUESTS.md.
+        ofDelivered: false,
+      },
+    ],
     typologies: [],
     nearby: [],
   },
@@ -847,7 +883,24 @@ export const projects: Project[] = [
     },
     gallery: [],
     proof: [],
-    tours: [],
+    tours: [
+      {
+        id: "temoin",
+        label: { fr: "Appartement témoin", ar: "شقة نموذجية" },
+        matterportId: "hiNnb5TZFkM",
+        poster: {
+          key: "th_dyar_al_bahia",
+          nature: "render",
+          alt: {
+            fr: "Immeubles de Dyar Al Bahia 2 à Harhoura, façades blanches et balcons orientés vers l'océan.",
+            ar: "عمارات ديار البهية 2 بالهرهورة، واجهات بيضاء وشرفات موجّهة نحو المحيط.",
+          },
+        },
+        // Still en lancement: nothing in this programme is delivered, so the
+        // tour is necessarily a show flat.
+        ofDelivered: false,
+      },
+    ],
     typologies: [],
     nearby: [],
   },
