@@ -213,6 +213,17 @@ const rg2Proof: ProofPair[] = [
 
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Segment values follow the client's own type pages on liliskane.com, not
+ * price coherence. `izdihar` at 485 000 DH sits in moyen-standing and
+ * `odyssee-studios` at 555 000 DH sits in haut-standing because that is how
+ * Chaabi markets them. Segment is commercial positioning; if you want to slice
+ * the portfolio by what a buyer can afford, filter on price, not on this field.
+ *
+ * One consequence worth knowing before you assume it is a bug: `economique`
+ * contains a single programme. `src/lib/filter.ts` lists `segments` among its
+ * relaxable facets, so a thin facet degrades rather than dead-ends.
+ */
 export const projects: Project[] = [
   {
     id: "209",
@@ -576,7 +587,7 @@ export const projects: Project[] = [
     neighbourhood: { fr: "Avenue Hassan II", ar: "شارع الحسن الثاني" },
     lat: 33.6871,
     lng: -7.3862,
-    segment: "moyen-standing",
+    segment: "haut-standing",
     status: "en-lancement",
     kinds: ["appartement", "local-commercial", "plateau-bureau"],
     price: { amount: 1010000, unit: "total" },
@@ -626,7 +637,7 @@ export const projects: Project[] = [
     neighbourhood: { fr: "Avenue Hassan II, rue d'Agadir", ar: "شارع الحسن الثاني، زنقة أكادير" },
     lat: 33.6858,
     lng: -7.3841,
-    segment: "moyen-standing",
+    segment: "haut-standing",
     status: "en-lancement",
     kinds: ["studio"],
     price: { amount: 555000, unit: "total" },
@@ -691,7 +702,7 @@ export const projects: Project[] = [
     neighbourhood: { fr: "Route de Rabat", ar: "طريق الرباط" },
     lat: 35.7412,
     lng: -5.8203,
-    segment: "haut-standing",
+    segment: "moyen-standing",
     status: "en-promotion",
     kinds: ["appartement"],
     price: { amount: 1760000, unit: "total" },
@@ -769,7 +780,7 @@ export const projects: Project[] = [
     neighbourhood: { fr: "Quartier Al Massira", ar: "حي المسيرة" },
     lat: 31.5152,
     lng: -9.7492,
-    segment: "economique",
+    segment: "moyen-standing",
     status: "en-lancement",
     kinds: ["appartement"],
     price: { amount: 485000, unit: "total" },
