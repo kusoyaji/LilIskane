@@ -6,3 +6,6 @@ next-env.d.ts
 .DS_Store
 
 .vercel
+
+# local dev server log (detached-launch workaround)
+dev.log
