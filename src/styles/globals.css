@@ -1,0 +1,1950 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+/* =============================================================================
+   LAYERING
+   -----------------------------------------------------------------------------
+   Everything below is layered deliberately. Tailwind v4 emits its utilities into
+   `@layer utilities`, and in the CSS cascade *unlayered* rules beat *layered*
+   ones regardless of specificity. An unlayered `img { height: auto }` therefore
+   silently defeats every `h-*` utility in the project — a bug that presents as
+   "Tailwind isn't working". Base resets go in `base`, our named registers go in
+   `components`, and Tailwind utilities stay on top where they can always win.
+   ========================================================================== */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  /* Scroll is never hijacked, but anchored jumps must clear the fixed nav. */
+  :target {
+    scroll-margin-block-start: calc(var(--nav-h) + 2rem);
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  figure,
+  blockquote {
+    margin: 0;
+  }
+
+  img,
+  video {
+    display: block;
+    max-inline-size: 100%;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Focus: visible, high-contrast, never removed. Both sides are specified
+     because this site runs paper sections and dark imagery on the same page. */
+  :focus-visible {
+    outline: 2px solid var(--color-ochre);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  .on-media :focus-visible {
+    outline-color: var(--color-paper);
+  }
+}
+
+@layer components {
+  /* ---------------------------------------------------------------------------
+     TYPE — three registers. If a component needs a fourth, the system is wrong
+     and should be fixed here rather than patched locally.
+     ------------------------------------------------------------------------ */
+
+  /* Archivo pulled tight and semi-expanded. The width axis is what makes large
+     headings read as signage cut into stone rather than a web headline. */
+  .u-display {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-stretch: 112%;
+    line-height: 0.9;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  .u-display-tight {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-stretch: 100%;
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  /* The counterweight to the tight display. The contrast between these two is
+     the entire typographic idea. */
+  .u-eyebrow {
+    font-size: var(--text-label);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    line-height: 1;
+    font-stretch: 100%;
+  }
+
+  .u-body {
+    max-inline-size: var(--measure);
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+
+  /* Prices and surfaces must never change width as they update. */
+  .u-numeric {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  /* ---------------------------------------------------------------------------
+     LAYOUT
+     ------------------------------------------------------------------------ */
+
+  .u-shell {
+    padding-inline: var(--gutter);
+    margin-inline: auto;
+    max-inline-size: 96rem;
+  }
+
+  /* Hairline in ink at low alpha — never a grey border, which reads cold
+     against this warm palette. */
+  .u-rule {
+    border-block-start: 1px solid color-mix(in oklab, var(--color-ink) 16%, transparent);
+  }
+
+  /* ---------------------------------------------------------------------------
+     ROUTE TRANSITION
+
+     Opacity only, and deliberately so — a transform on this wrapper would
+     become the containing block for every fixed and sticky descendant, which
+     silently breaks the pinned proof stage and the sticky filter rail.
+
+     The curve is front-loaded: content is at 90% opacity within the first
+     100ms, so a navigation reads as instant even though it takes 380ms to
+     settle. A linear fade of the same length would feel like waiting.
+     ------------------------------------------------------------------------ */
+
+  @media (prefers-reduced-motion: no-preference) {
+    .route-enter {
+      animation: route-in 380ms var(--ease-reveal) both;
+    }
+  }
+
+  @keyframes route-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* ---------------------------------------------------------------------------
+     PRESS FEEDBACK
+
+     Every control gives an immediate physical response. The timing is
+     deliberately asymmetric — down in 100ms, back up in 180ms — because a press
+     should feel instant and a release should feel like it settles. Symmetric
+     timing reads as mushy.
+
+     Hover is gated behind `(hover: hover)`. On a touchscreen a :hover rule
+     sticks after the tap, leaving a button visibly stuck in its hover state
+     until you press something else.
+     ------------------------------------------------------------------------ */
+
+  .u-press {
+    transition:
+      transform var(--dur-release) var(--ease-reveal),
+      opacity var(--dur-release) var(--ease-reveal),
+      background-color var(--dur-release) var(--ease-reveal),
+      color var(--dur-release) var(--ease-reveal);
+  }
+
+  .u-press:active {
+    transform: scale(0.97);
+    transition-duration: var(--dur-press);
+  }
+
+  @media (hover: hover) {
+    .u-press:hover {
+      opacity: 0.88;
+    }
+  }
+
+  /* Keyboard activation gets no scale: there is no press to mirror, and
+     animating it just delays the result. */
+  .u-press:focus-visible:not(:active) {
+    transform: none;
+  }
+
+  /* ---------------------------------------------------------------------------
+     ACCESSIBILITY HELPERS
+     ------------------------------------------------------------------------ */
+
+  .u-visually-hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .u-skip {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    z-index: 100;
+    transform: translateY(-120%);
+    background: var(--color-ink);
+    color: var(--color-paper);
+    padding: 0.75rem 1.25rem;
+    transition: transform var(--dur-ui) var(--ease-ui);
+  }
+
+  .u-skip:focus {
+    transform: translateY(0);
+  }
+}
+
+/* =============================================================================
+   MOTION
+   Entrances are opacity plus a short translate on the block axis, so they mirror
+   correctly in RTL without a second rule.
+   ========================================================================== */
+
+@layer components {
+  /* When the GSAP choreography is live it owns every reveal on the page, so the
+     CSS implementation stands down completely. Leaving both running means two
+     systems animating the same opacity on the same element, which shows up as
+     flicker or as blocks stranded half-revealed — and the CSS one would also
+     re-hide elements GSAP had already brought in. */
+  html.gsap-on .u-enter,
+  html.gsap-on .u-enter[data-reveal="mask"],
+  html.gsap-on .u-enter[data-reveal="media"] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  html.gsap-on .u-enter :is(img, video, .reveal-inner) {
+    transition: none;
+  }
+
+  /* Per-word wipe boxes, written into headings by the choreography.
+     `.rv-w` is the clip; `.rv-i` is the thing that travels inside it.
+     Both must be inline-block — `overflow: hidden` does nothing on an inline
+     box, so without this the words translate over the layout instead of
+     wiping out from behind their own baseline.
+     The descender allowance matches the one the mask reveal already uses:
+     at the display face's 0.9 line-height, a plain `overflow: hidden` shaves
+     the tail off a 'g' or 'q'. */
+  .rv-w {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    padding-block-end: 0.16em;
+    margin-block-end: -0.16em;
+  }
+
+  .rv-i {
+    display: inline-block;
+    will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .u-enter {
+      opacity: 0;
+      transform: translateY(1.25rem);
+      transition:
+        opacity var(--dur-reveal) var(--ease-reveal),
+        transform var(--dur-reveal) var(--ease-reveal);
+    }
+
+    .u-enter[data-visible="true"] {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* ------------------------------------------------------------------
+       Reveals — transform and opacity only.
+
+       Two earlier versions of this are worth knowing about, because both are
+       tempting and both are wrong:
+
+       1. `clip-path: inset(0 0 100% 0)` gives the element an empty intersection
+          rectangle, so IntersectionObserver reports it as not intersecting. The
+          element hides itself so completely that the observer meant to reveal it
+          never fires. Measured: clip-path ratio 0, mask ratio 1, same box.
+
+       2. Animated `mask-size` fixes that but is a paint-time property — it is
+          not composited, so every frame repaints the element. On a long page of
+          large headings and photographs, on the mid-range Android this site is
+          budgeted for, that is exactly the wrong thing to put on the main
+          thread.
+
+       So the wipe is done geometrically instead: the element clips with
+       `overflow: hidden` and an inner span translates up inside it. Same look,
+       pure transform, composited, and the observed element keeps full geometry.
+       ------------------------------------------------------------------ */
+    .u-enter[data-reveal="mask"] {
+      display: block;
+      overflow: hidden;
+      opacity: 1;
+      transform: none;
+      transition: none;
+      /* Descender room, so `overflow: hidden` does not shave the tail off a
+         'g' or 'q' at the display face's 0.9 line-height. */
+      padding-block-end: 0.14em;
+      margin-block-end: -0.14em;
+    }
+
+    .u-enter[data-reveal="mask"] > .reveal-inner {
+      display: block;
+      transform: translateY(105%);
+      transition: transform var(--dur-reveal) var(--ease-reveal);
+      will-change: transform;
+    }
+
+    .u-enter[data-reveal="mask"][data-visible="true"] > .reveal-inner {
+      transform: none;
+      /* Released once the transition is done — a permanent will-change keeps a
+         compositor layer alive for an element that has stopped moving. */
+      will-change: auto;
+    }
+
+    /* Media settles out of scale as it fades up. Opacity does not affect
+       intersection, so unlike a clip this cannot deadlock its own observer. */
+    .u-enter[data-reveal="media"] {
+      opacity: 0;
+      transform: none;
+      transition: opacity var(--dur-media) var(--ease-reveal);
+    }
+
+    .u-enter[data-reveal="media"] :is(img, video) {
+      transform: scale(1.06);
+      transition: transform var(--dur-media) var(--ease-reveal);
+      will-change: transform;
+    }
+
+    .u-enter[data-reveal="media"][data-visible="true"] {
+      opacity: 1;
+    }
+
+    .u-enter[data-reveal="media"][data-visible="true"] :is(img, video) {
+      transform: none;
+      will-change: auto;
+    }
+
+    /* Stagger, capped at four steps. 70ms is enough to read as orchestration;
+       beyond roughly 90ms it starts reading as lag, and the last item in a
+       four-step group is already almost a third of a second behind the first. */
+    .u-enter[data-step="1"] { transition-delay: 70ms; }
+    .u-enter[data-step="2"] { transition-delay: 140ms; }
+    .u-enter[data-step="3"] { transition-delay: 210ms; }
+    .u-enter[data-step="4"] { transition-delay: 280ms; }
+
+    /* Children inherit their parent's delay, or an image would start settling
+       before its own frame has opened. */
+    .u-enter[data-step="1"] :is(img, video, .reveal-inner) { transition-delay: 70ms; }
+    .u-enter[data-step="2"] :is(img, video, .reveal-inner) { transition-delay: 140ms; }
+    .u-enter[data-step="3"] :is(img, video, .reveal-inner) { transition-delay: 210ms; }
+    .u-enter[data-step="4"] :is(img, video, .reveal-inner) { transition-delay: 280ms; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .u-enter,
+    .u-enter[data-reveal="mask"],
+    .u-enter[data-reveal="media"] {
+      opacity: 1;
+      transform: none;
+      overflow: visible;
+    }
+
+    .u-enter :is(img, video, .reveal-inner) {
+      transform: none;
+    }
+  }
+}
+
+/* =============================================================================
+   SMOOTH SCROLL
+
+   Lenis ships a stylesheet, which this project deliberately does *not* import.
+   Two of its rules are wrong here, and one of them is destructive:
+
+     .lenis.lenis-smooth iframe { pointer-events: none; }
+
+   That rule exists so the wheel is never swallowed by an embedded document.
+   The only iframe on this site is the Matterport tour — a full-bleed 3D scene
+   whose entire purpose is being dragged around. Importing that rule would make
+   the most expensive feature on the site inert, so the tour keeps its pointer
+   events and simply owns the wheel while the cursor is inside it, exactly as it
+   does today.
+
+   `scroll-behavior: smooth` and Lenis both animate the same scroll. Left
+   together they fight over anchor jumps, so native smooth is handed off
+   whenever Lenis is actually running — which is also why the declaration is
+   keyed to the `.lenis` class the library sets, rather than being removed
+   outright: with reduced motion, or before hydration, native smooth is still
+   the correct behaviour and stays in force.
+   ========================================================================== */
+
+@layer components {
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  html.lenis {
+    scroll-behavior: auto;
+  }
+
+  /* Sub-scrollers opt out of page smoothing and keep their own scroll. */
+  .lenis [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+}
+
+/* =============================================================================
+   THE FIELD — the page's continuous ground
+
+   Sections do not paint backgrounds. One fixed layer behind the whole document
+   does, and its colour is interpolated between the tone of the section holding
+   the viewport and the tone of the one arriving. That is the entire reason this
+   page reads as a single space rather than as a stack of blocks: a boundary you
+   cannot see is a boundary that does not exist.
+
+   Stacking is explicit rather than negative. `z-index: -1` would put the field
+   behind the *canvas*, where the body background paints over it — the classic
+   way this technique silently does nothing. So the field sits at 0 and the
+   content above it at 1. The body keeps its paper background as the no-JS
+   fallback; the field simply covers it once mounted.
+   ========================================================================== */
+
+@layer components {
+  .field {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    --field-from: var(--color-paper);
+    --field-to: var(--color-paper);
+    --field-t: 0;
+    background: color-mix(
+      in oklab,
+      var(--field-to) calc(var(--field-t) * 100%),
+      var(--field-from)
+    );
+  }
+
+  /* `position: relative` is safe above the pinned stages — only `overflow` and
+     `transform` on an ancestor break `position: sticky`, and neither is set
+     here. The header is already fixed at z-50 and stays above both. */
+  body > main,
+  body > footer {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* =============================================================================
+   DEPTH
+   Parallax expressed as distance. Every child of a band reads the one `--p`
+   that band writes and scales it by its own `--depth`, so the rate difference
+   between two photographs is the only thing saying one is further away.
+   ========================================================================== */
+
+@layer components {
+  .depth-field {
+    --p: 0.5;
+    position: relative;
+  }
+
+  .depth {
+    /* Centred on 0.5 so a band is at rest when it is centred in the viewport,
+       and travels symmetrically either side of that. */
+    transform: translate3d(0, calc((var(--p) - 0.5) * var(--depth, 0.5) * -34vh), 0);
+    will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .depth {
+      transform: none;
+    }
+  }
+}
+
+/* =============================================================================
+   HERO
+   A fixed claim over changing ground. Only the media crossfades; the headline
+   is deliberately inert, because it is the argument rather than the content.
+   ========================================================================== */
+
+@layer components {
+  .hero {
+    position: relative;
+    isolation: isolate;
+    min-block-size: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    overflow: hidden;
+    /* Only ever visible in the instant before the first frame decodes. */
+    background: var(--color-ink);
+  }
+
+  .hero__scrim {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Deliberately taller than the hero on both edges. The media lags the page
+     as it scrolls away, and the overflow is the room that lag needs — without
+     it the translate would drag a hard edge into frame. Bleed (12%) is set to
+     exactly half the travel (24vh) so the frame can never run out of image.
+
+     `--hero-p` is written by the scroll hook onto the section and inherits down
+     to here. The fallback lives inside `var()` rather than as a local
+     declaration on purpose: declaring it here would shadow the inherited value
+     and pin the parallax at its rest position forever, while still computing
+     to a perfectly valid transform. */
+  .hero__frames {
+    position: absolute;
+    inset: -12% 0;
+    transform: translate3d(0, calc((var(--hero-p, 0.5) - 0.5) * 24vh), 0);
+    will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__frames {
+      inset: 0;
+      transform: none;
+    }
+  }
+
+  .hero__frame {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    /* Crossfade only. A slide would make this a carousel, and a carousel is a
+       different — and much cheaper — promise than the one this page makes. */
+    transition: opacity var(--dur-reveal) var(--ease-reveal);
+  }
+
+  .hero__frame[data-active] {
+    opacity: 1;
+  }
+
+  /* Media settles out of scale as it arrives, which is the same idiom every
+     other frame on this site uses. The camera curve rather than the reveal
+     curve: this is a dolly coming to rest, not a UI transition. */
+  .hero__frame img {
+    transform: scale(1.04);
+    transition: transform var(--dur-media) var(--ease-camera);
+  }
+
+  .hero__frame[data-active] img {
+    transform: none;
+  }
+
+  .hero__scrim {
+    background: linear-gradient(
+      to top,
+      color-mix(in oklab, var(--color-ink) 76%, transparent) 0%,
+      color-mix(in oklab, var(--color-ink) 44%, transparent) 26%,
+      color-mix(in oklab, var(--color-ink) 14%, transparent) 52%,
+      transparent 74%
+    );
+  }
+
+  .hero__type {
+    position: relative;
+    padding: var(--gutter);
+    padding-block-end: clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .hero__switch {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 1.15rem;
+  }
+
+  .hero__switch-lead {
+    color: color-mix(in oklab, var(--color-paper) 62%, transparent);
+  }
+
+  .hero__switch-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.5rem;
+  }
+
+  .hero__switch-option {
+    position: relative;
+    /* The switcher is the hero's primary control, and at 0.4rem of padding it
+       measured 25px tall — well under a comfortable touch target. The block is
+       padded to clear 44px on touch while the underline stays pinned to the
+       text baseline, so the larger hit area costs nothing visually. */
+    min-block-size: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    padding-block: 0.4rem;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    color: color-mix(in oklab, var(--color-paper) 52%, transparent);
+    /* Colour only. If the active option changed weight or size, the sentence it
+       belongs to would reflow every time you picked a different city. */
+    transition: color var(--dur-ui) var(--ease-ui);
+  }
+
+  .hero__switch-option[data-active] {
+    color: var(--color-paper);
+  }
+
+  @media (hover: hover) {
+    .hero__switch-option:hover {
+      color: color-mix(in oklab, var(--color-paper) 82%, transparent);
+    }
+  }
+
+  /* Drawn with a transform rather than an animated width, so the underline
+     scales on the compositor instead of relaying out the row on every frame. */
+  .hero__switch-option::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    /* Sits on the text baseline, not the padded box, so growing the touch
+       target did not drop the underline away from the word. */
+    inset-block-end: 0.55rem;
+    block-size: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform var(--dur-ui) var(--ease-ui);
+  }
+
+  [dir="rtl"] .hero__switch-option::after {
+    transform-origin: right center;
+  }
+
+  .hero__switch-option[data-active]::after {
+    transform: scaleX(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__frame img {
+      transform: none;
+    }
+
+    .hero__switch-option::after {
+      transition: none;
+    }
+  }
+}
+
+/* =============================================================================
+   PROOF STAGE
+   The one place motion is load-bearing, so it gets an explicit reduced-motion
+   layout rather than a disabled one. Motion users watch the render dissolve
+   into the photograph across a pinned stage; reduced-motion users get the two
+   frames side by side, both fully visible. Same argument, no animation.
+   ========================================================================== */
+
+@layer components {
+  .proof-section {
+    /* Two viewports: one to pin through, one of travel to wipe across. */
+    block-size: 200svh;
+    --p: 0;
+    /* Distance of the seam from the revealing edge. */
+    --wipe: calc((1 - var(--p)) * 100%);
+  }
+
+  .proof-stage {
+    position: sticky;
+    inset-block-start: 0;
+    block-size: 100svh;
+    overflow: hidden;
+  }
+
+  .proof-frames {
+    position: relative;
+    block-size: 100%;
+  }
+
+  /* Positioning is declared here rather than with Tailwind utilities, because
+     the reduced-motion rules must be able to return these elements to normal
+     flow — and a utility in @layer utilities always wins against a component
+     rule, no matter how specific. */
+  .proof-frame,
+  .proof-scrim {
+    position: absolute;
+    inset: 0;
+  }
+
+  .proof-head,
+  .proof-foot {
+    position: absolute;
+    inset-inline: 0;
+  }
+
+  .proof-head {
+    inset-block-start: 0;
+  }
+
+  .proof-foot {
+    inset-block-end: 0;
+  }
+
+  /* The tile grid that replaced the wipe. Laid out as a grid so the tiles are
+     seamless by construction — a 1px gap anywhere would draw a visible lattice
+     over the photograph underneath. */
+  .proof-tiles {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    /* The grid is the render; the photograph is a sibling beneath it. */
+    z-index: 1;
+  }
+
+  .proof-tile {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+    background-repeat: no-repeat;
+    will-change: transform, opacity;
+    /* Hairline outset kills the sub-pixel seams that appear between grid cells
+       at fractional viewport widths. */
+    outline: 0.5px solid transparent;
+  }
+
+  /* Reduced motion never runs the dissolve, so the render must not cover the
+     photograph — the two frames are shown side by side instead. */
+  @media (prefers-reduced-motion: reduce) {
+    .proof-tiles {
+      display: none;
+    }
+  }
+
+  /* Both writing directions clip the photograph from the inline-start edge, so
+     the seam is always `--wipe` in from inline-start. One rule, no RTL variant. */
+  .proof-seam {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: var(--wipe);
+    inline-size: 1px;
+    background: color-mix(in oklab, var(--color-paper) 85%, transparent);
+    /* Fades in at the edges of travel so the line never sits alone over a
+       single uninterrupted image. */
+    opacity: calc(min(var(--p), 1 - var(--p)) * 4);
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .proof-section {
+      block-size: auto;
+      --p: 1;
+    }
+
+    .proof-stage {
+      position: static;
+      block-size: auto;
+    }
+
+    /* The same comparison, held still: two frames side by side, both labelled,
+       nothing hidden. */
+    .proof-frames {
+      display: grid;
+      gap: 2px;
+      block-size: auto;
+    }
+
+    .proof-frame {
+      position: relative;
+      inset: auto;
+      aspect-ratio: 4 / 3;
+      clip-path: none;
+    }
+
+    .proof-seam {
+      display: none;
+    }
+
+    .proof-frames > .proof-scrim {
+      display: none;
+    }
+
+    /* Overlaid type returns to normal flow beneath the images. */
+    .proof-head,
+    .proof-foot {
+      position: static;
+      inset: auto;
+      padding-inline: var(--gutter) !important;
+    }
+
+    .proof-head {
+      order: -1;
+      /* Clears the fixed header, which would otherwise sit on the heading when
+         the section happens to align with the top of the viewport. */
+      padding-block: calc(var(--nav-h) + 2rem) 2rem !important;
+    }
+
+    .proof-foot {
+      padding-block: 2rem 3rem !important;
+    }
+
+    .proof-head :is(p, h2),
+    .proof-foot :is(p, span) {
+      color: var(--color-paper) !important;
+    }
+
+    .proof-foot .u-eyebrow:last-child {
+      color: var(--color-ochre) !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) and (width >= 48rem) {
+    .proof-frames {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .proof-head,
+    .proof-foot {
+      grid-column: 1 / -1;
+    }
+  }
+}
+
+/* =============================================================================
+   EXPANDING FRAME
+   A photograph growing from a tile to full-bleed. Every moving value is a
+   transform or an opacity; the only exception is the type colour, which is a
+   discrete-feeling crossfade over a narrow band rather than a continuous
+   repaint.
+   ========================================================================== */
+
+@layer components {
+  .expand-section {
+    --p: 0;
+    /* Two viewports of travel: one to pin through, one to grow across. */
+    block-size: 240svh;
+    /* No background: the page field paints the ground under this now. It used
+       to set paper here so it could bridge the hard cut into the dark index
+       below — that cut no longer exists, so owning a background would only put
+       a new edge back at its own top. */
+  }
+
+  .expand-stage {
+    position: sticky;
+    inset-block-start: 0;
+    block-size: 100svh;
+    overflow: hidden;
+    display: grid;
+    /* Type at the foot, not centred. Centring both put the heading straight
+       across the middle of the small tile, where it was unreadable against the
+       photograph — and it broke the site's convention of setting type low. */
+    align-items: end;
+  }
+
+  /* Laid out full-bleed, then scaled down. Growth is therefore one composited
+     transform rather than an animated size, which is what keeps it smooth. */
+  .expand-frame {
+    position: absolute;
+    inset: 0;
+    /* Lifted while small so the tile clears the type at the foot of the stage,
+       settling to no offset as it reaches full-bleed. Both parts are one
+       composited transform. */
+    transform: translateY(calc((1 - var(--p)) * -7vh))
+      scale(calc(0.26 + var(--p) * 0.74));
+    will-change: transform;
+    overflow: hidden;
+  }
+
+  .expand-scrim {
+    position: absolute;
+    inset: 0;
+    /* Held back until the frame is large enough to carry type. */
+    opacity: clamp(0, calc((var(--p) - 0.55) * 3), 1);
+    background: linear-gradient(
+      to top,
+      color-mix(in oklab, var(--color-ink) 72%, transparent) 0%,
+      color-mix(in oklab, var(--color-ink) 18%, transparent) 42%,
+      transparent 72%
+    );
+  }
+
+  .expand-type {
+    position: relative;
+    z-index: 1;
+    inline-size: 100%;
+    max-inline-size: 96rem;
+    margin-inline: auto;
+    padding: 0 var(--gutter) clamp(2.5rem, 6vw, 4.5rem);
+    /* Grows more slowly than the frame, so it reads as sitting further back —
+       the parallax is the rate difference, not a second calculation. Origin is
+       the bottom-start corner so it grows away from its anchor rather than
+       drifting off the baseline. */
+    transform: scale(calc(0.88 + var(--p) * 0.12));
+    transform-origin: bottom left;
+    will-change: transform;
+  }
+
+  [dir="rtl"] .expand-type {
+    transform-origin: bottom right;
+  }
+
+  /* Ink on paper while the frame is small; paper once the photograph has
+     covered the ground. The switch happens across the last third. */
+  .expand-title,
+  .expand-eyebrow,
+  .expand-caption {
+    color: color-mix(
+      in oklab,
+      var(--color-paper) calc(clamp(0, (var(--p) - 0.58) * 4, 1) * 100%),
+      var(--color-ink)
+    );
+  }
+
+  .expand-eyebrow {
+    opacity: 0.8;
+  }
+
+  .expand-title {
+    font-size: var(--text-display);
+    margin-block-start: 1.25rem;
+    text-wrap: balance;
+  }
+
+  .expand-caption {
+    margin-block-start: 1.5rem;
+    max-inline-size: 46ch;
+    /* Arrives last, once the image is effectively full-bleed. */
+    opacity: clamp(0, calc((var(--p) - 0.7) * 4), 1);
+  }
+
+
+  /* Reduced motion: no pinning, no growth. The photograph is simply shown at
+     its natural size with the type beneath it — the same content, held still. */
+  @media (prefers-reduced-motion: reduce) {
+    .expand-section {
+      block-size: auto;
+      padding-block: clamp(3rem, 8vw, 6rem);
+    }
+
+    .expand-stage {
+      position: static;
+      block-size: auto;
+      display: block;
+      overflow: visible;
+    }
+
+    .expand-frame {
+      position: relative;
+      inset: auto;
+      transform: none;
+      aspect-ratio: 16 / 9;
+    }
+
+    .expand-scrim {
+      display: none;
+    }
+
+    .expand-type {
+      transform: none;
+      margin-block-start: 2.5rem;
+      text-align: start;
+    }
+
+    .expand-title,
+    .expand-eyebrow,
+    .expand-caption {
+      color: var(--color-ink);
+      opacity: 1;
+    }
+  }
+}
+
+/* =============================================================================
+   TOUR CARDS
+   Doors into the 360s. The card is the whole target — no nested button, no
+   "click here" — and the panel grows out of the card that was pressed via a
+   FLIP set from JS. Everything that moves is transform or opacity.
+   ========================================================================== */
+
+@layer components {
+  /* Travel: one viewport to pin through, plus roughly a screen per tour beyond
+     the first. Fixed height rather than measured, because the section has to
+     reserve its space before the track has been laid out — measuring first
+     would collapse the page and then jolt it open. */
+  /* Height and pinning are ScrollTrigger's now. It injects its own spacer sized
+     to the real pan distance, so a fixed `260svh` here would add dead scroll on
+     top of it — and a CSS `sticky` pin would fight the JS one for the same
+     element. The section is ordinary flow; the stage is one viewport tall. */
+  .tours {
+    position: relative;
+  }
+
+  .tours__stage {
+    block-size: 100svh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(1.5rem, 4vh, 3rem);
+    padding-block: calc(var(--nav-h) + 1rem) clamp(2rem, 5vh, 3.5rem);
+  }
+
+  .tours__head {
+    flex-shrink: 0;
+  }
+
+  .tours__track {
+    display: flex;
+    align-items: stretch;
+    gap: clamp(1rem, 2.5vw, 2rem);
+    /* Padded on both ends so the first card starts at the gutter and the last
+       one can finish clear of the edge. */
+    padding-inline: var(--gutter);
+    /* `x` is written inline by GSAP, which measures the real overflow on every
+       refresh — see the note in the component on why this is not a hard-coded
+       percentage. RTL is handled there too, by flipping the sign, rather than
+       with a second rule here. */
+    will-change: transform;
+    min-block-size: 0;
+  }
+
+  .tours__slot {
+    flex: 0 0 auto;
+    inline-size: min(80vw, 34rem);
+    display: flex;
+  }
+
+  .tours__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    inline-size: 100%;
+    padding: 0;
+    background: none;
+    border: 0;
+    text-align: start;
+    cursor: pointer;
+    color: inherit;
+  }
+
+  .tours__media {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    background: var(--color-ink);
+    flex: 1 1 auto;
+    min-block-size: 0;
+  }
+
+  .tours__media img {
+    block-size: 100%;
+  }
+
+  /* The image lifts rather than the card, so the type underneath stays put and
+     only the picture responds. Scale on the media alone also means the corners
+     of the card never detach from the grid. */
+  .tours__media img {
+    transition: transform var(--dur-media) var(--ease-camera);
+  }
+
+  @media (hover: hover) {
+    .tours__card:hover .tours__media img {
+      transform: scale(1.045);
+    }
+  }
+
+  .tours__card:active .tours__media img {
+    transform: scale(0.995);
+    transition-duration: var(--dur-press);
+  }
+
+  .tours__veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      color-mix(in oklab, var(--color-ink) 55%, transparent) 0%,
+      transparent 55%
+    );
+  }
+
+  .tours__enter {
+    position: absolute;
+    inset-block-end: 0.9rem;
+    inset-inline-start: 0.9rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 999px;
+    color: var(--color-ink);
+    background: color-mix(in oklab, var(--color-paper) 92%, transparent);
+  }
+
+  .tours__label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .tours__delivered {
+    flex-shrink: 0;
+    color: var(--color-olive-deep);
+  }
+
+  /* ---- the opened tour ---------------------------------------------------- */
+
+  .tours__overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: color-mix(in oklab, var(--color-ink) 88%, transparent);
+    animation: tours-veil-in 260ms var(--ease-ui) both;
+  }
+
+  @keyframes tours-veil-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .tours__panel {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: var(--color-ink);
+    /* The inline transform written by the FLIP is removed to animate *to* this
+       resting state, so no end-state transform is declared here. */
+    will-change: transform, opacity;
+  }
+
+  .tours__frame,
+  .tours__poster {
+    position: absolute;
+    inset: 0;
+    inline-size: 100%;
+    block-size: 100%;
+    border: 0;
+  }
+
+  /* Held over the live scene until it reports ready, so the panel is never a
+     black rectangle mid-expansion. */
+  .tours__poster {
+    z-index: 1;
+    transition: opacity 500ms var(--ease-camera);
+  }
+
+  .tours__poster[data-hidden] {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .tours__loading {
+    position: absolute;
+    z-index: 2;
+    inset-block-end: 1.75rem;
+    inset-inline-start: var(--gutter);
+    color: color-mix(in oklab, var(--color-paper) 78%, transparent);
+  }
+
+  .tours__close {
+    position: absolute;
+    z-index: 3;
+    inset-block-start: 1.25rem;
+    inset-inline-end: var(--gutter);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1.35rem;
+    border: 0;
+    border-radius: 999px;
+    cursor: pointer;
+    color: var(--color-ink);
+    background: var(--color-paper);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tours__overlay {
+      animation: none;
+    }
+
+    .tours__media img,
+    .tours__poster {
+      transition: none;
+    }
+
+    /* No pin and no sideways travel: a horizontal track that only moves on
+       scroll is unreachable once the scroll driver is switched off, so the
+       tours return to a plain vertical list. */
+    .tours {
+      padding-block: clamp(4.5rem, 10vw, 8rem);
+    }
+
+    .tours__stage {
+      block-size: auto;
+      overflow: visible;
+      padding-block: 0;
+    }
+
+    .tours__track {
+      flex-direction: column;
+      transform: none;
+      padding-inline: var(--gutter);
+      margin-block-start: 2.5rem;
+    }
+
+    .tours__slot {
+      inline-size: 100%;
+    }
+
+    .tours__media img {
+      block-size: auto;
+    }
+  }
+
+  /* Touch keeps a native swipe as well as the scroll-driven pan, so the track
+     is reachable even if the pin is interrupted. */
+  @media (hover: none) {
+    .tours__track {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .tours__track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tours__slot {
+      scroll-snap-align: center;
+      inline-size: min(84vw, 26rem);
+    }
+  }
+}
+
+/* =============================================================================
+   DEPTH INTERSTITIAL
+   Fragments at different distances, drifting past a line of type that does not
+   move. Only transforms; the band itself is ordinary flow.
+   ========================================================================== */
+
+@layer components {
+  /* Absolute scatter was the wrong structure. Four small plates placed by
+     percentage in a tall band left most of the section empty — the images were
+     too few and too small to hold that much space, so it read as broken rather
+     than airy. A column grid fills the width by construction: the plates are
+     large, the gaps are deliberate, and the parallax comes from the columns
+     travelling at different rates rather than from scattered positions. */
+  .interstitial {
+    position: relative;
+    padding-block: clamp(4rem, 12vh, 9rem);
+    overflow: hidden;
+  }
+
+  .interstitial__plates {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    align-items: start;
+    gap: clamp(0.75rem, 2vw, 1.75rem);
+    padding-inline: var(--gutter);
+    max-inline-size: 110rem;
+    margin-inline: auto;
+  }
+
+  @media (width >= 64rem) {
+    .interstitial__plates {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* Staggered vertically so the row never reads as a filmstrip. The offsets
+       are what the eye reads as depth once the columns start moving. */
+    .interstitial__plate:nth-child(2) {
+      margin-block-start: 22%;
+    }
+
+    .interstitial__plate:nth-child(3) {
+      margin-block-start: 8%;
+    }
+
+    .interstitial__plate:nth-child(4) {
+      margin-block-start: 30%;
+    }
+  }
+
+  .interstitial__plate {
+    min-inline-size: 0;
+  }
+
+  .interstitial__card {
+    position: relative;
+    display: block;
+    margin: 0;
+    cursor: pointer;
+    /* Tilt is the resting state, so hover can straighten it — the plate
+       settles into alignment under the cursor rather than jumping. */
+    transform: rotate(var(--tilt, 0deg));
+    transition:
+      transform var(--dur-media) var(--ease-camera),
+      filter var(--dur-media) var(--ease-camera);
+  }
+
+  .interstitial__crop {
+    display: block;
+    overflow: hidden;
+    /* Landscape fragments, not squares — a uniform ratio across all four would
+       reinstate the grid rhythm this arrangement exists to avoid. */
+    aspect-ratio: 4 / 3;
+    box-shadow: 0 1.5rem 4rem color-mix(in oklab, var(--color-ink) 20%, transparent);
+    transition: box-shadow var(--dur-media) var(--ease-camera);
+  }
+
+  /* Pushing into the image inside a fixed crop, rather than scaling the card,
+     so neighbouring plates never get shoved and the shadow stays put. */
+  .interstitial__crop img {
+    transition: transform var(--dur-media) var(--ease-camera);
+  }
+
+  .interstitial__label {
+    display: block;
+    margin-block-start: 0.9rem;
+    color: var(--color-ink-soft);
+    opacity: 0;
+    transform: translateY(0.5rem);
+    transition:
+      opacity var(--dur-ui) var(--ease-ui),
+      transform var(--dur-ui) var(--ease-ui);
+  }
+
+  @media (hover: hover) {
+    .interstitial__card:hover {
+      transform: rotate(0deg) translateY(-0.75rem);
+    }
+
+    .interstitial__card:hover .interstitial__crop {
+      box-shadow: 0 2.25rem 5rem color-mix(in oklab, var(--color-ink) 30%, transparent);
+    }
+
+    .interstitial__card:hover .interstitial__crop img {
+      transform: scale(1.07);
+    }
+
+    .interstitial__card:hover .interstitial__label {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* The rest of the field recedes so the hovered plate is unambiguous. */
+    .interstitial__plates:hover .interstitial__card:not(:hover) {
+      filter: saturate(0.75);
+      opacity: 0.72;
+    }
+  }
+
+  .interstitial__card:focus-within .interstitial__label {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Type leads the field rather than sitting inside it. Centred type in the
+     middle of scattered plates was what forced the plates outward and created
+     the hole in the first place. */
+  .interstitial__type {
+    position: relative;
+    z-index: 1;
+    inline-size: 100%;
+    max-inline-size: 110rem;
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+    margin-block-end: clamp(2.5rem, 6vh, 4.5rem);
+  }
+
+  .interstitial__type h2 {
+    max-inline-size: 18ch;
+  }
+
+  @media (width < 48rem) {
+    /* All four still show — a 2-column grid holds them at this width, which
+       the absolute version could not. */
+    .interstitial__label {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* The grid already reads correctly held still, so only the motion-specific
+       parts are dropped: the tilt, and the staggered column offsets that exist
+       to make the parallax legible. */
+    .interstitial__card {
+      transform: none;
+    }
+
+    .interstitial__plate {
+      margin-block-start: 0 !important;
+    }
+
+    .interstitial__label {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/* =============================================================================
+   SCROLL FILM
+   One scroll position drives three things at once: the backdrop recedes, the
+   frame grows from a tile to full-bleed, and the playhead advances. Everything
+   that moves is a transform or an opacity; nothing animates a size, so the
+   whole sequence stays on the compositor.
+   ========================================================================== */
+
+@layer components {
+  .film-section {
+    --p: 0;
+    /* Three viewports: one to pin through, two of travel to open and play
+       across. The film is ten seconds, and giving it less travel than this
+       makes the playhead race the scroll. */
+    block-size: 300svh;
+  }
+
+  .film-stage {
+    position: sticky;
+    inset-block-start: 0;
+    block-size: 100svh;
+    overflow: hidden;
+    display: grid;
+    align-items: end;
+    background: var(--color-ink);
+  }
+
+  /* From here down the film's moving values are owned by GSAP, which writes
+     them inline. What stays in CSS is layout, plus a resting state that is
+     *complete* rather than at the start of the animation: if the timeline never
+     initialises — no JS, a hydration failure — the section reads as a finished
+     full-bleed frame instead of being stranded at 30% scale forever. GSAP's
+     `fromTo` sets the true start on init, so the correct opening is applied the
+     moment the timeline exists. */
+  .film-backdrop {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+  }
+
+  .film-backdrop__veil {
+    position: absolute;
+    inset: 0;
+    background: var(--color-ink);
+    opacity: 0.7;
+  }
+
+  .film-frame {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+    overflow: hidden;
+  }
+
+  .film-scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      color-mix(in oklab, var(--color-ink) 74%, transparent) 0%,
+      color-mix(in oklab, var(--color-ink) 18%, transparent) 44%,
+      transparent 72%
+    );
+  }
+
+  .film-type {
+    position: relative;
+    z-index: 1;
+    inline-size: 100%;
+    max-inline-size: 96rem;
+    margin-inline: auto;
+    padding: 0 var(--gutter) clamp(2.5rem, 6vw, 4.5rem);
+    /* Grows more slowly than the frame, so it reads as sitting further back —
+       the parallax is the rate difference between the two tweens, not a second
+       calculation. Scale is written by GSAP. */
+    transform-origin: bottom left;
+    will-change: transform;
+    color: var(--color-paper);
+  }
+
+  [dir="rtl"] .film-type {
+    transform-origin: bottom right;
+  }
+
+  .film-eyebrow {
+    color: var(--color-ochre-bright);
+  }
+
+  .film-title {
+    font-size: var(--text-display);
+    margin-block-start: 1.25rem;
+    text-wrap: balance;
+  }
+
+  .film-caption {
+    margin-block-start: 1.5rem;
+    max-inline-size: 46ch;
+    color: color-mix(in oklab, var(--color-paper) 88%, transparent);
+    /* Arrives last, once the film is effectively full-bleed — staged at 0.7 on
+       the timeline rather than tracking scroll linearly. */
+  }
+
+  /* Nothing is seek-driven before the mode resolves, so the shell needs less
+     travel than a live scrub. */
+  .film-section[data-mode="still"] {
+    block-size: 220svh;
+  }
+
+  /* Reduced motion: no pin, no growth, no video. The poster is shown at its
+     natural size with the type beneath it — the same content, held still. */
+  @media (prefers-reduced-motion: reduce) {
+    .film-section {
+      block-size: auto;
+      padding-block: clamp(3rem, 8vw, 6rem);
+      background: var(--color-ink);
+    }
+
+    .film-stage {
+      position: static;
+      block-size: auto;
+      display: block;
+      overflow: visible;
+    }
+
+    .film-backdrop {
+      display: none;
+    }
+
+    .film-frame {
+      position: relative;
+      inset: auto;
+      transform: none;
+      aspect-ratio: 16 / 9;
+    }
+
+    .film-scrim {
+      display: none;
+    }
+
+    .film-type {
+      transform: none;
+      margin-block-start: 2.5rem;
+    }
+
+    .film-caption {
+      opacity: 1;
+    }
+  }
+}
+
+/* =============================================================================
+   CINEMATIC SEQUENCE
+   The scroll-scrubbed film. Three modes, switched by a data attribute the
+   component sets after mount — never by a media query alone, because the choice
+   depends on reduced-motion and pointer type together.
+   ========================================================================== */
+
+@layer components {
+  .cine-section {
+    --p: 0;
+    position: relative;
+  }
+
+  /* Pinned only when scrubbing. In loop and static modes the section is its
+     own height and scrolls normally — pinning a looping video would hold the
+     viewport hostage for no reason. */
+  .cine-section[data-mode="scrub"] {
+    block-size: 320svh;
+  }
+
+  .cine-section[data-mode="scrub"] .cine-stage {
+    position: sticky;
+    inset-block-start: 0;
+    block-size: 100svh;
+    overflow: hidden;
+  }
+
+  .cine-stage {
+    position: relative;
+    block-size: 100svh;
+    min-block-size: 32rem;
+    overflow: hidden;
+  }
+
+  .cine-media,
+  .cine-scrim {
+    position: absolute;
+    inset: 0;
+  }
+
+  .cine-head,
+  .cine-foot {
+    position: absolute;
+    inset-inline: 0;
+  }
+
+  .cine-head {
+    inset-block-start: 0;
+  }
+
+  .cine-foot {
+    inset-block-end: 0;
+  }
+
+  /* Captions share one grid cell so the block never changes height as they
+     swap, which would otherwise nudge the progress bar up and down. */
+  .cine-captions {
+    display: grid;
+    max-inline-size: 46ch;
+  }
+
+  .cine-caption {
+    grid-column: 1;
+    grid-row: 1;
+    --pos: calc(var(--p) * (var(--beats) - 1));
+    --d: calc(var(--pos) - var(--i));
+    --dist: max(var(--d), calc(-1 * var(--d)));
+    opacity: clamp(0, calc(1 - var(--dist)), 1);
+  }
+
+  .cine-progress {
+    margin-block-start: 1.75rem;
+    block-size: 1px;
+    background: color-mix(in oklab, var(--color-paper) 26%, transparent);
+  }
+
+  .cine-progress__fill {
+    display: block;
+    block-size: 100%;
+    inline-size: calc(var(--p) * 100%);
+    background: var(--color-ochre-bright);
+  }
+
+  /* Loop and static: captions stack and read as a list, because there is no
+     playhead to synchronise them to. */
+  .cine-section:not([data-mode="scrub"]) .cine-captions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .cine-section:not([data-mode="scrub"]) .cine-caption {
+    opacity: 1;
+  }
+
+  .cine-section:not([data-mode="scrub"]) .cine-progress {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cine-stage {
+      block-size: auto;
+    }
+
+    .cine-media {
+      position: relative;
+      inset: auto;
+      aspect-ratio: 16 / 9;
+    }
+
+    .cine-scrim {
+      display: none;
+    }
+
+    .cine-head,
+    .cine-foot {
+      position: static;
+      padding-block: 2rem !important;
+    }
+
+    .cine-head {
+      padding-block-start: calc(var(--nav-h) + 2rem) !important;
+    }
+  }
+}
+
+/* =============================================================================
+   SEQUENCE STAGE
+   A pinned camera path. Frame `i` is at full opacity when scroll progress
+   reaches i/(n-1); neighbours fade across the gap. All of it is expressed in
+   custom properties so the component only ever writes a single number.
+   ========================================================================== */
+
+@layer components {
+  .sequence-section {
+    --p: 0;
+    block-size: calc(var(--frames) * 80svh);
+  }
+
+  .sequence-stage {
+    position: sticky;
+    inset-block-start: 0;
+    block-size: 100svh;
+    overflow: hidden;
+  }
+
+  /* Declared here, not as Tailwind utilities — see the note in the proof
+     stage: reduced motion has to return these to normal flow. */
+  .sequence-frame {
+    position: absolute;
+    inset: 0;
+  }
+
+  .sequence-head {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 0;
+  }
+
+  .sequence-caption {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+  }
+
+  .sequence-frame {
+    /* Where the playhead is, in frame units. */
+    --pos: calc(var(--p) * (var(--frames) - 1));
+    --d: calc(var(--pos) - var(--i));
+    /* abs() is still too new to rely on; max(x, -x) is equivalent. */
+    --dist: max(var(--d), calc(-1 * var(--d)));
+
+    opacity: clamp(0, calc(1 - var(--dist)), 1);
+    /* Settles from slightly over-scale into place — a dolly coming to rest,
+       not a slide. */
+    transform: scale(calc(1 + var(--dist) * 0.05));
+    will-change: opacity, transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sequence-section {
+      block-size: auto;
+    }
+
+    .sequence-stage {
+      position: static;
+      block-size: auto;
+    }
+
+    /* The same frames, in the same order, stacked and captioned. */
+    .sequence-frame {
+      position: relative;
+      inset: auto;
+      opacity: 1;
+      transform: none;
+      aspect-ratio: 16 / 9;
+    }
+
+    .sequence-head,
+    .sequence-caption {
+      position: static;
+      inset: auto;
+    }
+
+    .sequence-head {
+      padding-block: calc(var(--nav-h) + 2rem) 2rem !important;
+    }
+  }
+}
+
+/* =============================================================================
+   COMPARE CONTROL
+   The draggable render/photograph divider. The range input is stretched over
+   the whole frame and made invisible, so the entire image is the drag surface
+   while the browser keeps handling keyboard, touch and assistive tech.
+   ========================================================================== */
+
+@layer components {
+  .compare__photo {
+    clip-path: inset(0 0 0 var(--x));
+  }
+
+  [dir="rtl"] .compare__photo {
+    clip-path: inset(0 var(--x) 0 0);
+  }
+
+  .compare__seam {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: var(--x);
+    inline-size: 2px;
+    margin-inline-start: -1px;
+    background: var(--color-paper);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  /* The grab handle, drawn on the seam. */
+  .compare__seam::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: var(--color-paper);
+    box-shadow: 0 2px 10px color-mix(in oklab, var(--color-ink) 35%, transparent);
+  }
+
+  [dir="rtl"] .compare__seam::after {
+    transform: translate(50%, -50%);
+  }
+
+  .compare__range {
+    appearance: none;
+    background: transparent;
+    margin: 0;
+    cursor: ew-resize;
+    z-index: 3;
+  }
+
+  .compare__range::-webkit-slider-runnable-track {
+    block-size: 100%;
+    background: transparent;
+  }
+
+  .compare__range::-moz-range-track {
+    block-size: 100%;
+    background: transparent;
+  }
+
+  /* The visible handle is .compare__seam::after; the real thumb is transparent
+     but kept full height so the pointer can grab anywhere on the seam. */
+  .compare__range::-webkit-slider-thumb {
+    appearance: none;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    background: transparent;
+    border: 0;
+  }
+
+  .compare__range::-moz-range-thumb {
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    background: transparent;
+    border: 0;
+  }
+
+  .compare__range:focus-visible {
+    outline: 2px solid var(--color-ochre);
+    outline-offset: -4px;
+  }
+}
+
+/* =============================================================================
+   RANGE CONTROL
+   The budget slider is the most-touched control on the site, so the thumb is a
+   44px target on a 2px track rather than the 16px default. Styled for both
+   engines because an unstyled range renders blue-grey and breaks the palette.
+   ========================================================================== */
+
+@layer components {
+  .qualifier-range {
+    appearance: none;
+    background: transparent;
+    block-size: 2.75rem;
+    cursor: pointer;
+  }
+
+  .qualifier-range::-webkit-slider-runnable-track {
+    block-size: 2px;
+    background: color-mix(in oklab, var(--color-ink) 22%, transparent);
+  }
+
+  .qualifier-range::-moz-range-track {
+    block-size: 2px;
+    background: color-mix(in oklab, var(--color-ink) 22%, transparent);
+  }
+
+  .qualifier-range::-webkit-slider-thumb {
+    appearance: none;
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    margin-block-start: -0.72rem;
+    border-radius: 50%;
+    background: var(--color-ochre);
+    border: 3px solid var(--color-paper);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-ink) 25%, transparent);
+  }
+
+  .qualifier-range::-moz-range-thumb {
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+    border-radius: 50%;
+    background: var(--color-ochre);
+    border: 3px solid var(--color-paper);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-ink) 25%, transparent);
+  }
+
+  .qualifier-range:focus-visible::-webkit-slider-thumb {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+
+  .qualifier-range:focus-visible::-moz-range-thumb {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+}
+
+/* Unlayered on purpose: this is a user-agency override and must beat everything,
+   including Tailwind's own transition utilities. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

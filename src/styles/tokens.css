@@ -1,0 +1,127 @@
+/* =============================================================================
+   DESIGN TOKENS — Chaabi Lil Iskane
+   =============================================================================
+   Every colour here was sampled from Chaabi's own renders and delivery
+   photography (scripts/ sampling pass over assets-src/), not chosen from a
+   palette generator. That matters: the dominant colours of these buildings are
+   limestone, dusty olive and burnt amber under a hard Marrakech sky — not the
+   cream-and-terracotta that generic "warm luxury" defaults to.
+
+   Notably: the structural dark is a warm OLIVE-black, not neutral black. The
+   Palmeraie landscaping in every exterior render reads khaki, and carrying that
+   into the ink keeps the whole page in the same light as the photography.
+   ========================================================================== */
+
+@theme {
+  /* --- Ground ------------------------------------------------------------ */
+  /* Limestone facade, sampled #d6c5b0, lifted for use as page paper. */
+  --color-paper: #ede7dc;
+  --color-paper-warm: #e3dacb; /* recessed panels, input wells */
+  --color-sand: #d6c5b0; /* the facade stone itself */
+
+  /* Warm olive-black. Reads as shadow in these renders, never as UI grey. */
+  --color-ink: #1c1e14;
+  --color-ink-soft: #3a3c2e; /* secondary text on paper — 9.15:1 */
+  --color-ink-mute: #64634e; /* captions, metadata, disclaimers — 4.97:1 */
+
+  /* --- Accents ----------------------------------------------------------- */
+  /* Burnt amber: interior joinery + pisé walls. The single accent.
+     Three values, because one hue cannot clear 4.5:1 against both paper and
+     ink. The base is a FILL, never text on paper (3.13:1); `-deep` is the
+     text-on-paper and paper-on-fill value (4.74:1); `-bright` is for text on
+     the ink sections (5.65:1). Measured, not eyeballed. */
+  --color-ochre: #ac764e;
+  --color-ochre-deep: #8a5a38;
+  --color-ochre-bright: #c08a5e;
+
+  /* Palmeraie olive. Reserved to mean DELIVERED — something that has grown.
+     Same split for the same reason: 5.06:1 on paper, 5.55:1 on ink. */
+  --color-olive: #504d30;
+  --color-olive-deep: #666239;
+  --color-olive-bright: #9a9663;
+
+  /* Marrakech sky. Used almost nowhere — it earns its rarity. */
+  --color-sky: #afd0ee;
+
+  /* --- Type -------------------------------------------------------------- */
+  --font-display: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  --font-body: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  --font-arabic: var(--font-plex-arabic), "IBM Plex Sans Arabic", sans-serif;
+
+  /* Fluid scale. Clamps are deliberate: display sizes must not blow out on a
+     1024px tablet, and must stay readable at 360px. */
+  --text-mega: clamp(2.6rem, 6.6vw, 6.5rem);
+  --text-display: clamp(2rem, 4.4vw, 4rem);
+  --text-title: clamp(1.5rem, 2.6vw, 2.35rem);
+  --text-lead: clamp(1.125rem, 1.6vw, 1.5rem);
+  --text-body: 1rem;
+  --text-small: 0.875rem;
+  --text-label: 0.75rem;
+
+  /* --- Motion ------------------------------------------------------------ */
+  /* Three curves. `camera` is long and decelerating — a dolly coming to rest.
+     `ui` is short and near-linear-out for controls. `reveal` is heavier still:
+     almost all of the distance is covered in the first third, so a block appears
+     to arrive and settle rather than to slide in. That asymmetry is what makes a
+     reveal read as weight instead of as a transition. */
+  --ease-camera: cubic-bezier(0.16, 0.84, 0.24, 1);
+  --ease-ui: cubic-bezier(0.32, 0.72, 0, 1);
+  /* Strong ease-out: most of the distance is covered immediately, so motion
+     reads as responsive rather than as a thing being played at you. */
+  --ease-reveal: cubic-bezier(0.23, 1, 0.32, 1);
+
+  --dur-ui: 200ms;
+  --dur-mid: 400ms;
+  --dur-camera: 900ms;
+
+  /* Reveals were 1100/1600ms and it read as sluggish, not elegant. Fluidity
+     comes from a fast start and a long tail — which is the easing curve's job,
+     not the duration's. Media still settles slower than the type over it, so
+     the image is coming to rest after the words have landed. */
+  --dur-reveal: 620ms;
+  --dur-media: 900ms;
+
+  /* Press feedback is asymmetric: down fast, back up slower. */
+  --dur-press: 100ms;
+  --dur-release: 180ms;
+
+  /* --- Structure --------------------------------------------------------- */
+  --gutter: clamp(1.25rem, 5vw, 5rem);
+  --measure: 62ch;
+  --nav-h: 4.5rem;
+}
+
+/* The moucharabieh module. Chaabi's own facades use a square lattice; we take
+   its proportion as the layout unit rather than stamping it on as a texture.
+   8 units across a field, 1 unit of void between — the same rhythm as the
+   concrete screens in Ext_Cam_c1_jardin_1. */
+:root {
+  --lattice-unit: 0.5rem;
+  --lattice-gap: calc(var(--lattice-unit) * 0.25);
+}
+
+/* -----------------------------------------------------------------------------
+   Arabic overrides.
+   Not a mirrored French layout: Arabic gets its own type ramp. IBM Plex Sans
+   Arabic has a smaller effective x-height and denser diacritics than Archivo,
+   so it needs more leading and slightly larger optical sizing to hold the same
+   authority. Letter-spacing is zeroed everywhere — tracking Arabic breaks the
+   joins between letters and is the single most common tell of a lazy RTL build.
+   -------------------------------------------------------------------------- */
+[lang="ar"] {
+  --font-display: var(--font-plex-arabic), "IBM Plex Sans Arabic", sans-serif;
+  --font-body: var(--font-plex-arabic), "IBM Plex Sans Arabic", sans-serif;
+  --text-mega: clamp(2.5rem, 8vw, 7.5rem);
+  --text-display: clamp(2rem, 5.4vw, 4.75rem);
+}
+
+[lang="ar"] * {
+  letter-spacing: 0 !important;
+}
+
+[lang="ar"] .u-eyebrow {
+  /* Wide-tracked caps are a Latin device. In Arabic the equivalent signal is
+     weight and a rule, never tracking or uppercase (Arabic has no case). */
+  text-transform: none;
+  font-weight: 600;
+}
