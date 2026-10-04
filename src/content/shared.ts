@@ -30,7 +30,7 @@ export const shared: Copy<{
     ctaEyebrow: "Rendez-vous",
     ctaTitle: "Venez visiter l'appartement témoin.",
     ctaBody:
-      "Un conseiller vous reçoit en agence, du lundi au samedi, ou à distance par visioconférence. Sans engagement.",
+      "Un conseiller vous reçoit en agence ou à distance, en visioconférence. Sans engagement.",
   },
   ar: {
     home: "الرئيسية",
@@ -42,6 +42,6 @@ export const shared: Copy<{
     learnMore: "اعرف المزيد",
     ctaEyebrow: "موعد",
     ctaTitle: "زوروا الشقة النموذجية.",
-    ctaBody: "يستقبلكم مستشار في الوكالة من الإثنين إلى السبت، أو عن بُعد عبر الفيديو. دون أي التزام.",
+    ctaBody: "يستقبلكم مستشار في الوكالة أو عن بُعد عبر الفيديو. دون أي التزام.",
   },
 };
