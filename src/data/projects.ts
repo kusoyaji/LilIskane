@@ -1030,8 +1030,3 @@ export function getProject(slug: string): Project | undefined {
 }
 
 /** Company-level figures used in the home page argument. */
-export const companyRecord = {
-  homesDelivered: 40000,
-  cities: 15,
-  yearsActive: 40,
-} as const;

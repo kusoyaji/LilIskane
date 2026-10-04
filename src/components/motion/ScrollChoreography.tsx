@@ -81,7 +81,16 @@ export function ScrollChoreography() {
               const frag = document.createDocumentFragment();
               // Split on whitespace only — never on characters. Arabic letters
               // join, and boxing them individually would break the script.
-              (text.textContent ?? "").split(/(\s+)/).forEach((part) => {
+              //
+              // And only on *breaking* whitespace. JavaScript's `\s` also
+              // matches U+00A0, which is the thousands separator inside every
+              // formatted number. Splitting there put "40" and "000" in separate
+              // inline-block boxes, each its own bidi unit, so an Arabic heading
+              // laid them out right-to-left and read "000 40" — and the LTR
+              // isolate marks wrapping the number ended up in different boxes,
+              // so they could not hold it together. A no-break space means
+              // "these belong together"; the splitter now agrees.
+              (text.textContent ?? "").split(/([ \t\n\r\f\v]+)/).forEach((part) => {
                 if (!part) return;
                 if (!part.trim()) {
                   frag.appendChild(document.createTextNode(part));

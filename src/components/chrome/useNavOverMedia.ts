@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 /**
  * True while a full-bleed media block sits under the header strip.
@@ -17,6 +18,10 @@ import { useEffect, useState } from "react";
  */
 export function useNavOverMedia(): boolean {
   const [overMedia, setOverMedia] = useState(true);
+  // The header lives in the layout and never remounts, so the targets must be
+  // re-collected on every route change — otherwise a client-side navigation
+  // leaves the header observing the previous page's (now detached) sections.
+  const pathname = usePathname();
 
   useEffect(() => {
     if (typeof IntersectionObserver === "undefined") return;
@@ -49,7 +54,7 @@ export function useNavOverMedia(): boolean {
     targets.forEach((el) => observer.observe(el));
 
     return () => observer.disconnect();
-  }, []);
+  }, [pathname]);
 
   return overMedia;
 }
