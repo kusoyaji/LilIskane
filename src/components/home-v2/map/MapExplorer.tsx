@@ -17,7 +17,9 @@ export type MapDot = {
   /** Phone-width position, for the loupe points that would otherwise sit under one fingertip. */
   phone?: { left: number; top: number };
   inLoupe: boolean;
-  side: "n" | "s" | "e" | "w";
+  side: "n" | "s" | "e" | "w" | "ne";
+  /** Label side on phones, where only the active city is named. */
+  phoneSide?: "n" | "s" | "e" | "w" | "ne";
   labelled: boolean;
 };
 
@@ -219,6 +221,7 @@ export function MapExplorer({
                 data-pin={city.id}
                 data-count={Math.min(city.count, 3)}
                 data-side={city.side}
+                data-pside={city.phoneSide ?? city.side}
                 data-active={on || undefined}
                 aria-pressed={on}
                 aria-controls={panelId}
@@ -245,7 +248,9 @@ export function MapExplorer({
               <p className={`u-eyebrow ${s.panelCount}`}>{active.countLabel}</p>
               <h3 className={s.panelTitle}>{active.name}</h3>
             </div>
-            <ul className={s.progs}>
+            {/* Scrolls on desktop when a city holds more programmes than the
+                panel has room for; the page's smooth scroll leaves it alone. */}
+            <ul className={s.progs} data-lenis-prevent="">
               {active.programmes.map((p) => (
                 <li key={p.slug}>
                   <Link href={p.href} className={s.prog}>
@@ -260,8 +265,9 @@ export function MapExplorer({
                     </span>
                     <span className={s.progText}>
                       <span className={s.progName}>{p.name}</span>
-                      <span className={s.progMeta}>
-                        {p.meta} · <span data-delivered={p.delivered || undefined}>{p.status}</span>
+                      <span className={s.progMeta}>{p.meta}</span>
+                      <span className={s.progStatus} data-delivered={p.delivered || undefined}>
+                        {p.status}
                       </span>
                       <span className={s.progPrice}>{p.price}</span>
                     </span>

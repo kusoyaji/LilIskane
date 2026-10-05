@@ -13,6 +13,15 @@ import type { GalleryRef } from "./types";
 export const galleries: Record<string, GalleryRef[]> = {
   "al-anbar": [
     {
+      key: "g_al_anbar_01",
+      nature: "render",
+      sameAs: "hp_al_anbar",
+      alt: {
+        fr: "Rendu de la résidence Al Anbar, à Marrakech, vue depuis un carrefour : immeubles ocre rose aux fenêtres à ferronnerie et petits balcons, palmiers et passage piéton au premier plan.",
+        ar: "تصوّر لإقامة العنبر بمراكش من أحد ملتقيات الطرق: عمارات بلون المغرة الوردية بنوافذ ذات مشبّكات حديدية وشرفات صغيرة، ونخيل وممرّ للراجلين في المقدّمة.",
+      },
+    },
+    {
       key: "g_al_anbar_02",
       nature: "render",
       alt: {
@@ -20,16 +29,17 @@ export const galleries: Record<string, GalleryRef[]> = {
         ar: "تصوّر لإقامة العنبر بمراكش: واجهة طويلة بألوان المغرة الوردية والآجر تتخلّلها شفرات سوداء عمودية، على امتداد شارع تحفّه مواقف السيارات وأشجار النخيل.",
       },
     },
-    {
-      key: "g_al_anbar_01",
-      nature: "render",
-      alt: {
-        fr: "Rendu de la résidence Al Anbar, à Marrakech, vue depuis un carrefour : immeubles ocre rose aux fenêtres à ferronnerie et petits balcons, palmiers et passage piéton au premier plan.",
-        ar: "تصوّر لإقامة العنبر بمراكش من أحد ملتقيات الطرق: عمارات بلون المغرة الوردية بنوافذ ذات مشبّكات حديدية وشرفات صغيرة، ونخيل وممرّ للراجلين في المقدّمة.",
-      },
-    },
   ],
   "al-anbra": [
+    {
+      key: "g_al_anbra_01",
+      nature: "photograph",
+      sameAs: "hp_al_anbra",
+      alt: {
+        fr: "Entrée d'un immeuble d'Al Anbra, à Essaouira : façades beige et sable rythmées de persiennes et de hublots, allée pavée et plantations récentes.",
+        ar: "مدخل إحدى عمارات إقامة العنبرة بالصويرة: واجهات بلون البيج والرمل تتخللها شرائح تهوية ونوافذ دائرية، وممرّ مرصوف ونباتات حديثة الغرس.",
+      },
+    },
     {
       key: "g_al_anbra_02",
       nature: "photograph",
@@ -52,14 +62,6 @@ export const galleries: Record<string, GalleryRef[]> = {
       alt: {
         fr: "Chambre d'un appartement d'Al Anbra, à Essaouira, ouvrant sur un dressing en bois avec étagères et tiroirs.",
         ar: "غرفة نوم في إحدى شقق إقامة العنبرة بالصويرة تنفتح على غرفة ملابس خشبية برفوف وأدراج.",
-      },
-    },
-    {
-      key: "g_al_anbra_01",
-      nature: "photograph",
-      alt: {
-        fr: "Entrée d'un immeuble d'Al Anbra, à Essaouira : façades beige et sable rythmées de persiennes et de hublots, allée pavée et plantations récentes.",
-        ar: "مدخل إحدى عمارات إقامة العنبرة بالصويرة: واجهات بلون البيج والرمل تتخللها شرائح تهوية ونوافذ دائرية، وممرّ مرصوف ونباتات حديثة الغرس.",
       },
     },
     {
@@ -121,6 +123,15 @@ export const galleries: Record<string, GalleryRef[]> = {
   ],
   "al-yassamine": [
     {
+      key: "g_al_yassamine_04",
+      nature: "photograph",
+      sameAs: "hp_al_yassamine",
+      alt: {
+        fr: "Salon d'un appartement meublé de la résidence livrée Al Yassamine, à Essaouira : canapé d'angle à la marocaine, table basse en bois et plafond à moulures.",
+        ar: "صالون شقة مؤثثة بإقامة الياسمين المُسلَّمة بالصويرة: أريكة زاوية على الطراز المغربي، طاولة خشبية منخفضة، وسقف بزخارف جبسية.",
+      },
+    },
+    {
       key: "g_al_yassamine_05",
       nature: "photograph",
       alt: {
@@ -142,14 +153,6 @@ export const galleries: Record<string, GalleryRef[]> = {
       alt: {
         fr: "Seconde chambre d'un appartement meublé de la résidence livrée Al Yassamine, à Essaouira, aménagée avec un lit simple, un bureau et un pouf.",
         ar: "غرفة ثانية في شقة مؤثثة بإقامة الياسمين المُسلَّمة بالصويرة، مجهّزة بسرير فردي ومكتب وكرسي كيس.",
-      },
-    },
-    {
-      key: "g_al_yassamine_04",
-      nature: "photograph",
-      alt: {
-        fr: "Salon d'un appartement meublé de la résidence livrée Al Yassamine, à Essaouira : canapé d'angle à la marocaine, table basse en bois et plafond à moulures.",
-        ar: "صالون شقة مؤثثة بإقامة الياسمين المُسلَّمة بالصويرة: أريكة زاوية على الطراز المغربي، طاولة خشبية منخفضة، وسقف بزخارف جبسية.",
       },
     },
     {
@@ -208,6 +211,7 @@ export const galleries: Record<string, GalleryRef[]> = {
     {
       key: "g_amaia_03",
       nature: "render",
+      sameAs: "th_amaia",
       alt: {
         fr: "Rendu d'Amaïa, à Marrakech : rue résidentielle pavée bordée de palmiers et d'arbres, entre des immeubles ocre et rouge terre à balcons.",
         ar: "تصوّر لأمايا بمراكش: شارع سكني مبلّط تصطفّ على جانبيه أشجار النخيل، بين عمارات بلون المغرة والأحمر الترابي ذات شرفات.",
@@ -240,16 +244,18 @@ export const galleries: Record<string, GalleryRef[]> = {
   ],
   "assafa": [
     {
-      key: "g_assafa_02",
+      key: "g_assafa_01",
       nature: "render",
+      sameAs: "hp_assafa",
       alt: {
-        fr: "Rendu du rez-de-chaussée commercial d'Assafa, à Had Soualem : vitrines éclairées sous les étages, encadrements gris anthracite autour des fenêtres et trottoir planté d'orangers et de palmiers.",
-        ar: "تصوّر للطابق الأرضي التجاري لإقامة الصفاء بحد السوالم: واجهات عرض مضاءة أسفل الطوابق، وإطارات رمادية داكنة حول النوافذ، ورصيف مغروس بأشجار البرتقال والنخيل.",
+        fr: "Rendu des immeubles d'Assafa, à Had Soualem : façades blanches et grises sur quatre étages, commerces vitrés en rez-de-chaussée et palmiers le long du trottoir.",
+        ar: "تصوّر لعمارات إقامة الصفاء بحد السوالم: واجهات بيضاء ورمادية من أربعة طوابق، ومحلات تجارية بواجهات زجاجية في الطابق الأرضي، ونخيل على امتداد الرصيف.",
       },
     },
     {
       key: "g_assafa_03",
       nature: "photograph",
+      sameAs: "tp_assafa",
       alt: {
         fr: "Salon de l'appartement témoin d'Assafa, à Had Soualem : banquettes marocaines bleu-vert en angle, lustre circulaire à pampilles et sol en carrelage effet marbre.",
         ar: "صالون الشقة النموذجية لإقامة الصفاء بحد السوالم: أرائك مغربية زرقاء مخضرّة على شكل زاوية، وثريا دائرية بقطع متدلية، وأرضية من بلاط بمظهر الرخام.",
@@ -261,14 +267,6 @@ export const galleries: Record<string, GalleryRef[]> = {
       alt: {
         fr: "Salon de l'appartement témoin d'Assafa, à Had Soualem, vu vers l'entrée : banquettes face à face, table basse en verre fumé et console blanche surmontée de miroirs.",
         ar: "صالون الشقة النموذجية لإقامة الصفاء بحد السوالم من جهة المدخل: أرائك متقابلة، وطاولة منخفضة من الزجاج المدخّن، وكونسول أبيض تعلوه مرايا.",
-      },
-    },
-    {
-      key: "g_assafa_01",
-      nature: "render",
-      alt: {
-        fr: "Rendu des immeubles d'Assafa, à Had Soualem : façades blanches et grises sur quatre étages, commerces vitrés en rez-de-chaussée et palmiers le long du trottoir.",
-        ar: "تصوّر لعمارات إقامة الصفاء بحد السوالم: واجهات بيضاء ورمادية من أربعة طوابق، ومحلات تجارية بواجهات زجاجية في الطابق الأرضي، ونخيل على امتداد الرصيف.",
       },
     },
     {
@@ -335,8 +333,24 @@ export const galleries: Record<string, GalleryRef[]> = {
         ar: "حمّام الشقة النموذجية لإقامة الصفاء بحد السوالم: مغسلة بعمود، ومرآة بإضاءة خلفية، وبلاط رمادي مجزّع، ودُش بجدار من بلاط مزخرف.",
       },
     },
+    {
+      key: "g_assafa_02",
+      nature: "render",
+      alt: {
+        fr: "Rendu du rez-de-chaussée commercial d'Assafa, à Had Soualem : vitrines éclairées sous les étages, encadrements gris anthracite autour des fenêtres et trottoir planté d'orangers et de palmiers.",
+        ar: "تصوّر للطابق الأرضي التجاري لإقامة الصفاء بحد السوالم: واجهات عرض مضاءة أسفل الطوابق، وإطارات رمادية داكنة حول النوافذ، ورصيف مغروس بأشجار البرتقال والنخيل.",
+      },
+    },
   ],
   "assalam-tg": [
+    {
+      key: "g_assalam_tg_04",
+      nature: "photograph",
+      alt: {
+        fr: "Salon de l'appartement témoin d'Assalam, à Tanger : grand canapé d'angle gris, tables basses rondes en bois, lustre à globes et coin repas.",
+        ar: "صالون الشقة النموذجية لإقامة السلام بطنجة: أريكة زاوية رمادية كبيرة، طاولتان منخفضتان مستديرتان من الخشب، ثريا بكرات زجاجية وركن للطعام.",
+      },
+    },
     {
       key: "g_assalam_tg_05",
       nature: "photograph",
@@ -359,14 +373,6 @@ export const galleries: Record<string, GalleryRef[]> = {
       alt: {
         fr: "Cuisine équipée de l'appartement témoin d'Assalam, à Tanger : meubles foncés, plan de travail en granit, plaque de cuisson au gaz et four encastré.",
         ar: "المطبخ المجهّز في الشقة النموذجية لإقامة السلام بطنجة: خزائن داكنة، سطح عمل من الغرانيت، موقد غاز وفرن مدمج.",
-      },
-    },
-    {
-      key: "g_assalam_tg_04",
-      nature: "photograph",
-      alt: {
-        fr: "Salon de l'appartement témoin d'Assalam, à Tanger : grand canapé d'angle gris, tables basses rondes en bois, lustre à globes et coin repas.",
-        ar: "صالون الشقة النموذجية لإقامة السلام بطنجة: أريكة زاوية رمادية كبيرة، طاولتان منخفضتان مستديرتان من الخشب، ثريا بكرات زجاجية وركن للطعام.",
       },
     },
     {
@@ -455,6 +461,14 @@ export const galleries: Record<string, GalleryRef[]> = {
   ],
   "bougainvillier": [
     {
+      key: "g_bougainvillier_01",
+      nature: "photograph",
+      alt: {
+        fr: "Cour intérieure de la résidence livrée Bougainvillier, à Mohammedia : piscine entourée de palmiers et de massifs fleuris, au pied d'immeubles aux façades beiges.",
+        ar: "الفناء الداخلي لإقامة بوغانفيلي المُسلَّمة بالمحمدية: مسبح تحيط به أشجار النخيل وأحواض الزهور، عند أسفل عمارات بواجهات بلون بيج.",
+      },
+    },
+    {
       key: "g_bougainvillier_02",
       nature: "photograph",
       alt: {
@@ -465,6 +479,7 @@ export const galleries: Record<string, GalleryRef[]> = {
     {
       key: "g_bougainvillier_03",
       nature: "photograph",
+      sameAs: "th_bougainvillier",
       alt: {
         fr: "Séjour d'un appartement de Bougainvillier, résidence livrée à Mohammedia : canapés gris, coin lecture, table à manger aux chaises de velours bleu et sol clair brillant.",
         ar: "صالون شقة في بوغانفيلي، إقامة مُسلَّمة بالمحمدية: أرائك رمادية، ركن للقراءة، طاولة طعام بكراسٍ من المخمل الأزرق وأرضية فاتحة لامعة.",
@@ -476,14 +491,6 @@ export const galleries: Record<string, GalleryRef[]> = {
       alt: {
         fr: "Séjour d'un appartement de Bougainvillier, résidence livrée à Mohammedia : canapé d'angle gris sous de larges fenêtres voilées, table basse ronde et chaises de velours bleu au premier plan.",
         ar: "صالون شقة في بوغانفيلي، إقامة مُسلَّمة بالمحمدية: أريكة زاوية رمادية تحت نوافذ واسعة بستائر خفيفة، طاولة قهوة مستديرة وكراسٍ من المخمل الأزرق في المقدّمة.",
-      },
-    },
-    {
-      key: "g_bougainvillier_01",
-      nature: "photograph",
-      alt: {
-        fr: "Cour intérieure de la résidence livrée Bougainvillier, à Mohammedia : piscine entourée de palmiers et de massifs fleuris, au pied d'immeubles aux façades beiges.",
-        ar: "الفناء الداخلي لإقامة بوغانفيلي المُسلَّمة بالمحمدية: مسبح تحيط به أشجار النخيل وأحواض الزهور، عند أسفل عمارات بواجهات بلون بيج.",
       },
     },
     {
@@ -537,11 +544,20 @@ export const galleries: Record<string, GalleryRef[]> = {
   ],
   "dyar-al-bahia-2": [
     {
+      key: "g_dyar_al_bahia_2_01",
+      nature: "render",
+      sameAs: "th_dyar_al_bahia",
+      alt: {
+        fr: "Rendu de Dyar Al Bahia 2, à Témara : immeuble aux façades claires et balcons vitrés, palmiers et place piétonne devant un rez-de-chaussée largement vitré.",
+        ar: "تصوّر لإقامة ديار الباهية 2 بتمارة: عمارة بواجهات فاتحة وشرفات زجاجية، ونخيل وساحة للراجلين أمام طابق أرضي بواجهات زجاجية واسعة.",
+      },
+    },
+    {
       key: "g_dyar_al_bahia_2_02",
       nature: "render",
       alt: {
         fr: "Rendu de Dyar Al Bahia 2, à Témara, vu depuis l'angle de la rue : immeubles aux façades claires rythmées de bardage sombre, balcons vitrés et enseigne Aswak Assalam en rez-de-chaussée.",
-        ar: "تصوّر لإقامة ديار البهية 2 بتمارة من زاوية الشارع: عمارات بواجهات فاتحة تتخلّلها كسوة داكنة، وشرفات زجاجية، ولافتة أسواق السلام بالطابق الأرضي.",
+        ar: "تصوّر لإقامة ديار الباهية 2 بتمارة من زاوية الشارع: عمارات بواجهات فاتحة تتخلّلها كسوة داكنة، وشرفات زجاجية، ولافتة أسواق السلام بالطابق الأرضي.",
       },
     },
     {
@@ -549,7 +565,7 @@ export const galleries: Record<string, GalleryRef[]> = {
       nature: "render",
       alt: {
         fr: "Rendu de Dyar Al Bahia 2, à Témara : une mosquée et son minaret au premier plan, devant les immeubles de la résidence.",
-        ar: "تصوّر لإقامة ديار البهية 2 بتمارة: مسجد بصومعته في المقدّمة، أمام عمارات الإقامة.",
+        ar: "تصوّر لإقامة ديار الباهية 2 بتمارة: مسجد بصومعته في المقدّمة، أمام عمارات الإقامة.",
       },
     },
     {
@@ -557,15 +573,7 @@ export const galleries: Record<string, GalleryRef[]> = {
       nature: "render",
       alt: {
         fr: "Rendu de Dyar Al Bahia 2, à Témara : place plantée de palmiers entre deux immeubles, rampe d'accès au parking en sous-sol et enseigne Aswak Assalam en rez-de-chaussée.",
-        ar: "تصوّر لإقامة ديار البهية 2 بتمارة: ساحة يزيّنها النخيل بين عمارتين، ومنحدر الولوج إلى المرأب تحت الأرضي، ولافتة أسواق السلام بالطابق الأرضي.",
-      },
-    },
-    {
-      key: "g_dyar_al_bahia_2_01",
-      nature: "render",
-      alt: {
-        fr: "Rendu de Dyar Al Bahia 2, à Témara : immeuble aux façades claires et balcons vitrés, palmiers et place piétonne devant un rez-de-chaussée largement vitré.",
-        ar: "تصوّر لإقامة ديار البهية 2 بتمارة: عمارة بواجهات فاتحة وشرفات زجاجية، ونخيل وساحة للراجلين أمام طابق أرضي بواجهات زجاجية واسعة.",
+        ar: "تصوّر لإقامة ديار الباهية 2 بتمارة: ساحة يزيّنها النخيل بين عمارتين، ومنحدر الولوج إلى المرأب تحت الأرضي، ولافتة أسواق السلام بالطابق الأرضي.",
       },
     },
     {
@@ -573,7 +581,7 @@ export const galleries: Record<string, GalleryRef[]> = {
       nature: "photograph",
       alt: {
         fr: "Séjour de l'appartement témoin de Dyar Al Bahia 2, à Témara : canapé d'angle clair, table ronde entourée de chaises jaunes et mur tapissé d'un motif de feuillages.",
-        ar: "صالون الشقة النموذجية لديار البهية 2 بتمارة: أريكة زاوية فاتحة اللون، وطاولة مستديرة تحيط بها كراسٍ صفراء، وجدار مكسوّ بورق حائط بنقوش أوراق نباتية.",
+        ar: "صالون الشقة النموذجية لديار الباهية 2 بتمارة: أريكة زاوية فاتحة اللون، وطاولة مستديرة تحيط بها كراسٍ صفراء، وجدار مكسوّ بورق حائط بنقوش أوراق نباتية.",
       },
     },
     {
@@ -581,7 +589,7 @@ export const galleries: Record<string, GalleryRef[]> = {
       nature: "photograph",
       alt: {
         fr: "Séjour de l'appartement témoin de Dyar Al Bahia 2, à Témara : grand canapé clair et table basse en métal noir, avec le coin repas aux chaises jaunes en arrière-plan.",
-        ar: "صالون الشقة النموذجية لديار البهية 2 بتمارة: أريكة كبيرة فاتحة اللون وطاولة منخفضة من المعدن الأسود، وركن الأكل بكراسيه الصفراء في الخلفية.",
+        ar: "صالون الشقة النموذجية لديار الباهية 2 بتمارة: أريكة كبيرة فاتحة اللون وطاولة منخفضة من المعدن الأسود، وركن الأكل بكراسيه الصفراء في الخلفية.",
       },
     },
     {
@@ -589,7 +597,7 @@ export const galleries: Record<string, GalleryRef[]> = {
       nature: "photograph",
       alt: {
         fr: "Cuisine équipée de l'appartement témoin de Dyar Al Bahia 2, à Témara : meubles façon bois, plan de travail noir, plaque de cuisson, four encastré et crédence en carreaux à motifs, avec une porte vitrée ouvrant sur la terrasse.",
-        ar: "المطبخ المجهّز بالشقة النموذجية لديار البهية 2 بتمارة: خزائن بلون الخشب، وسطح عمل أسود، وموقد وفرن مدمج، وجدار مكسوّ ببلاط مزخرف، مع باب زجاجي يفتح على الشرفة.",
+        ar: "المطبخ المجهّز بالشقة النموذجية لديار الباهية 2 بتمارة: خزائن بلون الخشب، وسطح عمل أسود، وموقد وفرن مدمج، وجدار مكسوّ ببلاط مزخرف، مع باب زجاجي يفتح على الشرفة.",
       },
     },
     {
@@ -597,7 +605,7 @@ export const galleries: Record<string, GalleryRef[]> = {
       nature: "photograph",
       alt: {
         fr: "Chambre de l'appartement témoin de Dyar Al Bahia 2, à Témara : lit double à tête de lit grise, papier peint à motifs dorés, console blanche et miroir rond en rotin.",
-        ar: "غرفة نوم بالشقة النموذجية لديار البهية 2 بتمارة: سرير مزدوج بمسند رمادي، وورق حائط بنقوش ذهبية، وطاولة بيضاء ومرآة دائرية من الخيزران.",
+        ar: "غرفة نوم بالشقة النموذجية لديار الباهية 2 بتمارة: سرير مزدوج بمسند رمادي، وورق حائط بنقوش ذهبية، وطاولة بيضاء ومرآة دائرية من الخيزران.",
       },
     },
     {
@@ -605,7 +613,7 @@ export const galleries: Record<string, GalleryRef[]> = {
       nature: "photograph",
       alt: {
         fr: "Chambre de l'appartement témoin de Dyar Al Bahia 2, à Témara : lit double au linge rayé, papier peint à motifs dorés et placard à portes en bois.",
-        ar: "غرفة نوم بالشقة النموذجية لديار البهية 2 بتمارة: سرير مزدوج بأغطية مخطّطة، وورق حائط بنقوش ذهبية، وخزانة حائطية بأبواب خشبية.",
+        ar: "غرفة نوم بالشقة النموذجية لديار الباهية 2 بتمارة: سرير مزدوج بأغطية مخطّطة، وورق حائط بنقوش ذهبية، وخزانة حائطية بأبواب خشبية.",
       },
     },
     {
@@ -613,7 +621,7 @@ export const galleries: Record<string, GalleryRef[]> = {
       nature: "photograph",
       alt: {
         fr: "Chambre à lit simple de l'appartement témoin de Dyar Al Bahia 2, à Témara : lit bleu, tapis bleu, bureau blanc et mur habillé d'un papier peint effet bois.",
-        ar: "غرفة بسرير فردي في الشقة النموذجية لديار البهية 2 بتمارة: سرير أزرق وزربية زرقاء ومكتب أبيض، وجدار مكسوّ بورق حائط يحاكي الخشب.",
+        ar: "غرفة بسرير فردي في الشقة النموذجية لديار الباهية 2 بتمارة: سرير أزرق وزربية زرقاء ومكتب أبيض، وجدار مكسوّ بورق حائط يحاكي الخشب.",
       },
     },
     {
@@ -621,7 +629,7 @@ export const galleries: Record<string, GalleryRef[]> = {
       nature: "photograph",
       alt: {
         fr: "Chambre d'enfant de l'appartement témoin de Dyar Al Bahia 2, à Témara : lit cabane en bois au linge rose, tapis rond et papier peint coloré à motifs d'arcs-en-ciel et de fraises.",
-        ar: "غرفة الأطفال بالشقة النموذجية لديار البهية 2 بتمارة: سرير خشبي على شكل كوخ بأغطية وردية، وزربية دائرية، وورق حائط ملوّن بنقوش أقواس قزح وحبّات فراولة.",
+        ar: "غرفة الأطفال بالشقة النموذجية لديار الباهية 2 بتمارة: سرير خشبي على شكل كوخ بأغطية وردية، وزربية دائرية، وورق حائط ملوّن بنقوش أقواس قزح وحبّات فراولة.",
       },
     },
     {
@@ -629,7 +637,7 @@ export const galleries: Record<string, GalleryRef[]> = {
       nature: "photograph",
       alt: {
         fr: "Salle d'eau de l'appartement témoin de Dyar Al Bahia 2, à Témara : douche à paroi vitrée, faïence beige à rayures façon bois, vasque sur meuble en bois et WC.",
-        ar: "حمّام بدوش في الشقة النموذجية لديار البهية 2 بتمارة: دوش بحاجز زجاجي، وبلاط بيج بخطوط تحاكي الخشب، ومغسلة فوق خزانة خشبية، ومرحاض.",
+        ar: "حمّام بدوش في الشقة النموذجية لديار الباهية 2 بتمارة: دوش بحاجز زجاجي، وبلاط بيج بخطوط تحاكي الخشب، ومغسلة فوق خزانة خشبية، ومرحاض.",
       },
     },
     {
@@ -637,7 +645,7 @@ export const galleries: Record<string, GalleryRef[]> = {
       nature: "photograph",
       alt: {
         fr: "Toilettes de l'appartement témoin de Dyar Al Bahia 2, à Témara : murs bleus, vasque posée sur un plan en bois, mosaïque murale et WC.",
-        ar: "دورة المياه بالشقة النموذجية لديار البهية 2 بتمارة: جدران زرقاء، ومغسلة فوق سطح خشبي، وفسيفساء جدارية، ومقعد مرحاض.",
+        ar: "دورة المياه بالشقة النموذجية لديار الباهية 2 بتمارة: جدران زرقاء، ومغسلة فوق سطح خشبي، وفسيفساء جدارية، ومقعد مرحاض.",
       },
     },
     {
@@ -645,11 +653,20 @@ export const galleries: Record<string, GalleryRef[]> = {
       nature: "photograph",
       alt: {
         fr: "Terrasse de l'appartement témoin de Dyar Al Bahia 2, à Témara : deux chaises pliantes blanches, tablette fixée au garde-corps ajouré et végétation derrière la balustrade.",
-        ar: "شرفة الشقة النموذجية لديار البهية 2 بتمارة: كرسيان أبيضان قابلان للطي، وطاولة صغيرة مثبّتة على الدرابزين المخرَّم، ونباتات خلف السياج.",
+        ar: "شرفة الشقة النموذجية لديار الباهية 2 بتمارة: كرسيان أبيضان قابلان للطي، وطاولة صغيرة مثبّتة على الدرابزين المخرَّم، ونباتات خلف السياج.",
       },
     },
   ],
   "izdihar": [
+    {
+      key: "g_izdihar_01",
+      nature: "render",
+      sameAs: "th_izdihar",
+      alt: {
+        fr: "Rendu de la résidence Izdihar, à Essaouira : immeubles blancs sur trois niveaux aux encadrements de fenêtres couleur bois, balcons à garde-corps métalliques et palmiers en bord de voie.",
+        ar: "تصوّر لإقامة الازدهار بالصويرة: عمارات بيضاء من ثلاثة مستويات بإطارات نوافذ بلون الخشب، وشرفات بحواجز معدنية، ونخيل على حافة الطريق.",
+      },
+    },
     {
       key: "g_izdihar_02",
       nature: "render",
@@ -658,46 +675,24 @@ export const galleries: Record<string, GalleryRef[]> = {
         ar: "تصوّر للواجهة المطلة على الشارع بإقامة الازدهار بالصويرة: مبنى أبيض من ثلاثة مستويات، ونوافذ بإطارات رمادية مائلة إلى البني، ونخيل مصطفّ على طول الرصيف.",
       },
     },
-    {
-      key: "g_izdihar_01",
-      nature: "render",
-      alt: {
-        fr: "Rendu de la résidence Izdihar, à Essaouira : immeubles blancs sur trois niveaux aux encadrements de fenêtres couleur bois, balcons à garde-corps métalliques et palmiers en bord de voie.",
-        ar: "تصوّر لإقامة الازدهار بالصويرة: عمارات بيضاء من ثلاثة مستويات بإطارات نوافذ بلون الخشب، وشرفات بحواجز معدنية، ونخيل على حافة الطريق.",
-      },
-    },
   ],
   "jasmin": [
     {
-      key: "g_jasmin_01",
+      key: "g_jasmin_03",
       nature: "photograph",
+      sameAs: "hp_jasmin",
       alt: {
-        fr: "Jardin de Jasmin, à Mohammedia : pelouse plantée de palmiers et pergola au pied d'immeubles aux façades roses et beiges.",
-        ar: "حديقة جاسمين بالمحمدية: مساحة عشبية مغروسة بأشجار النخيل وعريشة عند أسفل عمارات بواجهات وردية وبيج.",
-      },
-    },
-    {
-      key: "g_jasmin_02",
-      nature: "photograph",
-      alt: {
-        fr: "Façades de Jasmin, à Mohammedia : immeubles beiges et rosés alignés le long d'une rue, avec haie basse et palmiers à leur pied.",
-        ar: "واجهات جاسمين بالمحمدية: عمارات بلون بيج ووردي فاتح مصطفّة على طول الشارع، مع سياج نباتي منخفض وأشجار نخيل عند أسفلها.",
+        fr: "Séjour de l'appartement témoin de Jasmin, à Mohammedia : grand canapé d'angle crème, table ronde en verre, lustre à globes et voilages pleine hauteur.",
+        ar: "صالون الشقة النموذجية في جاسمين بالمحمدية: أريكة زاوية كبيرة بلون كريمي، طاولة مستديرة من الزجاج، ثريا بكرات زجاجية وستائر بكامل الارتفاع.",
       },
     },
     {
       key: "g_jasmin_04",
       nature: "photograph",
+      sameAs: "tp_jasmin",
       alt: {
         fr: "Séjour de l'appartement témoin de Jasmin, à Mohammedia : coin repas à table ronde et chaises bouclées, miroir rond et porte d'entrée en bois.",
         ar: "صالون الشقة النموذجية في جاسمين بالمحمدية: ركن طعام بطاولة مستديرة وكراسٍ منجّدة، مرآة دائرية وباب مدخل خشبي.",
-      },
-    },
-    {
-      key: "g_jasmin_03",
-      nature: "photograph",
-      alt: {
-        fr: "Séjour de l'appartement témoin de Jasmin, à Mohammedia : grand canapé d'angle crème, table ronde en verre, lustre à globes et voilages pleine hauteur.",
-        ar: "صالون الشقة النموذجية في جاسمين بالمحمدية: أريكة زاوية كبيرة بلون كريمي، طاولة مستديرة من الزجاج، ثريا بكرات زجاجية وستائر بكامل الارتفاع.",
       },
     },
     {
@@ -743,6 +738,15 @@ export const galleries: Record<string, GalleryRef[]> = {
   ],
   "jnane-souss": [
     {
+      key: "g_jnane_souss_02",
+      nature: "photograph",
+      sameAs: "hp_jnane_souss",
+      alt: {
+        fr: "Salon de l'appartement témoin de Jnane Souss, à Agadir : banquettes marocaines bleu-vert en U, tables basses rondes gigognes et tapis rond sur sol clair.",
+        ar: "صالون الشقة النموذجية بإقامة جنان سوس بأكادير: أرائك مغربية بلون أزرق مخضرّ على شكل حرف U، وطاولات منخفضة دائرية متداخلة، وزربية دائرية على أرضية فاتحة.",
+      },
+    },
+    {
       key: "g_jnane_souss_03",
       nature: "photograph",
       alt: {
@@ -753,6 +757,7 @@ export const galleries: Record<string, GalleryRef[]> = {
     {
       key: "g_jnane_souss_04",
       nature: "photograph",
+      sameAs: "tp_jnane_souss",
       alt: {
         fr: "Petit salon de l'appartement témoin de Jnane Souss, à Agadir : canapé d'angle écru, coussins moutarde, table ronde blanche et sol effet bois.",
         ar: "الصالون الصغير بالشقة النموذجية بإقامة جنان سوس بأكادير: أريكة زاوية بلون عاجي، ووسائد بلون الخردل، وطاولة دائرية بيضاء، وأرضية بمظهر خشبي.",
@@ -764,14 +769,6 @@ export const galleries: Record<string, GalleryRef[]> = {
       alt: {
         fr: "Cuisine équipée de l'appartement témoin de Jnane Souss, à Agadir : façades chêne clair, plan de travail en granit noir, crédence en carreaux à motifs et réfrigérateur inox.",
         ar: "المطبخ المجهّز بالشقة النموذجية بإقامة جنان سوس بأكادير: واجهات من خشب البلوط الفاتح، وسطح عمل من الغرانيت الأسود، وجدار ببلاط مزخرف، وثلاجة من الفولاذ المقاوم للصدأ.",
-      },
-    },
-    {
-      key: "g_jnane_souss_02",
-      nature: "photograph",
-      alt: {
-        fr: "Salon de l'appartement témoin de Jnane Souss, à Agadir : banquettes marocaines bleu-vert en U, tables basses rondes gigognes et tapis rond sur sol clair.",
-        ar: "صالون الشقة النموذجية بإقامة جنان سوس بأكادير: أرائك مغربية بلون أزرق مخضرّ على شكل حرف U، وطاولات منخفضة دائرية متداخلة، وزربية دائرية على أرضية فاتحة.",
       },
     },
     {
@@ -858,14 +855,6 @@ export const galleries: Record<string, GalleryRef[]> = {
       },
     },
     {
-      key: "g_les_pins_de_maamora_01",
-      nature: "render",
-      alt: {
-        fr: "Rendu de la façade des Pins de Maamora, à Sala Al Jadida : immeuble R+3 blanc à balcons en retrait, panneaux ajourés et commerces en rez-de-chaussée.",
-        ar: "تصوّر لواجهة إقامة لي بان دو معمورة بسلا الجديدة: عمارة بيضاء من صنف R+3 بشرفات غائرة، ألواح مُخرَّمة ومحلات تجارية في الطابق الأرضي.",
-      },
-    },
-    {
       key: "g_les_pins_de_maamora_08",
       nature: "photograph",
       alt: {
@@ -882,11 +871,12 @@ export const galleries: Record<string, GalleryRef[]> = {
       },
     },
     {
-      key: "g_les_pins_de_maamora_10",
-      nature: "photograph",
+      key: "g_les_pins_de_maamora_01",
+      nature: "render",
+      sameAs: "hp_les_pins_de_maamora",
       alt: {
-        fr: "Bâtiment à façade rouge ondulée et grandes baies vitrées, à proximité des Pins de Maamora, à Sala Al Jadida.",
-        ar: "بناية بواجهة حمراء متموّجة ونوافذ زجاجية كبيرة، على مقربة من إقامة لي بان دو معمورة بسلا الجديدة.",
+        fr: "Rendu de la façade des Pins de Maamora, à Sala Al Jadida : immeuble R+3 blanc à balcons en retrait, panneaux ajourés et commerces en rez-de-chaussée.",
+        ar: "تصوّر لواجهة إقامة لي بان دو معمورة بسلا الجديدة: عمارة بيضاء من صنف R+3 بشرفات غائرة، ألواح مُخرَّمة ومحلات تجارية في الطابق الأرضي.",
       },
     },
     {
@@ -919,6 +909,15 @@ export const galleries: Record<string, GalleryRef[]> = {
   ],
   "massylia": [
     {
+      key: "g_massylia_02",
+      nature: "photograph",
+      sameAs: "hp_massylia",
+      alt: {
+        fr: "Salon de l'appartement témoin de Massylia, à Agadir : banquettes marocaines terracotta et beiges en angle, grande table basse en noyer et stores jour-nuit sur la fenêtre.",
+        ar: "صالون الشقة النموذجية بإقامة ماسيليا بأكادير: أرائك مغربية بلون الطين والبيج على شكل زاوية، وطاولة منخفضة كبيرة من خشب الجوز، وستائر مخطَّطة على النافذة.",
+      },
+    },
+    {
       key: "g_massylia_03",
       nature: "photograph",
       alt: {
@@ -929,6 +928,7 @@ export const galleries: Record<string, GalleryRef[]> = {
     {
       key: "g_massylia_04",
       nature: "photograph",
+      sameAs: "tp_massylia",
       alt: {
         fr: "Second salon de l'appartement témoin de Massylia, à Agadir : banquettes aux motifs géométriques rouges et noirs, table basse en verre et sol effet bois.",
         ar: "الصالون الثاني بالشقة النموذجية بإقامة ماسيليا بأكادير: أرائك بزخارف هندسية حمراء وسوداء، وطاولة منخفضة زجاجية، وأرضية بمظهر خشبي.",
@@ -940,14 +940,6 @@ export const galleries: Record<string, GalleryRef[]> = {
       alt: {
         fr: "Cuisine équipée de l'appartement témoin de Massylia, à Agadir : façades bois foncé, crédence en carreaux à motifs bleus, four encastré et porte vitrée donnant sur l'extérieur.",
         ar: "المطبخ المجهّز بالشقة النموذجية بإقامة ماسيليا بأكادير: واجهات خشبية داكنة، وجدار ببلاط مزخرف أزرق، وفرن مدمج، وباب زجاجي يطل على فضاء خارجي.",
-      },
-    },
-    {
-      key: "g_massylia_02",
-      nature: "photograph",
-      alt: {
-        fr: "Salon de l'appartement témoin de Massylia, à Agadir : banquettes marocaines terracotta et beiges en angle, grande table basse en noyer et stores jour-nuit sur la fenêtre.",
-        ar: "صالون الشقة النموذجية بإقامة ماسيليا بأكادير: أرائك مغربية بلون الطين والبيج على شكل زاوية، وطاولة منخفضة كبيرة من خشب الجوز، وستائر مخطَّطة على النافذة.",
       },
     },
     {
@@ -1020,6 +1012,7 @@ export const galleries: Record<string, GalleryRef[]> = {
     {
       key: "g_oceane_02",
       nature: "render",
+      sameAs: "th_oceane",
       alt: {
         fr: "Rendu du jardin commun d'Océane, à Sidi Rahal : allées, massifs arbustifs et piscine au pied des villas à étage.",
         ar: "تصوّر للحديقة المشتركة بأوسيان في سيدي رحال: ممرات وأحواض شجيرات ومسبح عند أقدام الفيلات ذات الطابقين.",
@@ -1076,19 +1069,20 @@ export const galleries: Record<string, GalleryRef[]> = {
   ],
   "odyssee": [
     {
+      key: "g_odyssee_01",
+      nature: "render",
+      sameAs: "th_odyssee",
+      alt: {
+        fr: "Rendu d'Odyssée, à Mohammedia : immeubles aux façades blanches et pierre grise, balcons encadrés de bois et végétalisés, palmiers et bancs sur le parvis longeant une large avenue.",
+        ar: "تصوّر لإقامة أوديسي بالمحمدية: عمارات بواجهات بيضاء وحجر رمادي، وشرفات بإطارات خشبية تكسوها النباتات، ونخيل ومقاعد على الرصيف المحاذي لشارع عريض.",
+      },
+    },
+    {
       key: "g_odyssee_02",
       nature: "render",
       alt: {
         fr: "Rendu d'Odyssée, à Mohammedia, à la tombée du jour : piscine centrale bordée de transats et de parasols, entre des immeubles aux fenêtres éclairées et des jardins de palmiers.",
         ar: "تصوّر لإقامة أوديسي بالمحمدية عند الغروب: مسبح مركزي تحيط به كراسي الاستلقاء والمظلات، بين عمارات بنوافذ مضاءة وحدائق نخيل.",
-      },
-    },
-    {
-      key: "g_odyssee_01",
-      nature: "render",
-      alt: {
-        fr: "Rendu d'Odyssée, à Mohammedia : immeubles aux façades blanches et pierre grise, balcons encadrés de bois et végétalisés, palmiers et bancs sur le parvis longeant une large avenue.",
-        ar: "تصوّر لإقامة أوديسي بالمحمدية: عمارات بواجهات بيضاء وحجر رمادي، وشرفات بإطارات خشبية تكسوها النباتات، ونخيل ومقاعد على الرصيف المحاذي لشارع عريض.",
       },
     },
   ],
@@ -1098,15 +1092,16 @@ export const galleries: Record<string, GalleryRef[]> = {
       nature: "render",
       alt: {
         fr: "Rendu de la façade d'Odyssée Studios, à Mohammedia : immeuble d'angle aux encadrements bois et parements de pierre, balcons vitrés et palmiers le long de l'avenue.",
-        ar: "تصوّر لواجهة أوديسي ستوديوهات بالمحمدية: عمارة عند زاوية الشارع بإطارات خشبية وتكسيات حجرية، شرفات زجاجية وأشجار نخيل على طول الشارع.",
+        ar: "تصوّر لواجهة أوديسي استوديوهات بالمحمدية: عمارة عند زاوية الشارع بإطارات خشبية وتكسيات حجرية، شرفات زجاجية وأشجار نخيل على طول الشارع.",
       },
     },
     {
       key: "g_odyssee_studios_02",
       nature: "render",
+      sameAs: "th_odyssee_studios",
       alt: {
         fr: "Rendu de la piscine d'Odyssée Studios, à Mohammedia : bassin rectangulaire bordé de transats et de parasols, entre des immeubles aux balcons végétalisés.",
-        ar: "تصوّر لمسبح أوديسي ستوديوهات بالمحمدية: حوض مستطيل تحيط به كراسي الاستلقاء والمظلات، بين عمارات بشرفات مكسوّة بالنباتات.",
+        ar: "تصوّر لمسبح أوديسي استوديوهات بالمحمدية: حوض مستطيل تحيط به كراسي الاستلقاء والمظلات، بين عمارات بشرفات مكسوّة بالنباتات.",
       },
     },
   ],
@@ -1120,8 +1115,18 @@ export const galleries: Record<string, GalleryRef[]> = {
       },
     },
     {
+      key: "g_patio_verde_02",
+      nature: "photograph",
+      sameAs: "hp_patio_verde",
+      alt: {
+        fr: "Séjour de l'appartement témoin de Patio Verde, à Mohammedia : canapés en bouclette crème, table basse ronde, plafond à éclairage indirect et baie voilée.",
+        ar: "صالون الشقة النموذجية بباتيو فيردي بالمحمدية: أرائك من قماش البوكليه بلون كريمي، وطاولة منخفضة دائرية، وسقف بإضاءة غير مباشرة، ونافذة واسعة بستائر خفيفة.",
+      },
+    },
+    {
       key: "g_patio_verde_03",
       nature: "photograph",
+      sameAs: "tp_patio_verde",
       alt: {
         fr: "Séjour de l'appartement témoin de Patio Verde, à Mohammedia, vu vers l'entrée : canapé d'angle, claustra en lames de bois et meuble télé suspendu.",
         ar: "صالون الشقة النموذجية بباتيو فيردي بالمحمدية من جهة المدخل: أريكة زاوية، وحاجز من شرائح خشبية، وخزانة تلفاز معلّقة.",
@@ -1133,14 +1138,6 @@ export const galleries: Record<string, GalleryRef[]> = {
       alt: {
         fr: "Coin repas de l'appartement témoin de Patio Verde, à Mohammedia : table ovale noire, chaises en bouclette marron et suspension à globes, séparé du salon par un panneau en bois.",
         ar: "ركن الطعام في الشقة النموذجية بباتيو فيردي بالمحمدية: طاولة بيضوية سوداء، وكراسٍ بنية من قماش البوكليه، وثريا بكرات زجاجية، يفصله عن الصالون حاجز خشبي.",
-      },
-    },
-    {
-      key: "g_patio_verde_02",
-      nature: "photograph",
-      alt: {
-        fr: "Séjour de l'appartement témoin de Patio Verde, à Mohammedia : canapés en bouclette crème, table basse ronde, plafond à éclairage indirect et baie voilée.",
-        ar: "صالون الشقة النموذجية بباتيو فيردي بالمحمدية: أرائك من قماش البوكليه بلون كريمي، وطاولة منخفضة دائرية، وسقف بإضاءة غير مباشرة، ونافذة واسعة بستائر خفيفة.",
       },
     },
     {
@@ -1218,46 +1215,6 @@ export const galleries: Record<string, GalleryRef[]> = {
   ],
   "riad-garden-i": [
     {
-      key: "rg1_DSC08632",
-      nature: "photograph",
-      alt: {
-        fr: "Façade d'un immeuble de la résidence livrée Riad Garden I, à Marrakech : enduit ocre rose, balcons, claustras et arbres le long de l'allée.",
-        ar: "واجهة إحدى عمارات إقامة رياض غاردن 1 المُسلَّمة بمراكش: طلاء وردي مغرّي، شرفات ومشربيات، وأشجار على طول الممر.",
-      },
-    },
-    {
-      key: "rg1_DSC08344",
-      nature: "photograph",
-      alt: {
-        fr: "Séjour d'un appartement meublé de la résidence livrée Riad Garden I, à Marrakech : table à manger en marbre, canapés aux formes arrondies et baie vitrée sur la terrasse.",
-        ar: "صالة الجلوس في شقة مؤثثة بإقامة رياض غاردن 1 المُسلَّمة بمراكش: طاولة طعام رخامية، أرائك بأشكال دائرية ونافذة زجاجية واسعة تُطل على التراس.",
-      },
-    },
-    {
-      key: "rg1_DSC08548",
-      nature: "photograph",
-      alt: {
-        fr: "Salon d'un appartement meublé de la résidence livrée Riad Garden I, à Marrakech : canapé d'angle clair, pouf orange, coin repas et baie vitrée ouverte sur une terrasse meublée.",
-        ar: "صالون شقة مؤثثة بإقامة رياض غاردن 1 المُسلَّمة بمراكش: أريكة زاوية فاتحة، مقعد برتقالي، ركن طعام ونافذة زجاجية مفتوحة على تراس مؤثث.",
-      },
-    },
-    {
-      key: "rg1_DSC00924",
-      nature: "photograph",
-      alt: {
-        fr: "Piscine de la résidence livrée Riad Garden I, à Marrakech, bordée de palmiers et d'immeubles ocre rose à balcons.",
-        ar: "مسبح إقامة رياض غاردن 1 المُسلَّمة بمراكش، تحيط به أشجار النخيل وعمارات بلون وردي مغرّي ذات شرفات.",
-      },
-    },
-    {
-      key: "rg1_DSC08446",
-      nature: "photograph",
-      alt: {
-        fr: "Cuisine d'un appartement meublé de la résidence livrée Riad Garden I, à Marrakech : façades vert d'eau et bois, plaque de cuisson, four encastré, réfrigérateur rétro et table haute.",
-        ar: "مطبخ شقة مؤثثة بإقامة رياض غاردن 1 المُسلَّمة بمراكش: واجهات بالأخضر المائي والخشب، موقد، فرن مدمج، ثلاجة بطراز كلاسيكي وطاولة عالية.",
-      },
-    },
-    {
       key: "rg1_DSC08588",
       nature: "photograph",
       alt: {
@@ -1266,11 +1223,19 @@ export const galleries: Record<string, GalleryRef[]> = {
       },
     },
     {
-      key: "rg1_DSC08601",
+      key: "rg1_DSC08632",
       nature: "photograph",
       alt: {
-        fr: "Chambre et salle de bain attenante d'un appartement meublé de la résidence livrée Riad Garden I, à Marrakech : parquet à chevrons, meuble vasque en bois et miroir rond.",
-        ar: "غرفة نوم وحمّام ملحق بها في شقة مؤثثة بإقامة رياض غاردن 1 المُسلَّمة بمراكش: باركيه بنقشة متعرّجة، مغسلة على خزانة خشبية ومرآة مستديرة.",
+        fr: "Façade d'un immeuble de la résidence livrée Riad Garden I, à Marrakech : enduit ocre rose, balcons, claustras et arbres le long de l'allée.",
+        ar: "واجهة إحدى عمارات إقامة رياض غاردن 1 المُسلَّمة بمراكش: طلاء وردي مغرّي، شرفات ومشربيات، وأشجار على طول الممر.",
+      },
+    },
+    {
+      key: "rg1_DSC08446",
+      nature: "photograph",
+      alt: {
+        fr: "Cuisine d'un appartement meublé de la résidence livrée Riad Garden I, à Marrakech : façades vert d'eau et bois, plaque de cuisson, four encastré, réfrigérateur rétro et table haute.",
+        ar: "مطبخ شقة مؤثثة بإقامة رياض غاردن 1 المُسلَّمة بمراكش: واجهات بالأخضر المائي والخشب، موقد، فرن مدمج، ثلاجة بطراز كلاسيكي وطاولة عالية.",
       },
     },
     {
@@ -1295,6 +1260,38 @@ export const galleries: Record<string, GalleryRef[]> = {
       alt: {
         fr: "Aire de jeux de la résidence livrée Riad Garden I, à Marrakech : toboggan, cabane en bois et pelouse plantée de palmiers et d'oliviers.",
         ar: "فضاء ألعاب الأطفال بإقامة رياض غاردن 1 المُسلَّمة بمراكش: زحليقة، كوخ خشبي ومرجة خضراء تتخللها أشجار النخيل والزيتون.",
+      },
+    },
+    {
+      key: "rg1_DSC08548",
+      nature: "photograph",
+      alt: {
+        fr: "Salon d'un appartement meublé de la résidence livrée Riad Garden I, à Marrakech : canapé d'angle clair, pouf orange, coin repas et baie vitrée ouverte sur une terrasse meublée.",
+        ar: "صالون شقة مؤثثة بإقامة رياض غاردن 1 المُسلَّمة بمراكش: أريكة زاوية فاتحة، مقعد برتقالي، ركن طعام ونافذة زجاجية مفتوحة على تراس مؤثث.",
+      },
+    },
+    {
+      key: "rg1_DSC08601",
+      nature: "photograph",
+      alt: {
+        fr: "Chambre et salle de bain attenante d'un appartement meublé de la résidence livrée Riad Garden I, à Marrakech : parquet à chevrons, meuble vasque en bois et miroir rond.",
+        ar: "غرفة نوم وحمّام ملحق بها في شقة مؤثثة بإقامة رياض غاردن 1 المُسلَّمة بمراكش: باركيه بنقشة متعرّجة، مغسلة على خزانة خشبية ومرآة مستديرة.",
+      },
+    },
+    {
+      key: "rg1_DSC08344",
+      nature: "photograph",
+      alt: {
+        fr: "Séjour d'un appartement meublé de la résidence livrée Riad Garden I, à Marrakech : table à manger en marbre, canapés aux formes arrondies et baie vitrée sur la terrasse.",
+        ar: "صالة الجلوس في شقة مؤثثة بإقامة رياض غاردن 1 المُسلَّمة بمراكش: طاولة طعام رخامية، أرائك بأشكال دائرية ونافذة زجاجية واسعة تُطل على التراس.",
+      },
+    },
+    {
+      key: "rg1_DSC00924",
+      nature: "photograph",
+      alt: {
+        fr: "Piscine de la résidence livrée Riad Garden I, à Marrakech, bordée de palmiers et d'immeubles ocre rose à balcons.",
+        ar: "مسبح إقامة رياض غاردن 1 المُسلَّمة بمراكش، تحيط به أشجار النخيل وعمارات بلون وردي مغرّي ذات شرفات.",
       },
     },
   ],

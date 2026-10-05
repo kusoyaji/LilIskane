@@ -11,12 +11,12 @@ const COPY: Record<
   fr: {
     eyebrow: "En film",
     title: "Notre histoire, racontée par l'image.",
-    lead: "Le film institutionnel de Chaabi Lil Iskane, et celui d'Essaouira El Jadida, la ville nouvelle engagée en 2000.",
+    lead: "Le film institutionnel de Chaabi Lil Iskane, et celui d'Essaouira El Jadida, la ville nouvelle lancée en 2000.",
     corporate: "Film institutionnel",
     essaouira: "Essaouira El Jadida · 2000",
   },
   ar: {
-    eyebrow: "بالفيلم",
+    eyebrow: "بالصوت والصورة",
     title: "قصتنا، تحكيها الصورة.",
     lead: "الفيلم المؤسساتي للشعبي للإسكان، وفيلم الصويرة الجديدة، المدينة الجديدة التي انطلقت سنة 2000.",
     corporate: "الفيلم المؤسساتي",

@@ -31,7 +31,7 @@ Présentation du 6 octobre 2026.
 6. **La carte du Maroc.** Cliquer Agadir ou Marrakech : la liste des programmes apparaît. Une seule
    silhouette, Sahara compris, sans aucune frontière intérieure.
 7. **« Partez de ce que vous payez chaque mois. »** Bouger le curseur de mensualité, puis
-   *Voir les N projets* : la page Projets s'ouvre déjà filtrée. Montrer le filtre
+   *Voir les N programmes* : la page Projets s'ouvre déjà filtrée. Montrer le filtre
    **Livraison immédiate** : les cinq programmes où l'on peut recevoir ses clés maintenant.
 8. **Une page programme récente** — Massylia (Agadir) ou Patio Verde (Mohammedia) : la galerie
    (*Voir toutes les images*, flèches du clavier, ou balayage sur téléphone), le film du programme,
@@ -45,6 +45,12 @@ Présentation du 6 octobre 2026.
 
 ## Si la question vient — ce qui reste à valider avec Chaabi
 
+- **Al Maamora R+1 — à trancher en premier** : la fiche donne des lots de 330 à 550 m² dans sa
+  description, mais de 474 à 618 m² dans ses caractéristiques. La maquette suit les
+  caractéristiques, comme pour tous les autres programmes : 474 à 618 m², soit 2 180 400 DH pour le
+  plus petit lot à 4 600 DH/m². Si la description est la bonne, le plus petit lot revient à
+  1 518 000 DH : une ligne à changer.
+
 - **Vos films affichent d'autres prix que vos fiches.** Les vignettes YouTube annoncent par exemple
   Patio Verde *à partir de 990 000 DH* (fiche : 607 000 DH), Massylia 865 000 DH (fiche :
   1 045 000 DH), Jasmin 700 000 DH (732 000 DH), Al Anbar 560 000 DH (545 000 DH), Izdihar
@@ -54,14 +60,26 @@ Présentation du 6 octobre 2026.
   mentions *Livraison immédiate* et *Livraison imminente*. Il suffira de nous fournir les dates.
 - **Le film d'ouverture** est une séquence d'ambiance réalisée à partir des rendus de Riad
   Garden II ; elle doit être validée par l'architecte avant mise en ligne.
-- **Photographies à confirmer** : les deux vues extérieures publiées sur la fiche Jasmin pourraient
-  montrer Bougainvillier (même boulevard, même architecture) ; Al Anbra est *en cours de
-  construction* mais ses photos montrent des appartements terminés (tranche précédente ?).
+- **Photographies à confirmer** : les deux vues extérieures publiées sur la fiche Jasmin montrent des
+  immeubles déjà habités (paraboles, climatiseurs), sans doute Bougainvillier (même boulevard, même
+  architecture) : la maquette les a retirées de la galerie Jasmin en attendant. Al Anbra et Les Pins
+  de Maamora sont *en cours de construction* mais leurs photos montrent des appartements terminés
+  (tranche précédente ? appartement témoin ?) : la maquette les présente avec la mention
+  « Photographies d'appartements achevés, présentées à titre indicatif — non contractuelles ».
+  Une photo d'un bâtiment rouge voisin, sur la fiche Les Pins, a été écartée.
+- **Noms arabes à valider** : « لي بان دو معمورة » pour Les Pins de Maamora (transcription du
+  français ; « صنوبر المعمورة » serait la traduction) et « العنبرة » pour Al Anbra. Dyar Al Bahia
+  suit désormais votre propre graphie YouTube, « ديار الباهية ».
+- **Nombre de villes** : « 15 villes » vient de la liste de votre formulaire de contact, qui ne
+  comprend pas Sidi Rahal, où se trouvent Océane et Océane R+1. 15 ou 16 ?
+- **Locaux commerciaux** : vos fiches Riad Garden II, Odyssée et Al Youssoufia R+3 mentionnent des
+  commerces en rez-de-chaussée, mais ne les proposent pas à la vente ; la maquette ne les liste donc
+  plus parmi les biens proposés. Les duplex d'Assalam et d'Al Anbar ne sont pas encore une catégorie.
+- **Rendus d'Assafa** : les vitrines des rendus portent des enseignes de marques de mode
+  reconnaissables ; ce ne sont pas des enseignes réelles du programme.
 - **Visuels à demander** en haute définition : une façade de Massylia, de Jnane Souss,
   d'Al Yassamine et d'Assalam (seules existent des images de 728 à 1 100 px) ; des intérieurs
   d'Amaïa (aucun n'est publié).
-- **Al Maamora R+1** : la fiche donne des lots de 330 à 550 m² dans sa description, et de 474 à
-  618 m² dans ses caractéristiques. La maquette suit la description.
 - **Massylia et Jnane Souss** partagent le même point sur votre carte ; **Jasmin** partage celui de
   Bougainvillier. Des coordonnées précises améliorent la carte.
 - **La brochure** liée sur la fiche Assalam est un ancien catalogue général (Nador, Kénitra,
@@ -74,7 +92,7 @@ Présentation du 6 octobre 2026.
 
 ## Ce qui a changé depuis la v1
 
-- **Tout le contenu de votre site est repris** : 23 programmes (la v1 en montrait 14), 155 de vos
+- **Tout le contenu de votre site est repris** : 23 programmes (la v1 en montrait 14), 152 de vos
   photographies et rendus en galeries, 12 visites 360°, et vos films YouTube — sur les pages
   programme, sur l'accueil, À propos et Actualités.
 - Les fiches suivent désormais **vos propres pages** : adresses, surfaces, hauteurs, équipements,

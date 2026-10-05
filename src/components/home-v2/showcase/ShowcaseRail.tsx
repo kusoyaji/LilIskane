@@ -70,10 +70,13 @@ export function ShowcaseRail({
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          // About half as much scroll as pan, capped at three screens:
-          // fourteen programmes are a rail to sweep along, not a walkthrough
-          // to sit in (≈2 700px of wheel at 1440×900, down from ≈4 150px).
-          end: () => `+=${Math.max(1, Math.round(Math.min(shift() * 0.52, window.innerHeight * 3)))}`,
+          // About half as much scroll as pan, capped at four and a half
+          // screens: the programmes are a rail to sweep along, not a
+          // walkthrough to sit in. With 23 cards the pan is ≈8 500px at
+          // 1440×900; a three-screen cap moved it 3.1px per px of wheel (a
+          // card per notch, a blur). 4.5 screens (≈4 050px) keeps it near the
+          // ≈2:1 the 14-card rail had.
+          end: () => `+=${Math.max(1, Math.round(Math.min(shift() * 0.52, window.innerHeight * 4.5)))}`,
           pin: stage,
           anticipatePin: 1,
           // The only pin on the home page: it measures first, so every

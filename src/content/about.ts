@@ -120,7 +120,7 @@ export const about: Copy<{
     next: {
       eyebrow: "Aujourd'hui",
       title: "La suite s'écrit à Marrakech.",
-      body: "Riad Garden II, deuxième tranche de Riad Garden, à deux cents mètres de la première. En lancement.",
+      body: "Riad Garden II, deuxième tranche de Riad Garden, sur la même avenue que la première. En lancement.",
       cta: "Découvrir Riad Garden II",
       renderNote: "Rendu — image non contractuelle",
     },
@@ -157,7 +157,7 @@ export const about: Copy<{
     },
     guarantees: {
       eyebrow: "Garanties & durabilité",
-      title: "Chaque logement est garanti, jusqu'à dix ans.",
+      title: "Des garanties légales, jusqu'à dix ans après la réception.",
       lead: "Acheter un logement est une étape majeure. Chaque bien est protégé par les garanties prévues par le cadre légal marocain, à compter de la réception des travaux.",
       unit: (n) => (n === 1 ? "an" : "ans"),
       scale: "Durée de couverture après réception",
@@ -218,9 +218,9 @@ export const about: Copy<{
     next: {
       eyebrow: "اليوم",
       title: "والحكاية تتواصل في مراكش.",
-      body: "رياض غاردن 2، الشطر الثاني من رياض غاردن، على بعد مائتي متر من الأول. في طور الإطلاق.",
+      body: "رياض غاردن 2، الشطر الثاني من رياض غاردن، على الشارع نفسه الذي يقع عليه الشطر الأول. في طور الإطلاق.",
       cta: "اكتشفوا رياض غاردن 2",
-      renderNote: "تصور — صورة غير تعاقدية",
+      renderNote: "تصوّر — صورة غير تعاقدية",
     },
     values: {
       eyebrow: "قيمنا",
@@ -255,7 +255,7 @@ export const about: Copy<{
     },
     guarantees: {
       eyebrow: "الضمانات والاستدامة",
-      title: "كل مسكن مضمون، لمدة تصل إلى عشر سنوات.",
+      title: "ضمانات قانونية تصل إلى عشر سنوات بعد تسلّم الأشغال.",
       lead: "اقتناء مسكن خطوة كبرى. لذلك يحظى كل عقار بالضمانات التي ينص عليها الإطار القانوني المغربي، ابتداءً من تسلّم الأشغال.",
       unit: (n) => (n === 1 ? "سنة" : n === 2 ? "سنتان" : "سنوات"),
       scale: "مدة الضمان بعد التسلّم",

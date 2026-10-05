@@ -231,7 +231,7 @@ export const projects: Project[] = [
     lng: -7.9902,
     segment: "haut-standing",
     status: "en-lancement",
-    kinds: ["appartement", "local-commercial"],
+    kinds: ["appartement"],
     price: { amount: 1830000, unit: "total" },
     surfaceMin: 84,
     surfaceMax: 116,
@@ -531,7 +531,8 @@ export const projects: Project[] = [
   {
     id: "191",
     slug: "oceane-r1",
-    name: { fr: "Océane R+1 — lots de terrain", ar: "أوسيان R+1 — بقع أرضية" },
+    // No-break space before the dash: it must not open the second line of a wrapped card title.
+    name: { fr: "Océane R+1 — lots de terrain", ar: "أوسيان R+1 — بقع أرضية" },
     cityId: "sidi-rahal",
     neighbourhood: { fr: "Route d'Azemmour", ar: "طريق أزمور" },
     lat: 33.4716,
@@ -579,7 +580,7 @@ export const projects: Project[] = [
     lng: -7.3862,
     segment: "haut-standing",
     status: "en-lancement",
-    kinds: ["appartement", "local-commercial"],
+    kinds: ["appartement"],
     price: { amount: 1010000, unit: "total" },
     surfaceMin: 73,
     surfaceMax: 111,
@@ -622,7 +623,7 @@ export const projects: Project[] = [
   {
     id: "220",
     slug: "odyssee-studios",
-    name: { fr: "Odyssée Studios", ar: "أوديسي ستوديوهات" },
+    name: { fr: "Odyssée Studios", ar: "أوديسي استوديوهات" },
     cityId: "mohammedia",
     neighbourhood: { fr: "Avenue Hassan II, rue d'Agadir", ar: "شارع الحسن الثاني، زنقة أكادير" },
     lat: 33.6858,
@@ -652,14 +653,14 @@ export const projects: Project[] = [
     ],
     summary: {
       fr: "Studios de 38 à 47 m² dans le programme Odyssée, avec séjour, chambre séparée, cuisine équipée et balcon.",
-      ar: "ستوديوهات من 38 إلى 47 م² ضمن برنامج أوديسي، بصالون وغرفة منفصلة ومطبخ مجهّز وشرفة.",
+      ar: "استوديوهات من 38 إلى 47 م² ضمن مشروع أوديسي، بصالون وغرفة منفصلة ومطبخ مجهّز وشرفة.",
     },
     hero: {
       key: "th_odyssee_studios",
       nature: "render",
       alt: {
         fr: "Odyssée Studios à Mohammedia : piscine centrale bordée de transats et de parasols, entre des immeubles aux façades claires.",
-        ar: "أوديسي ستوديوهات بالمحمدية: مسبح مركزي تحيط به كراسي الاستلقاء والمظلات، بين عمارات بواجهات فاتحة.",
+        ar: "أوديسي استوديوهات بالمحمدية: مسبح مركزي تحيط به كراسي الاستلقاء والمظلات، بين عمارات بواجهات فاتحة.",
       },
     },
     gallery: galleries["odyssee-studios"],
@@ -668,7 +669,7 @@ export const projects: Project[] = [
     typologies: [
       {
         id: "studio",
-        label: { fr: "Studio", ar: "ستوديو" },
+        label: { fr: "Studio", ar: "استوديو" },
         kind: "studio",
         surfaceMin: 38,
         surfaceMax: 47,
@@ -847,8 +848,8 @@ export const projects: Project[] = [
       key: "th_izdihar",
       nature: "render",
       alt: {
-        fr: "Résidence Izdihar à Essaouira : immeubles blancs à volets bleus organisés autour d'une cour plantée.",
-        ar: "إقامة الازدهار بالصويرة: عمارات بيضاء بمصاريع زرقاء منتظمة حول فناء مغروس.",
+        fr: "Rendu de la résidence Izdihar, à Essaouira : immeubles blancs sur trois niveaux aux encadrements de fenêtres couleur bois, palmiers sur une pelouse en bord de voie.",
+        ar: "تصوّر لإقامة الازدهار بالصويرة: عمارات بيضاء من ثلاثة مستويات بإطارات نوافذ بلون الخشب، ونخيل على عشب بمحاذاة الطريق.",
       },
     },
     gallery: galleries["izdihar"],
@@ -863,7 +864,7 @@ export const projects: Project[] = [
   {
     id: "161",
     slug: "dyar-al-bahia-2",
-    name: { fr: "Dyar Al Bahia 2", ar: "ديار البهية 2" },
+    name: { fr: "Dyar Al Bahia 2", ar: "ديار الباهية 2" },
     cityId: "temara",
     neighbourhood: { fr: "Al Massira II, avenue Lalla Meriem", ar: "المسيرة 2، شارع للا مريم" },
     // Client: "au cœur de la ville de Temara" — the Témara centroid, not
@@ -891,7 +892,7 @@ export const projects: Project[] = [
       nature: "render",
       alt: {
         fr: "Immeubles de Dyar Al Bahia 2 à Témara, façades blanches et balcons.",
-        ar: "عمارات ديار البهية 2 بتمارة، واجهات بيضاء وشرفات.",
+        ar: "عمارات ديار الباهية 2 بتمارة، واجهات بيضاء وشرفات.",
       },
     },
     gallery: galleries["dyar-al-bahia-2"],
@@ -907,7 +908,7 @@ export const projects: Project[] = [
           nature: "render",
           alt: {
             fr: "Immeubles de Dyar Al Bahia 2 à Témara, façades blanches et balcons.",
-            ar: "عمارات ديار البهية 2 بتمارة، واجهات بيضاء وشرفات.",
+            ar: "عمارات ديار الباهية 2 بتمارة، واجهات بيضاء وشرفات.",
           },
         },
         // Still en lancement: nothing in this programme is delivered, so the
@@ -970,7 +971,7 @@ export const projects: Project[] = [
     lng: -7.8479,
     segment: "terrain",
     status: "en-construction",
-    kinds: ["lot", "local-commercial"],
+    kinds: ["lot"],
     price: { amount: 4950, unit: "per-sqm", minimumLotSqm: 147 },
     surfaceMin: 147,
     surfaceMax: 173,
@@ -1010,15 +1011,19 @@ export const projects: Project[] = [
     lat: 34.0043,
     lng: -6.7412,
     segment: "terrain",
-    // Client: "Livraison immédiate", no promotion. Lots of 330 to 550 m² per
-    // the client's description (its spec line says 474–618 m²: to confirm
-    // with the client; the description's range is used until then).
+    // Client: "Livraison immédiate", no promotion. The fiche contradicts
+    // itself: its description says lots "de 330 à 550 m²", its spec block
+    // "Superficie min : 474 m² / max : 618 m²". Surfaces follow the spec block,
+    // as for every other programme (Youssoufia's 120 and 147 m² are spec-block
+    // figures too), and it is the conservative choice: the derived smallest-lot
+    // price can only be too high, never undercut the client. Open question in
+    // docs/DEMO.md.
     status: "livre",
     readyNow: true,
     kinds: ["lot"],
-    price: { amount: 4600, unit: "per-sqm", minimumLotSqm: 330 },
-    surfaceMin: 330,
-    surfaceMax: 550,
+    price: { amount: 4600, unit: "per-sqm", minimumLotSqm: 474 },
+    surfaceMin: 474,
+    surfaceMax: 618,
     bedroomsMin: 0,
     bedroomsMax: 0,
     floors: null,
@@ -1026,8 +1031,8 @@ export const projects: Project[] = [
     deliveredYear: null,
     amenities: ["mosquee", "ecoles", "commerces", "espaces-verts", "piscine", "centre-commercial"],
     summary: {
-      fr: "Lots de villas viabilisés et équipés, de 330 à 550 m², en bande ou isolés, à bâtir en R+1 avec sous-sol, face à la mosquée Mohammed VI. Livraison immédiate.",
-      ar: "بقع فيلات مجهّزة من 330 إلى 550 م²، متلاصقة أو مستقلة، للبناء بطابق أرضي وطابق علوي مع طابق تحت أرضي، قبالة مسجد محمد السادس. تسليم فوري.",
+      fr: "Lots de villas viabilisés et équipés, en bande ou isolés, à bâtir en R+1 avec sous-sol, face à la mosquée Mohammed VI. Livraison immédiate.",
+      ar: "بقع فيلات مجهّزة، متلاصقة أو مستقلة، للبناء بطابق أرضي وطابق علوي مع طابق تحت أرضي، قبالة مسجد محمد السادس. تسليم فوري.",
     },
     hero: {
       key: "th_maamora",
@@ -1068,7 +1073,7 @@ export const projects: Project[] = [
     floors: "R+4",
     deliveryYear: null,
     deliveredYear: null,
-    amenities: ["mosquee","centre-commercial","commerces"],
+    amenities: ["mosquee","centre-commercial","commerces","ascenseur"],
     summary: {
       fr: "Assafa est située sur le boulevard Mohammed VI, au cœur de Had Soualem, à dix minutes des plages de Sidi Rahal. Ses immeubles en R+4 avec ascenseurs accueillent des appartements de 55 à 65 m², avec salon, trois chambres, cuisine avec buanderie et salle de bains.",
       ar: "تقع إقامة الصفاء على شارع محمد السادس، في قلب حد السوالم، على بعد عشر دقائق من شواطئ سيدي رحال. وتضم عماراتها المكوّنة من طابق أرضي وأربعة طوابق والمجهّزة بمصاعد شققاً من 55 إلى 65 م²، بصالون وثلاث غرف ومطبخ مع غرفة غسيل وحمّام.",
@@ -1122,7 +1127,7 @@ export const projects: Project[] = [
     floors: "R+5",
     deliveryYear: null,
     deliveredYear: null,
-    amenities: ["piscine","mosquee","ecoles","parking-sous-sol","espaces-verts","commerces","centre-commercial","aires-de-jeux"],
+    amenities: ["piscine","mosquee","ecoles","parking-sous-sol","espaces-verts","commerces","centre-commercial","aires-de-jeux","ascenseur"],
     summary: {
       fr: "Résidence en R+5 à Tassila, dans l'extension du quartier Al Houda, à l'entrée d'Agadir en venant de Marrakech, avec piscines, espaces verts et ascenseurs. Appartements de 3 chambres de 80 à 96 m², avec balcons, salon, cuisine équipée et deux salles de bains.",
       ar: "إقامة في عمارات من طابق أرضي وخمسة طوابق بتاسيلا، في امتداد حي الهدى عند مدخل أكادير من جهة مراكش، تضم مسابح ومساحات خضراء ومصاعد. شقق بثلاث غرف نوم من 80 إلى 96 م²، مع شرفات وصالون ومطبخ مجهّز وحمّامين.",
@@ -1176,7 +1181,7 @@ export const projects: Project[] = [
     floors: "R+5",
     deliveryYear: null,
     deliveredYear: null,
-    amenities: ["mosquee","ecoles","parking-sous-sol","espaces-verts","commerces","centre-commercial"],
+    amenities: ["mosquee","ecoles","parking-sous-sol","espaces-verts","commerces","centre-commercial","ascenseur"],
     summary: {
       fr: "Résidence en immeubles R+5 à Tassila, dans l'extension du quartier Al Houda à Agadir, proche des commerces, des transports et des plages, avec ascenseurs et parkings souterrains. Appartements de 3 chambres de 70 à 91 m², avec balcon, salon, cuisine équipée et buanderie, deux salles de bains et toilettes de service.",
       ar: "إقامة في عمارات من طابق أرضي وخمسة طوابق بتاسيلا، في امتداد حي الهدى بأكادير، قريبة من المتاجر ووسائل النقل والشواطئ، ومجهّزة بمصاعد ومرائب تحت أرضية. شقق بثلاث غرف نوم من 70 إلى 91 م²، مع شرفة وصالون ومطبخ مجهّز وغرفة غسيل وحمّامين ومرحاض للخدمة.",
@@ -1283,6 +1288,11 @@ export const projects: Project[] = [
       },
     },
     gallery: galleries["al-anbra"],
+    // The badge says "En cours de construction"; the client's photographs show finished flats.
+    galleryNote: {
+      fr: "Photographies d'appartements achevés, présentées à titre indicatif — non contractuelles.",
+      ar: "صور لشقق مكتملة الإنجاز، مقدَّمة على سبيل الاستئناس — غير تعاقدية.",
+    },
     proof: [],
     tours: [],
     typologies: [],
@@ -1311,8 +1321,8 @@ export const projects: Project[] = [
     deliveredYear: null,
     amenities: ["espaces-verts","mosquee","ecoles","commerces"],
     summary: {
-      fr: "À Al Ghazoua, à 7 km d'Essaouira et près des plages, Al Yassamine est une résidence livrée d'immeubles en R+3 implantés au milieu de larges espaces verts, avec des espaces communs aménagés et sécurisés. Ses appartements de 77 à 142 m², disponibles immédiatement, comptent deux ou trois chambres, deux salles de bain et une cuisine.",
-      ar: "في الغزوة، على بُعد 7 كلم من الصويرة وعلى مقربة من الشواطئ، تضمّ إقامة الياسمين المُسلَّمة عمارات من طابق أرضي وثلاثة طوابق وسط مساحات خضراء واسعة، مع فضاءات مشتركة مهيّأة ومؤمَّنة. شققها، من 77 إلى 142 م²، متاحة فوراً، وتضمّ غرفتين أو ثلاث غرف وحمّامين ومطبخاً.",
+      fr: "À Al Ghazoua, à 7 km d'Essaouira et près des plages, Al Yassamine est une résidence livrée d'immeubles en R+3 implantés au milieu de larges espaces verts, avec des espaces communs aménagés et sécurisés. Ses appartements de 77 à 142 m², disponibles immédiatement, comptent deux ou trois chambres, deux salles de bain et une cuisine. Projet éligible au programme d'aide directe au logement.",
+      ar: "في الغزوة، على بُعد 7 كلم من الصويرة وعلى مقربة من الشواطئ، تضمّ إقامة الياسمين المُسلَّمة عمارات من طابق أرضي وثلاثة طوابق وسط مساحات خضراء واسعة، مع فضاءات مشتركة مهيّأة ومؤمَّنة. شققها، من 77 إلى 142 م²، متاحة فوراً، وتضمّ غرفتين أو ثلاث غرف وحمّامين ومطبخاً. مشروع مؤهَّل لبرنامج الدعم المباشر للسكن.",
     },
     hero: {
       key: "hp_al_yassamine",
@@ -1403,10 +1413,10 @@ export const projects: Project[] = [
     floors: "R+5",
     deliveryYear: null,
     deliveredYear: null,
-    amenities: ["centre-commercial","spa","espaces-verts","parking-sous-sol","ecoles","commerces","mosquee","terrains-de-sport"],
+    amenities: ["centre-commercial","spa","espaces-verts","parking-sous-sol","ecoles","commerces","mosquee","terrains-de-sport","ascenseur"],
     summary: {
       fr: "Sur l'avenue Hassan II à Mohammedia, Patio Verde réunit des immeubles en R+5 avec ascenseurs et parking en sous-sol. Studios de 46 à 83 m² avec balcon, et appartements de 88 à 130 m² à deux chambres, dont une suite parentale avec salle de bains et dressing.",
-      ar: "على شارع الحسن الثاني بالمحمدية، تضم إقامة باتيو فيردي عمارات من طابق أرضي وخمسة طوابق مجهّزة بمصاعد ومرأب تحت أرضي. ستوديوهات من 46 إلى 83 م² بشرفات، وشقق من 88 إلى 130 م² بغرفتين، إحداهما جناح رئيسي بحمّام وغرفة ملابس.",
+      ar: "على شارع الحسن الثاني بالمحمدية، تضم إقامة باتيو فيردي عمارات من طابق أرضي وخمسة طوابق مجهّزة بمصاعد ومرأب تحت أرضي. استوديوهات من 46 إلى 83 م² بشرفات، وشقق من 88 إلى 130 م² بغرفتين، إحداهما جناح رئيسي بحمّام وغرفة ملابس.",
     },
     hero: {
       key: "hp_patio_verde",
@@ -1457,7 +1467,7 @@ export const projects: Project[] = [
     floors: "R+3",
     deliveryYear: null,
     deliveredYear: null,
-    amenities: ["commerces","ecoles","mosquee","parking-sous-sol","aires-de-jeux","piscine"],
+    amenities: ["commerces","ecoles","mosquee","parking-sous-sol","aires-de-jeux","piscine","ascenseur"],
     summary: {
       fr: "Immeubles R+3 de moyen standing aux abords de la forêt, avenue Lalla Meryem à Sala Al Jadida, avec un ascenseur desservant le parking en sous-sol et un rez-de-chaussée commercial. Les appartements de 72 à 97 m² comptent deux à trois chambres, dont une suite parentale avec salle de bain, et une cuisine équipée avec buanderie.",
       ar: "عمارات من طابق أرضي وثلاثة طوابق، من فئة السكن المتوسط، على مشارف الغابة بشارع للا مريم في سلا الجديدة، بمصعد يصل إلى المرأب تحت الأرضي وطابق أرضي تجاري. شقق من 72 إلى 97 م²، من غرفتين إلى ثلاث غرف، منها جناح أبوي بحمّام خاص، ومطبخ مجهّز مع غرفة غسيل.",
@@ -1471,6 +1481,11 @@ export const projects: Project[] = [
       },
     },
     gallery: galleries["les-pins-de-maamora"],
+    // The badge says "En cours de construction"; the client's photographs show finished flats.
+    galleryNote: {
+      fr: "Photographies d'appartements achevés, présentées à titre indicatif — non contractuelles.",
+      ar: "صور لشقق مكتملة الإنجاز، مقدَّمة على سبيل الاستئناس — غير تعاقدية.",
+    },
     proof: [],
     tours: [],
     typologies: [],

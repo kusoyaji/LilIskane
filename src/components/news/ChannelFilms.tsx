@@ -17,8 +17,8 @@ const COPY: Record<Locale, { eyebrow: string; title: string; lead: string; progr
   ar: {
     eyebrow: "على قناتنا",
     title: "أحدث الأفلام.",
-    lead: "البرامج بالصورة، كما تقدّمها الشعبي للإسكان على قناتها في يوتيوب.",
-    programme: "اكتشفوا البرنامج",
+    lead: "المشاريع بالصورة، كما تقدّمها الشعبي للإسكان على قناتها في يوتيوب.",
+    programme: "عرض المشروع",
     channel: "القناة كاملة على يوتيوب",
   },
 };

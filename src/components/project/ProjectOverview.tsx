@@ -5,7 +5,7 @@ import { getCity } from "@/data/cities";
 import type { Project } from "@/data/types";
 import { getDictionary } from "@/i18n";
 import type { Locale } from "@/i18n/config";
-import { KIND_LABELS, projectCopy, SEGMENT_LABELS, statusText } from "@/content/projects";
+import { KIND_LABELS, projectCopy, readyNowLine, SEGMENT_LABELS, statusText } from "@/content/projects";
 import { formatPrice } from "@/lib/format";
 import { LandPlan } from "./LandPlan";
 import { heroMode, year } from "./view";
@@ -31,7 +31,7 @@ export function ProjectOverview({
   const c = projectCopy[locale];
   const city = getCity(project.cityId);
 
-  const statusLine = project.readyNow
+  const statusLine = readyNowLine(project)
     ? `${statusText(project, locale)} · ${c.readyNow}`
     : project.deliveryYear
       ? `${statusText(project, locale)} · ${c.delivery(year(project.deliveryYear))}`

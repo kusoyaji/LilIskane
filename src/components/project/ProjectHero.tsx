@@ -110,7 +110,16 @@ export function ProjectHero({ locale, project }: { locale: Locale; project: Proj
     return (
       <section className={`${s.hero} ${s.full}`} data-nav-media>
         <div className={s.backdrop} data-parallax="0.25">
-          <Figure ref_={project.hero} locale={locale} sizes="100vw" priority className={s.backdropImg} />
+          {/* Portrait screens crop a landscape picture to cover a tall box: ask for
+              a file as wide as the cropped picture really is (box height x 16/9),
+              or a phone gets a 420 px file stretched four times. */}
+          <Figure
+            ref_={project.hero}
+            locale={locale}
+            sizes="(max-aspect-ratio: 1/1) 178vh, 100vw"
+            priority
+            className={s.backdropImg}
+          />
         </div>
         <div aria-hidden className={s.scrim} />
         {project.hero.nature === "render" && (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import s from "./YouTubeFilm.module.css";
 
 /**
@@ -16,19 +16,30 @@ export function YouTubePlayer({
   youtubeId,
   title,
   playLabel,
+  badge,
   children,
 }: {
   youtubeId: string;
   title: string;
   playLabel: string;
+  /** Shown over the poster only (e.g. the non-contractual note on a render). */
+  badge?: string;
   children: React.ReactNode;
 }) {
   const [playing, setPlaying] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // The pressed button unmounts as the player mounts; hand focus to the
+  // player so a keyboard user lands on its controls, not back at <body>.
+  useEffect(() => {
+    if (playing) iframeRef.current?.focus();
+  }, [playing]);
 
   return (
     <div className={s.frame}>
       {playing ? (
         <iframe
+          ref={iframeRef}
           className={s.iframe}
           src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
           title={title}
@@ -48,6 +59,7 @@ export function YouTubePlayer({
           </span>
         </button>
       )}
+      {badge && !playing && <span className={s.badge}>{badge}</span>}
     </div>
   );
 }

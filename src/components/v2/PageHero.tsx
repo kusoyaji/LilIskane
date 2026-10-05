@@ -46,7 +46,13 @@ export function PageHero({
       {variant === "media" && media && (
         <>
           <div className={s.heroBackdrop} data-parallax="0.35">
-            <Figure ref_={media} locale={locale} sizes="100vw" priority className="h-full w-full object-cover" />
+            <Figure
+              ref_={media}
+              locale={locale}
+              sizes="(max-aspect-ratio: 1/1) 160vh, 100vw"
+              priority
+              className="h-full w-full object-cover"
+            />
           </div>
           <div aria-hidden className={s.heroScrim} />
         </>

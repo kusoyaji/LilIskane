@@ -138,7 +138,7 @@ export const flagshipCopy: Copy<{
     commerces: string;
   };
   phase1Eyebrow: string;
-  phase1Title: (metres: string) => string;
+  phase1Title: string;
   phase1Body: string;
   photoNote: string;
   amenitiesLabel: string;
@@ -166,9 +166,9 @@ export const flagshipCopy: Copy<{
       commerces: "Les commerces",
     },
     phase1Eyebrow: "Riad Garden I · livraison immédiate",
-    phase1Title: (m) => `La première tranche est livrée, à ${m} mètres.`,
+    phase1Title: "La première tranche est livrée, sur la même avenue.",
     phase1Body:
-      "Mêmes équipes, mêmes finitions. Des familles y vivent déjà : venez la voir avant de vous engager sur Riad Garden II.",
+      "Des familles y vivent déjà. Venez la voir avant de vous engager sur Riad Garden II : c'est la meilleure façon de juger ce que nous livrons.",
     photoNote: "Photographie — Riad Garden I, livré",
     amenitiesLabel: "Sur place et à proximité",
     amenities: {
@@ -181,7 +181,6 @@ export const flagshipCopy: Copy<{
       ascenseur: "Ascenseur",
       "espaces-verts": "Jardins plantés",
       "vue-montagne": "Vue sur les montagnes",
-      securite: "Sécurité",
     },
     ctaProject: "Tout sur Riad Garden II",
   },
@@ -205,9 +204,9 @@ export const flagshipCopy: Copy<{
       commerces: "المحلات التجارية",
     },
     phase1Eyebrow: "رياض غاردن 1 · تسليم فوري",
-    phase1Title: (m) => `الشطر الأول مُسلَّم، على بعد ${m} متر.`,
+    phase1Title: "الشطر الأول مُسلَّم، على الشارع نفسه.",
     phase1Body:
-      "نفس الفرق، نفس التشطيبات. عائلات تسكنه اليوم: تعالوا لرؤيته قبل الالتزام برياض غاردن 2.",
+      "عائلات تسكنه اليوم. تعالوا لزيارته قبل الالتزام برياض غاردن 2: إنها أفضل طريقة للحكم على ما نسلّمه.",
     photoNote: "صورة — رياض غاردن 1 بعد التسليم",
     amenitiesLabel: "في عين المكان وبالقرب منه",
     amenities: {
@@ -220,7 +219,6 @@ export const flagshipCopy: Copy<{
       ascenseur: "مصعد",
       "espaces-verts": "حدائق مغروسة",
       "vue-montagne": "إطلالة على الجبال",
-      securite: "حراسة وأمن",
     },
     ctaProject: "كل شيء عن رياض غاردن 2",
   },

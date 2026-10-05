@@ -13,7 +13,7 @@ import s from "./map/Map.module.css";
 /* -----------------------------------------------------------------------------
  * Geometry, in the outline's own viewBox units (1000 × 1066).
  *
- * Five of the eight programme cities sit within forty kilometres of each other
+ * Five of the nine programme cities sit within forty kilometres of each other
  * on the Rabat–Casablanca coast — at any size a page can give a whole-country
  * map, their pins would sit on top of one another. Rather than crop the map
  * (the outline is the Kingdom, whole, and is never cut), that stretch is shown
@@ -23,9 +23,14 @@ import s from "./map/Map.module.css";
 
 /** Centre of the magnified stretch (between Had Soualem and Salé). */
 const SOURCE = { x: 600, y: 160 };
-/** Where the loupe sits: open ocean, west of the coast at every latitude it spans. */
-const LOUPE = { x: 250, y: 210, r: 190 };
-const ZOOM = 3.4;
+/**
+ * Where the loupe sits: open ocean, west of the coast at every latitude it
+ * spans. As large as that water allows — its right edge stops just short of
+ * Essaouira's pin — because five labelled programme cities share it.
+ */
+const LOUPE = { x: 236, y: 214, r: 205 };
+/** Same source circle as ever (≈56 units): only the lens grew. */
+const ZOOM = 3.668;
 const SOURCE_R = LOUPE.r / ZOOM;
 
 /**
@@ -36,14 +41,19 @@ const SOURCE_R = LOUPE.r / ZOOM;
 const LABEL_SIDE: Record<string, MapDot["side"]> = {
   tanger: "e",
   marrakech: "e",
-  essaouira: "s",
-  agadir: "e",
+  // Essaouira is boxed in: the loupe to the west, Agadir's pin 80 km south,
+  // Marrakech's pin due east. Its label sits above, starting a little west of
+  // its pin, which clears both the loupe ring and Marrakech.
+  essaouira: "ne",
+  // Below its pin: east of it is where the city panel sits on desktop.
+  agadir: "s",
   "al-hoceima": "s",
   nador: "e",
   "ksar-el-kebir": "w",
   kenitra: "e",
-  // inside the loupe
-  "sala-al-jadida": "e",
+  // Inside the loupe: coastal names over the water, inland names over land,
+  // every one inside the ring (measured down to a 514px map, at 1024 wide).
+  "sala-al-jadida": "w",
   temara: "w",
   mohammedia: "e",
   // Sidi Rahal Chatai is on the coast: its label sits above, over the ocean.
@@ -52,15 +62,40 @@ const LABEL_SIDE: Record<string, MapDot["side"]> = {
 };
 
 /**
+ * Phones name only the active city, so its label only has to clear the ring
+ * and its neighbours' discs; at 350px the lens is 145px across, so every name
+ * in it points towards the middle. Had Soualem, low in the lens, is named
+ * above its pin and to the east ("ne"), where the ring is wide enough.
+ */
+const PHONE_LABEL_SIDE: Record<string, MapDot["side"]> = {
+  "sala-al-jadida": "w",
+  temara: "s",
+  mohammedia: "n",
+  "sidi-rahal": "e",
+  "had-soualem": "ne",
+};
+
+/**
  * Desktop: loupe points nudged apart where true positions collide.
  *
- * Sidi Rahal Chatai and Had Soualem are ~10 km apart, which even at 3.4× puts
- * their programme pins on top of each other. Sidi Rahal keeps its true place on
- * the coastline; Had Soualem moves a few kilometres further inland — the
- * direction it actually lies from the coast. Loupe (viewBox) units.
+ * Five programme cities and three footprint cities share a lens 410 units
+ * across, and at their true magnified places Témara's pin sits on Sala Al
+ * Jadida's and Had Soualem's on Sidi Rahal's. These are the same points moved
+ * as little as possible (found by search, checked at every desktop width from
+ * a 514px map up) until every pin and label is clear of every other and of the
+ * ring. Sidi Rahal keeps its true place on the coastline; Témara slides a few
+ * kilometres south along the coast; Had Soualem moves inland, the direction it
+ * actually lies; Sala Al Jadida stays north-east of Témara. Loupe (viewBox)
+ * units.
  */
 const DESK_LOUPE: Record<string, { x: number; y: number }> = {
-  "had-soualem": { x: 192, y: 296 },
+  "sala-al-jadida": { x: 391, y: 134 },
+  temara: { x: 331, y: 181 },
+  mohammedia: { x: 241, y: 236 },
+  "had-soualem": { x: 175, y: 304 },
+  casablanca: { x: 200, y: 245 },
+  rabat: { x: 362, y: 161 },
+  nouaceur: { x: 217, y: 294 },
 };
 
 /**
@@ -76,15 +111,26 @@ const DESK_LOUPE: Record<string, { x: number; y: number }> = {
  * (viewBox) units; anything not listed keeps its place.
  */
 const PHONE_LOUPE: Record<string, { x: number; y: number }> = {
-  "sala-al-jadida": { x: 401, y: 133 },
-  temara: { x: 339, y: 197 },
-  mohammedia: { x: 247, y: 204 },
+  "sala-al-jadida": { x: 399, y: 131 },
+  temara: { x: 332, y: 200 },
+  mohammedia: { x: 233, y: 208 },
   // Coastal (Sidi Rahal Chatai); Had Soualem pushed inland so the two
   // programme pins are a fingertip apart.
-  "sidi-rahal": { x: 140, y: 252 },
-  "had-soualem": { x: 206, y: 302 },
-  rabat: { x: 369, y: 132 },
-  nouaceur: { x: 223, y: 286 },
+  "sidi-rahal": { x: 117, y: 259 },
+  "had-soualem": { x: 189, y: 313 },
+  casablanca: { x: 207, y: 244 },
+  rabat: { x: 364, y: 130 },
+  nouaceur: { x: 207, y: 296 },
+};
+
+/**
+ * Phones, outside the loupe: Essaouira and Agadir are 80 km apart, which on a
+ * 350px map is 26px — closer than a fingertip. Each slides a few kilometres
+ * along its own coast (Essaouira north, Agadir south). Map (viewBox) units.
+ */
+const PHONE_MAP: Record<string, { x: number; y: number }> = {
+  essaouira: { x: 462, y: 298 },
+  agadir: { x: 468, y: 400 },
 };
 
 /** Cities inside the loupe that would only crowd it if labelled. */
@@ -98,7 +144,7 @@ function place(id: string, lat: number, lng: number) {
   const dy = p.y - SOURCE.y;
   const inLoupe = Math.hypot(dx, dy) <= SOURCE_R * 0.92;
   const at = inLoupe ? (DESK_LOUPE[id] ?? { x: LOUPE.x + dx * ZOOM, y: LOUPE.y + dy * ZOOM }) : p;
-  const phone = inLoupe ? PHONE_LOUPE[id] : undefined;
+  const phone = inLoupe ? PHONE_LOUPE[id] : PHONE_MAP[id];
   return {
     inLoupe,
     left: pct(at.x, MOROCCO_VIEWBOX.width),
@@ -130,7 +176,8 @@ function programmeItem(project: Project, locale: Locale) {
     href: `/${locale}/projets/${project.slug}`,
     name: project.name[locale],
     meta: segmentLabels[locale][project.segment],
-    price: `${shared[locale].from} ${formatPrice(project.price, locale)}`,
+    // The figure keeps its unit: the line may wrap after "à partir de", never before "DH".
+    price: `${shared[locale].from} ${formatPrice(project.price, locale).replace(/ (?=\S+$)/, "\u00a0")}`,
     status: statusLabel(project, locale),
     delivered: project.status === "livre",
     // Land has no honest picture (the client's are clip-art signposts), so its
@@ -170,6 +217,7 @@ export function MapSection({ locale }: { locale: Locale }) {
         name: city.name[locale],
         ...at,
         side: LABEL_SIDE[id] ?? "e",
+        phoneSide: PHONE_LABEL_SIDE[id] ?? LABEL_SIDE[id] ?? "e",
         labelled: true,
         count: list.length,
         countLabel: programmeCount(list.length, locale, fmt),

@@ -232,7 +232,8 @@
 .film {
   display: grid;
   gap: clamp(1.5rem, 3vw, 2.5rem);
-  margin-block-start: clamp(4rem, 10vh, 7rem);
+  /* The parent grid gap already separates it from the key dates. */
+  margin-block-start: 0;
   padding-block-start: clamp(2.5rem, 6vh, 4rem);
   border-block-start: 1px solid color-mix(in oklab, var(--color-paper) 22%, transparent);
 }

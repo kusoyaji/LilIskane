@@ -373,6 +373,11 @@
     grid-column: span 2;
   }
 }
+/* Two columns, filtered: keep every row full (see ORDER in NewsList). */
+@media (min-width: 48rem) and (max-width: 71.99rem) {
+  .grid[data-filter="launch"] > .wide:last-child { grid-column: auto; }
+  .grid[data-filter="company"] > .companyClosing { grid-column: span 2; }
+}
 .grid[data-filter="launch"] > [data-cat="company"],
 .grid[data-filter="company"] > [data-cat="launch"] {
   display: none;

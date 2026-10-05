@@ -37,6 +37,8 @@ export function Typologies({
   const t = getDictionary(locale);
   const c = projectCopy[locale];
   const single = typologies.length === 1;
+  /** Arabic sets its percent sign tight against the figure ("4,5٪"). */
+  const pct = locale === "ar" ? "٪" : " %";
   const bedrooms = typologies.map((typology) => typology.bedrooms);
   const title = c.typologiesTitle({
     minBedrooms: Math.min(...bedrooms),
@@ -59,10 +61,16 @@ export function Typologies({
       <ul className={s.grid} data-single={single || undefined}>
         {typologies.map((typology, index) => {
           const published = entryPrice !== undefined && typology.price.amount === entryPrice;
+          // Arabic names one and two rooms with the noun alone ("غرفة واحدة",
+          // "غرفتان"); a numeral in front of a dual reads as a stutter.
           const rooms =
             typology.kind === "studio"
               ? c.studio
-              : `${formatNumber(typology.bedrooms, locale)} ${c.bedroomsWord(typology.bedrooms)}`;
+              : locale === "ar" && typology.bedrooms <= 2
+                ? typology.bedrooms === 1
+                  ? "غرفة واحدة"
+                  : "غرفتان"
+                : `${formatNumber(typology.bedrooms, locale)} ${c.bedroomsWord(typology.bedrooms)}`;
           return (
             <li key={typology.id} className={`u-enter ${s.card}`} data-step={String(Math.min(index + 1, 4))}>
               <div className={s.cardTop}>
@@ -101,7 +109,10 @@ export function Typologies({
               </div>
 
               {slug && (
-                <Link href={`/${locale}/contact?projet=${slug}`} className={`u-eyebrow ${s.ask}`}>
+                <Link
+                  href={`/${locale}/contact?projet=${encodeURIComponent(slug)}&plan=${encodeURIComponent(typology.id)}`}
+                  className={`u-eyebrow ${s.ask}`}
+                >
                   <span>{c.askPlan}</span>
                   <Arrow />
                 </Link>
@@ -114,8 +125,8 @@ export function Typologies({
       <p className={s.note}>
         {c.pricesNote(
           formatNumber(CREDIT_DEFAULTS.years, locale),
-          isolateRun(`${String(Math.round(CREDIT_DEFAULTS.annualRate * 1000) / 10).replace(".", ",")} %`, locale),
-          isolateRun(`${Math.round(CREDIT_DEFAULTS.minDepositRatio * 100)} %`, locale),
+          isolateRun(`${String(Math.round(CREDIT_DEFAULTS.annualRate * 1000) / 10).replace(".", ",")}${pct}`, locale),
+          isolateRun(`${Math.round(CREDIT_DEFAULTS.minDepositRatio * 100)}${pct}`, locale),
         )}
       </p>
     </section>

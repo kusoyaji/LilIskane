@@ -19,6 +19,8 @@ export type ProjectPrefill = {
   cityId: string;
   cityName: string;
   type: BienType | null;
+  /** The plan asked for from a typology ("Demander le plan"), already labelled. */
+  plan?: { id: string; label: string };
 };
 
 export type CityOption = { id: string; name: string };

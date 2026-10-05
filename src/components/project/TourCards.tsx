@@ -302,12 +302,14 @@ export function TourCards({ locale, tours, body, renderNote }: Props) {
     const root = document.documentElement;
     const previousOverflow = root.style.overflow;
     root.style.overflow = "hidden";
+    root.style.scrollbarGutter = "stable"; // no sideways jump with classic scrollbars
     closeRef.current?.focus();
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       for (const element of madeInert) element.removeAttribute("inert");
       root.style.overflow = previousOverflow;
+      root.style.scrollbarGutter = "";
     };
   }, [openId, close]);
 

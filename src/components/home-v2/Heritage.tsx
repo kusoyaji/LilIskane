@@ -8,8 +8,8 @@ import { Drift } from "./heritage/Drift";
 import s from "./heritage/Heritage.module.css";
 
 const FILM: Record<Locale, { eyebrow: string; title: string }> = {
-  fr: { eyebrow: "Le film institutionnel", title: "Soixante-quinze ans, en quelques minutes." },
-  ar: { eyebrow: "الفيلم المؤسساتي", title: "خمسة وسبعون عاماً، في دقائق." },
+  fr: { eyebrow: "Le film institutionnel", title: "Plus de soixante-quinze ans, en quelques minutes." },
+  ar: { eyebrow: "الفيلم المؤسساتي", title: "أكثر من خمسة وسبعين عاماً، في دقائق." },
 };
 
 /** The four dates shown on the home strip; the full ten live on /a-propos. */

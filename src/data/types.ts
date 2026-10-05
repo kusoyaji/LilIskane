@@ -113,6 +113,11 @@ export type GalleryRef = {
   alt: Localized;
   nature: "render" | "photograph";
   smallOnly?: true;
+  /**
+   * The key of the same frame published under another file name (a hero or
+   * tour-poster copy). Lets a page recognise a picture it already shows.
+   */
+  sameAs?: string;
 };
 
 /**
@@ -221,6 +226,11 @@ export type Project = {
   summary: Localized;
   hero: MediaRef;
   gallery: GalleryRef[];
+  /**
+   * Shown under the gallery title when the client's photographs need saying
+   * what they are — e.g. finished flats on a programme still under construction.
+   */
+  galleryNote?: Localized;
   typologies: Typology[];
   tours: VirtualTour[];
   proof: ProofPair[];

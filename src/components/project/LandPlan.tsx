@@ -24,6 +24,13 @@ function offset(index: number, roadAfter: number) {
 
 const SIZE = offset(COLS - 1, ROAD_AFTER_COL) + CELL;
 
+/**
+ * The lattice is drawn left to right, but a label is read in its own script:
+ * an Arabic "⁦150⁩ م²" is set right to left so the unit follows the
+ * (already isolated) number the way Arabic reads it.
+ */
+const labelDir = (label: string) => (/[؀-ۿ]/.test(label) ? "rtl" : "ltr");
+
 export function LandPlan({
   minLabel,
   maxLabel,
@@ -78,6 +85,7 @@ export function LandPlan({
         x={small.x + CELL / 2}
         y={small.y + CELL / 2 + 8}
         textAnchor="middle"
+        direction={labelDir(minLabel)}
         style={{ fontSize: 22, fontWeight: 600, fill: "var(--color-ink)", fontVariantNumeric: "tabular-nums" }}
       >
         {minLabel}
@@ -96,6 +104,7 @@ export function LandPlan({
         x={large.x + largeW / 2}
         y={large.y + CELL / 2 + 8}
         textAnchor="middle"
+        direction={labelDir(maxLabel)}
         style={{ fontSize: 22, fontWeight: 600, fill: "var(--color-ochre-bright)", fontVariantNumeric: "tabular-nums" }}
       >
         {maxLabel}

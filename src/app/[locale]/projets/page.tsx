@@ -53,9 +53,23 @@ export default async function ProjectsPage({
   const typedLocale: Locale = locale;
   const c = searchCopy[typedLocale];
 
-  const filters = fromSearchParams(await searchParams);
+  // Status values offered as chips: those some programme has — minus "Livré"
+  // while every delivered programme is also "Livraison immédiate" (the client's
+  // own label for them), where it would only be a redundant subset.
+  const offeredStatuses = STATUS_FACETS.filter(
+    (st) =>
+      projects.some((p) => hasStatusFacet(p, st)) &&
+      !(st === "livre" && projects.filter((p) => p.status === "livre").every((p) => p.readyNow)),
+  );
+  // A stale or hand-made URL may carry a status no chip offers; dropping it
+  // here keeps the relaxation from widening a filter the visitor cannot see.
+  const parsed = fromSearchParams(await searchParams);
+  const filters = {
+    ...parsed,
+    statuses: parsed.statuses.filter((st) => (offeredStatuses as readonly string[]).includes(st)),
+  };
   const result = search(filters);
-  const query = toSearchParams(filters).toString();
+  const query = toSearchParams(filters).toString().replace(/%2C/gi, ",");
   const items = toListItems(result.projects, typedLocale);
 
   // The relaxation walks a fixed order and records every facet it stepped
@@ -95,7 +109,7 @@ export default async function ProjectsPage({
   const segmentFacets: Facet[] = SEGMENTS.filter((seg) => projects.some((p) => p.segment === seg)).map(
     (seg) => ({ value: seg, label: SEGMENT_LABELS[seg][typedLocale], count: count("segments", (p) => p.segment === seg) }),
   );
-  const statusFacets: Facet[] = STATUS_FACETS.filter((st) => projects.some((p) => hasStatusFacet(p, st))).map(
+  const statusFacets: Facet[] = offeredStatuses.map(
     (st) => ({
       value: st,
       label:

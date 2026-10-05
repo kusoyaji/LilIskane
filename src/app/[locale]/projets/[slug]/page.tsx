@@ -62,6 +62,19 @@ function siblingOf(project: Project): { project: Project; relation: "previous" |
 }
 
 /**
+ * Picture keys this page already shows outside the gallery — the hero, the
+ * tour posters and the film poster. The gallery moves them behind its "+N"
+ * tile so the same frame is not seen twice in one scroll.
+ */
+function shownElsewhere(project: Project): string[] {
+  const keys: string[] = [project.hero.key, ...project.tours.map((tour) => tour.poster.key)];
+  const poster = programmeFilms[project.slug]?.poster;
+  if (poster) keys.push(poster.key);
+  if (project.slug === "riad-garden-i") keys.push("rg1_DSC08344"); // its closing band
+  return keys;
+}
+
+/**
  * Three programmes worth seeing next: same city first, then the same
  * standing, then the closest price — so a buyer looking at a 485 000 DH flat
  * is not sent to a 2.4 M DH one.
@@ -170,6 +183,8 @@ export default async function ProjectPage({
           <ProjectGallery
             locale={typedLocale}
             images={gallery}
+            onPage={shownElsewhere(project)}
+            note={project.galleryNote?.[typedLocale]}
             delivered={project.readyNow === true || project.status === "livre"}
           />
         </div>
@@ -231,12 +246,14 @@ export default async function ProjectPage({
       </div>
 
       <div data-tone="paper">
-        {/* Land programmes have no building to show, and a picture of one
-            under the programme's name would promise what a plot does not
-            deliver. They close on a generic line over the default band image
-            (a delivered Riad Garden I room, never a stock photograph). */}
+        {/* The band's default picture is a delivered Riad Garden I salon.
+            Under "Venez découvrir <another programme>" it would pass that room
+            off as this programme's, so every other programme closes on the ink
+            ground and façade lattice instead. Land programmes also get a
+            generic line: a plot has no rooms to visit. */}
         <CtaBand
           locale={typedLocale}
+          media={project.slug === "riad-garden-i" ? undefined : null}
           title={
             project.segment === "terrain" ? c.ctaTitleLand : c.ctaTitle(project.name[typedLocale])
           }

@@ -70,3 +70,18 @@
 .caption { display: grid; gap: 0.4rem; }
 .eyebrow { color: var(--color-ochre-deep); }
 .title { font-size: var(--text-small); line-height: 1.45; opacity: 0.8; }
+
+/* The non-contractual note on a render poster: top corner, away from the play pill. */
+.badge {
+  position: absolute;
+  inset-block-start: clamp(0.75rem, 1.6vw, 1.25rem);
+  inset-inline-end: clamp(0.75rem, 1.6vw, 1.25rem);
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: rgb(28 30 20 / 0.62);
+  color: var(--color-paper);
+  font-size: var(--text-label);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+}

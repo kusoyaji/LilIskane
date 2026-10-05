@@ -13,6 +13,9 @@ export type ScalarKey = "mensualite" | "apport" | "ville" | "chambres";
 /** Mirrors `DEFAULT_DEPOSIT` in `src/lib/filter.ts`: the value that is left out of the URL. */
 export const DEFAULT_DEPOSIT = 150_000;
 
+/** Lists stay legible in a shared link: "statut=immediate,imminente", not %2C. */
+const legible = (params: URLSearchParams) => params.toString().replace(/%2C/gi, ",");
+
 export function withScalar(query: string, key: ScalarKey, value: string | number | null): string {
   const params = new URLSearchParams(query);
   if (value === null || value === "" || (key === "apport" && Number(value) === DEFAULT_DEPOSIT)) {
@@ -20,7 +23,7 @@ export function withScalar(query: string, key: ScalarKey, value: string | number
   } else {
     params.set(key, String(value));
   }
-  return params.toString();
+  return legible(params);
 }
 
 export function toggleInList(query: string, key: ListKey, value: string): string {
@@ -29,7 +32,7 @@ export function toggleInList(query: string, key: ListKey, value: string): string
   const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value];
   if (next.length) params.set(key, next.join(","));
   else params.delete(key);
-  return params.toString();
+  return legible(params);
 }
 
 export function listOf(query: string, key: ListKey): string[] {

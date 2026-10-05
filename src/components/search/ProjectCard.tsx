@@ -5,8 +5,8 @@ import { heroMode, statusTone, year } from "@/components/project/view";
 import type { ProjectListItem } from "@/data/list";
 import { getDictionary } from "@/i18n";
 import { formatNumber, type Locale } from "@/i18n/config";
-import { projectCopy, statusText } from "@/content/projects";
-import { formatMonthly, formatPrice, formatRange } from "@/lib/format";
+import { projectCopy, readyNowLine, statusText } from "@/content/projects";
+import { effectiveTotal, formatMonthly, formatPrice, formatRange } from "@/lib/format";
 import s from "./ProjectCard.module.css";
 
 /**
@@ -35,9 +35,9 @@ export function ProjectCard({
   const specs = [
     `${formatRange(item.surfaceMin, item.surfaceMax, locale)} ${sqm}`,
     ...(item.bedroomsMax > 0
-      ? [`${formatRange(item.bedroomsMin, item.bedroomsMax, locale)} ${c.bedroomsWord(item.bedroomsMax).toLowerCase()}`]
+      ? [c.bedroomsRange(item.bedroomsMin, item.bedroomsMax, formatRange(item.bedroomsMin, item.bedroomsMax, locale))]
       : []),
-    item.readyNow
+    readyNowLine(item)
       ? c.readyNow
       : item.deliveryYear
         ? c.delivery(year(item.deliveryYear))
@@ -77,8 +77,14 @@ export function ProjectCard({
           <div className={s.priceRow}>
             <p className={s.priceLabel}>{land ? c.perSqm : c.fromPrice}</p>
             <p className={`u-numeric ${s.price}`}>{formatPrice(item.price, locale)}</p>
-            <p className={`u-numeric ${s.monthly}`}>
-              {c.monthlyApprox} {formatMonthly(item.price, locale)}
+            <p className={`u-numeric ${s.monthly} ${item.price.unit === "per-sqm" ? s.monthlyLand : ""}`}>
+              {item.price.unit === "per-sqm"
+                ? c.landLot(
+                    `${formatNumber(item.price.minimumLotSqm ?? item.surfaceMin, locale)} ${sqm}`,
+                    `${formatNumber(effectiveTotal(item.price), locale)} ${t.common.currency}`,
+                    formatMonthly(item.price, locale),
+                  )
+                : `${c.monthlyApprox} ${formatMonthly(item.price, locale)}`}
             </p>
           </div>
 

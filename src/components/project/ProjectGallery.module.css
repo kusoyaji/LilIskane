@@ -151,3 +151,12 @@
   background: rgb(28 30 20 / 0.55);
   border-radius: 999px;
 }
+
+/* What the photographs show, when the client's set needs saying so. */
+.lede {
+  margin: 0;
+  max-inline-size: 60ch;
+  font-size: var(--text-small);
+  line-height: 1.55;
+  color: var(--color-ink-soft, currentColor);
+}

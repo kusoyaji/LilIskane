@@ -38,6 +38,7 @@ export const STATUS_LABELS: Record<Status, { fr: string; ar: string }> = {
 };
 
 const READY_SOON = { fr: "Livraison imminente", ar: "تسليم وشيك" };
+const READY_NOW = { fr: "Livraison immédiate", ar: "تسليم فوري" };
 
 /**
  * The status as the client words it, for every badge on the site.
@@ -45,19 +46,27 @@ const READY_SOON = { fr: "Livraison imminente", ar: "تسليم وشيك" };
  * "Livraison imminente" replaces the status outright (it is the only label the
  * client gives those programmes); a promotion carries its discount ("En
  * promotion · Remise 6 %"), because a promotion without its figure is not
- * the client's offer. `readyNow` is not folded in here — callers show
- * "Livraison immédiate" as its own line.
+ * the client's offer. A delivered programme the client labels only
+ * "Livraison immédiate" (Al Yassamine, Al Maamora R+1) shows exactly that,
+ * not "Livré". Otherwise `readyNow` is not folded in here — callers show
+ * "Livraison immédiate" as its own line (see `readyNowLine`).
  */
 export function statusText(
-  p: { status: Status; readySoon?: boolean; remisePct?: number | null },
+  p: { status: Status; readySoon?: boolean; readyNow?: boolean; remisePct?: number | null },
   locale: Locale,
 ): string {
   if (p.readySoon) return READY_SOON[locale];
+  if (p.readyNow && p.status === "livre") return READY_NOW[locale];
   const label = STATUS_LABELS[p.status][locale];
   if (p.status !== "en-promotion" || !p.remisePct) return label;
   return locale === "ar"
     ? `${label} · تخفيض ⁦${p.remisePct}⁩٪`
     : `${label} · Remise ${p.remisePct} %`;
+}
+
+/** Whether "Livraison immédiate" still needs its own line beside the status badge. */
+export function readyNowLine(p: { status: Status; readyNow?: boolean }): boolean {
+  return p.readyNow === true && p.status !== "livre";
 }
 
 export const AMENITY_LABELS: Record<Amenity, { fr: string; ar: string }> = {
@@ -70,7 +79,7 @@ export const AMENITY_LABELS: Record<Amenity, { fr: string; ar: string }> = {
   "centre-commercial": { fr: "Centre commercial", ar: "مركز تجاري" },
   "aires-de-jeux": { fr: "Aires de jeux", ar: "فضاءات لعب" },
   "terrains-de-sport": { fr: "Terrains de sport", ar: "ملاعب رياضية" },
-  spa: { fr: "Spa", ar: "منتجع صحي" },
+  spa: { fr: "Spa", ar: "فضاء للعافية" },
   ascenseur: { fr: "Ascenseurs", ar: "مصاعد" },
   securite: { fr: "Gardiennage", ar: "حراسة" },
   "vue-mer": { fr: "Vue sur mer", ar: "إطلالة على البحر" },
@@ -94,6 +103,8 @@ export const projectCopy: Copy<{
   monthlyApprox: string;
   perSqm: string;
   smallestLot: (total: string) => string;
+  /** Land card: the smallest lot, its total and its monthly — never a monthly beside a per-m² price. */
+  landLot: (lot: string, total: string, monthly: string) => string;
   factSurfaces: string;
   factBedrooms: string;
   factFloors: string;
@@ -126,6 +137,8 @@ export const projectCopy: Copy<{
   typologiesLead: string;
   studio: string;
   bedroomsWord: (n: number) => string;
+  /** "2–3 chambres" / "2–3 غرف", "غرفتان": a bedroom range with a noun that agrees. */
+  bedroomsRange: (min: number, max: number, formatted: string) => string;
   surface: string;
   monthlyEst: string;
   composition: string;
@@ -165,6 +178,7 @@ export const projectCopy: Copy<{
     monthlyApprox: "soit environ",
     perSqm: "Prix au m²",
     smallestLot: (total) => `soit ${total} pour le plus petit lot`,
+    landLot: (lot, total, monthly) => `Lot de ${lot} dès ${total}, soit environ ${monthly}`,
     factSurfaces: "Surfaces",
     factBedrooms: "Chambres",
     factFloors: "Hauteur",
@@ -195,12 +209,13 @@ export const projectCopy: Copy<{
       if (!(minBedrooms < maxBedrooms && maxBedrooms < words.length)) return "Les plans.";
       return minBedrooms === 1
         ? `Les plans, d'une à ${words[maxBedrooms]} chambres.`
-        : `Les plans, du ${words[minBedrooms]} au ${words[maxBedrooms]} chambres.`;
+        : `Les plans, de ${words[minBedrooms]} à ${words[maxBedrooms]} chambres.`;
     },
     typologiesLead:
       "Surfaces indicatives. Prix et disponibilités par plan : sur demande auprès d'un conseiller.",
     studio: "Studio",
     bedroomsWord: (n) => (n > 1 ? "chambres" : "chambre"),
+    bedroomsRange: (_min, max, formatted) => `${formatted} ${max > 1 ? "chambres" : "chambre"}`,
     surface: "Surface",
     monthlyEst: "Mensualité estimée",
     composition: "Composition",
@@ -209,7 +224,7 @@ export const projectCopy: Copy<{
     pricesNote: (years, rate, deposit) =>
       `Prix indiqués à partir de, hors frais de notaire et d'enregistrement, susceptibles d'évoluer. Mensualités estimées sur ${years} ans à ${rate} avec ${deposit} d'apport.`,
     toursBodyDelivered:
-      "Déplacez-vous librement dans un appartement livré, pièce par pièce : les volumes, les finitions et les vues tels qu'ils ont été remis aux propriétaires.",
+      "Parcourez les appartements témoins de la tranche livrée, pièce par pièce : les volumes et les finitions de Riad Garden I, tels que livrés.",
     amenitiesEyebrow: "Sur place et autour",
     amenitiesTitle: "À portée de main.",
     locationEyebrow: "L'emplacement",
@@ -238,12 +253,13 @@ export const projectCopy: Copy<{
   },
   ar: {
     crumbProjects: "مشاريعنا",
-    renderNote: "تصور — صورة غير تعاقدية",
-    renderShort: "تصور — غير تعاقدي",
+    renderNote: "تصوّر — صورة غير تعاقدية",
+    renderShort: "تصوّر — غير تعاقدي",
     fromPrice: "ابتداءً من",
     monthlyApprox: "أي حوالي",
     perSqm: "الثمن للمتر المربع",
     smallestLot: (total) => `أي ${total} لأصغر بقعة`,
+    landLot: (lot, total, monthly) => `بقعة من ${lot} ابتداءً من ${total}، أي حوالي ${monthly}`,
     factSurfaces: "المساحات",
     factBedrooms: "غرف النوم",
     factFloors: "الارتفاع",
@@ -253,7 +269,7 @@ export const projectCopy: Copy<{
     readyNow: "تسليم فوري",
     photoReady: "صورة · تسليم فوري",
     bookVisit: "حجز موعد",
-    overviewEyebrow: "البرنامج",
+    overviewEyebrow: "المشروع",
     ficheTitle: "باختصار",
     ficheCity: "المدينة",
     ficheNeighbourhood: "الحي",
@@ -266,7 +282,7 @@ export const projectCopy: Copy<{
     delivery: (year) => `التسليم ${year}`,
     galleryEyebrow: "بالصور",
     galleryTitleDelivered: "سُلّم، وصُوّر كما هو.",
-    galleryTitleRender: "البرنامج بالصور.",
+    galleryTitleRender: "المشروع بالصور.",
     typologiesEyebrow: "المخططات",
     typologiesTitle: ({ minBedrooms, maxBedrooms, studioOnly }) => {
       if (studioOnly) return "مخطط الاستوديو.";
@@ -278,15 +294,19 @@ export const projectCopy: Copy<{
     typologiesLead: "مساحات إرشادية. الأثمنة والتوفر حسب كل مخطط: عند الطلب لدى مستشارينا.",
     studio: "استوديو",
     bedroomsWord: (n) => (n === 1 ? "غرفة" : n === 2 ? "غرفتان" : "غرف"),
+    // A range takes the plural ("1–2 غرف"); a single count agrees with its number:
+    // the dual stands alone ("غرفتان"), never "2 غرفتان".
+    bedroomsRange: (min, max, formatted) =>
+      min !== max ? `${formatted} غرف` : arCount(max, "غرفة واحدة", "غرفتان", "غرف", "غرفة", formatted),
     surface: "المساحة",
     monthlyEst: "القسط الشهري التقديري",
     composition: "التركيبة",
     priceOnRequest: "الثمن عند الطلب",
     askPlan: "طلب المخطط",
     pricesNote: (years, rate, deposit) =>
-      `الأثمنة المعروضة ابتداءً من، دون احتساب مصاريف التوثيق والتسجيل، وقابلة للتغيير. الأقساط تقديرية على ${years} سنة بنسبة ${rate} مع مساهمة شخصية بنسبة ${deposit}.`,
+      `الأثمنة المعروضة أثمنة ابتدائية، لا تشمل مصاريف التوثيق والتسجيل، وقابلة للتغيير. الأقساط تقديرية على ${years} سنة بنسبة ${rate} مع مساهمة شخصية بنسبة ${deposit}.`,
     toursBodyDelivered:
-      "تجوّلوا بحرية داخل شقة مُسلَّمة، غرفة بغرفة: الأحجام والتشطيبات والإطلالات كما سُلّمت للمالكين.",
+      "تجوّلوا داخل الشقق النموذجية للشطر المُسلَّم، غرفة بغرفة: أحجام وتشطيبات رياض غاردن 1 كما سُلِّمت.",
     amenitiesEyebrow: "في عين المكان وبالجوار",
     amenitiesTitle: "في متناول اليد.",
     locationEyebrow: "الموقع",
@@ -302,10 +322,10 @@ export const projectCopy: Copy<{
     simulatorEyebrow: "محاكي القرض",
     simulatorTitle: (name) => `قسطكم الشهري في ${name}.`,
     simulatorBody: (price) =>
-      `مملوء مسبقاً بأدنى ثمن في البرنامج، ${price}. غيّروا المساهمة الشخصية والمدة لتحصلوا على قسطكم.`,
+      `مملوء مسبقاً بأدنى ثمن في المشروع، ${price}. غيّروا المساهمة الشخصية والمدة لتحصلوا على قسطكم.`,
     simulatorBodyLand: (price) =>
       `مملوء مسبقاً بثمن أصغر بقعة، ${price}. غيّروا الثمن والمساهمة الشخصية والمدة لتحصلوا على قسطكم.`,
-    relatedEyebrow: "برامج أخرى",
+    relatedEyebrow: "مشاريع أخرى",
     relatedTitle: "اكتشفوا أيضاً.",
     ctaTitle: (name) => `تعالوا لاكتشاف ${name}.`,
     ctaTitleLand: "لنتحدث عن قطعتكم الأرضية.",
@@ -402,7 +422,7 @@ export const searchCopy: Copy<{
     heroEyebrow: "مشاريعنا",
     heroTitle: "اعثروا على عنوانكم.",
     heroLead: (programmes, cities) =>
-      `${programmes} برنامجاً في ${cities} مدن، من الاستوديو إلى البقعة الأرضية، في طور الإطلاق أو مُسلَّمة. ابدؤوا بالقسط الشهري أو المدينة أو الفئة.`,
+      `${programmes} مشروعاً في ${cities} مدن، من الاستوديو إلى البقعة الأرضية، في طور الإطلاق أو مُسلَّمة. ابدؤوا بالقسط الشهري أو المدينة أو الفئة.`,
     heroAction: "استكشاف الخريطة",
     budget: "القسط الشهري الأقصى",
     budgetAny: "دون حد",
@@ -419,8 +439,8 @@ export const searchCopy: Copy<{
     moreFilters: "مزيد من المعايير",
     fewerFilters: "معايير أقل",
     clear: "مسح الكل",
-    results: (n, formatted) => arCount(n, "برنامج واحد", "برنامجان", "برامج", "برنامجاً", formatted),
-    noExact: "لا يوجد برنامج مطابق تماماً.",
+    results: (n, formatted) => arCount(n, "مشروع واحد", "مشروعان", "مشاريع", "مشروعاً", formatted),
+    noExact: "لا يوجد مشروع مطابق تماماً.",
     relaxedPrefix: "وسّعنا",
     relaxedSuffix: "لنعرض عليكم الأقرب.",
     relaxed: {
@@ -434,15 +454,15 @@ export const searchCopy: Copy<{
     },
     mapEyebrow: "الخريطة",
     mapHint: "اختاروا مدينة للتصفية.",
-    mapLabel: "خريطة المغرب — المدن التي توجد بها برامجنا",
+    mapLabel: "خريطة المغرب — المدن التي توجد بها مشاريعنا",
     showMap: "عرض الخريطة",
     hideMap: "إخفاء الخريطة",
-    programmesIn: (n, formatted) => arCount(n, "برنامج واحد", "برنامجان", "برامج", "برنامجاً", formatted),
+    programmesIn: (n, formatted) => arCount(n, "مشروع واحد", "مشروعان", "مشاريع", "مشروعاً", formatted),
     filtersTitle: "تدقيق البحث",
     updating: "جارٍ التحديث",
     ctaTitle: "مستشار يرافق بحثكم.",
     ctaBody:
-      "أخبرونا بميزانيتكم ومدينتكم وآجالكم: يعرض عليكم مستشار البرامج التي تستجيب لها، في الوكالة أو عبر الفيديو. دون أي التزام.",
+      "أخبرونا بميزانيتكم ومدينتكم وآجالكم: يعرض عليكم مستشار المشاريع التي تستجيب لها، في الوكالة أو عبر الفيديو. دون أي التزام.",
   },
 };
 

@@ -3,6 +3,7 @@ import { GalleryFigure } from "@/components/media/GalleryFigure";
 import { galleryMedia } from "@/data/media.gallery.generated";
 import type { GalleryRef, MediaRef, ResolvedMediaRef } from "@/data/types";
 import type { Locale } from "@/i18n/config";
+import { projectCopy } from "@/content/projects";
 import { YouTubePlayer } from "./YouTubePlayer";
 import s from "./YouTubeFilm.module.css";
 
@@ -35,9 +36,16 @@ export function YouTubeFilm({
   caption?: string;
   sizes?: string;
 }) {
+  // A render keeps its non-contractual note here too, as it does in the gallery.
+  const render = "nature" in poster && poster.nature === "render";
   return (
     <figure className={s.film}>
-      <YouTubePlayer youtubeId={youtubeId} title={title} playLabel={PLAY[locale]}>
+      <YouTubePlayer
+        youtubeId={youtubeId}
+        title={title}
+        playLabel={PLAY[locale]}
+        badge={render ? projectCopy[locale].renderShort : undefined}
+      >
         {poster.key in galleryMedia ? (
           <GalleryFigure ref_={poster as GalleryRef} locale={locale} sizes={sizes} className="h-full w-full object-cover" />
         ) : (

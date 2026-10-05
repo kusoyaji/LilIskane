@@ -8,6 +8,7 @@ import { getDictionary } from "@/i18n";
 import { formatNumber, isolateRun, type Locale } from "@/i18n/config";
 import { formatPrice, statusLabel } from "@/lib/format";
 import { shared } from "@/content/shared";
+import { readyNowLine } from "@/content/projects";
 import { fill, segmentLabels, showcaseCopy } from "@/content/home-portfolio";
 import { ShowcaseRail, type FilterChip } from "./showcase/ShowcaseRail";
 import s from "./showcase/Showcase.module.css";
@@ -22,6 +23,8 @@ const SMALL_ASSETS = new Set(["th_dyar_al_bahia", "th_odyssee_studios"]);
 
 /** Order of the filter chips; only segments that actually have programmes appear. */
 const SEGMENT_ORDER: Segment[] = ["haut-standing", "moyen-standing", "economique", "terrain", "commercial", "bureaux"];
+
+const keep = (text: string) => text.replace(/ /g, "\u00a0");
 
 const isLand = (p: Project) => p.segment === "terrain" || p.price.unit === "per-sqm";
 
@@ -48,7 +51,7 @@ function railOrder(list: Project[]): Project[] {
 
 function yearLine(project: Project, locale: Locale): string | null {
   const t = showcaseCopy[locale];
-  if (project.readyNow) return t.readyNow;
+  if (readyNowLine(project)) return t.readyNow;
   if (project.deliveryYear) return `${t.deliveryIn} ${isolateRun(String(project.deliveryYear), locale)}`;
   return null;
 }
@@ -116,7 +119,9 @@ export function Showcase({ locale }: { locale: Locale }) {
         const status = statusLabel(project, locale);
         const delivered = project.status === "livre";
         const year = yearLine(project, locale);
-        const meta = `${cityName} · ${segLabels[project.segment]}`;
+        // City and segment each hold together; the line may only break at the dot
+        // ("Sala Al Jadida ·" / "Moyen standing", never a lone "standing").
+        const meta = `${keep(cityName)} · ${keep(segLabels[project.segment])}`;
 
         if (isLand(project)) {
           return (

@@ -27,6 +27,10 @@ import s from "./news.module.css";
  * with the "Lancements" filter (company cards hidden) it is 6 + 3 = 9, still
  * full. On the two-column grid every W spans the row and the singles pair up
  * (HQE·Amaïa, aide·Dyar, ISO·Studios), so the default view ends on a full row.
+ * The two filtered views on two columns are evened out in the stylesheet:
+ * "Lancements" (three singles) lets Océane give up its span to sit beside
+ * Odyssée Studios, and "Entreprise" (three cards) lets the last company card
+ * take the row. Measured at 1440, 1100 and 800 wide, FR and AR.
  * Change ORDER and WIDE together, or the grid ends on a lone card again.
  *
  * Anything "en lancement" that is not named here is appended, so a programme
@@ -64,6 +68,10 @@ export function NewsList({ locale, launches }: { locale: Locale; launches: Proje
     ...launches.map((p) => p.slug).filter((k) => !ORDER.includes(k)),
   ];
 
+  // An odd number of company cards leaves the last one alone on the
+  // two-column "Entreprise" view; that one spans the row there (CSS).
+  const lastCompany = t.companyNews.length % 2 === 1 ? `company:${t.companyNews.at(-1)?.id}` : null;
+
   const counts = {
     all: launches.length + t.companyNews.length,
     launch: launches.length,
@@ -94,7 +102,7 @@ export function NewsList({ locale, launches }: { locale: Locale; launches: Proje
           >
             {keys.map((key) => {
               const company = companyById.get(key);
-              if (company) return <CompanyCard key={key} locale={locale} item={company} />;
+              if (company) return <CompanyCard key={key} locale={locale} item={company} closing={key === lastCompany} />;
               const project = bySlug.get(key)!;
               return <LaunchCard key={key} locale={locale} project={project} wide={WIDE[key]} />;
             })}
@@ -186,11 +194,11 @@ function LaunchCard({ locale, project, wide }: { locale: Locale; project: Projec
   );
 }
 
-function CompanyCard({ locale, item }: { locale: Locale; item: CompanyNews }) {
+function CompanyCard({ locale, item, closing }: { locale: Locale; item: CompanyNews; closing: boolean }) {
   const t = news[locale];
   const long = item.mark.length > 5;
   return (
-    <article className={s.card} data-cat="company" data-reveal="media">
+    <article className={[s.card, closing ? s.companyClosing : ""].join(" ")} data-cat="company" data-reveal="media">
       <div className={`${s.cardMedia} ${s.panel} ${s.panelSand}`} aria-hidden>
         <p className={`u-eyebrow ${s.panelTop}`}>
           <span>{t.companyLabel}</span>

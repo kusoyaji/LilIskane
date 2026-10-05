@@ -172,6 +172,10 @@
   aspect-ratio: 1000 / 1066;
   max-inline-size: 52rem;
   margin-inline: auto;
+  /* The pins and their labels are sized against the map (cqi), not the page:
+     the loupe is a fixed fraction of the map, and the five names inside it
+     only fit if the type shrinks with it. */
+  container-type: inline-size;
 }
 @media (min-width: 64rem) {
   .map { inline-size: min(100%, calc(min(86svh, 54rem) * 0.938)); }
@@ -263,7 +267,10 @@
 
 /* -------------------------------------------------------- programme pins -- */
 .pin {
-  --d: 1.6rem;
+  /* 1rem at a 722px map (1440 wide) and above; down to 0.79rem at the 514px
+     map of a 1024px screen. Everything on a pin is a multiple of it. */
+  --k: clamp(0.79rem, 2.216cqi, 1rem);
+  --d: calc(var(--k) * 1.6);
   position: absolute;
   inline-size: var(--d);
   block-size: var(--d);
@@ -280,8 +287,8 @@
     opacity 520ms var(--ease-reveal) calc(var(--i, 0) * 70ms + 250ms),
     transform 620ms cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i, 0) * 70ms + 250ms);
 }
-.pin[data-count="2"] { --d: 1.95rem; }
-.pin[data-count="3"] { --d: 2.3rem; }
+.pin[data-count="2"] { --d: calc(var(--k) * 1.95); }
+.pin[data-count="3"] { --d: calc(var(--k) * 2.3); }
 
 .map[data-armed]:not([data-in]) .pin,
 .map[data-armed]:not([data-in]) .dot {
@@ -311,7 +318,7 @@
   transition: opacity var(--dur-mid) var(--ease-ui), transform var(--dur-mid) var(--ease-ui);
 }
 .pinFigure {
-  font-size: 0.8rem;
+  font-size: calc(var(--k) * 0.8);
   font-weight: 700;
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -331,7 +338,7 @@
 .pinLabel {
   position: absolute;
   font-family: var(--font-display);
-  font-size: 0.95rem;
+  font-size: calc(var(--k) * 0.95);
   font-weight: 600;
   line-height: 1;
   white-space: nowrap;
@@ -340,13 +347,19 @@
   pointer-events: none;
   z-index: 2;
 }
-.pin[data-active] .pinLabel { color: var(--color-ochre-deep); }
+/* The named city reads over any neighbouring disc (phones, where one label shows). */
+.pin[data-active] .pinLabel { color: var(--color-ochre-deep); z-index: 3; }
 
-/* Label sides, shared by pins and dots. Physical on purpose: geography. */
-:is(.pin, .dot)[data-side="e"] > span:last-child { left: calc(100% + 0.55rem); top: 50%; transform: translateY(-50%); }
-:is(.pin, .dot)[data-side="w"] > span:last-child { right: calc(100% + 0.55rem); top: 50%; transform: translateY(-50%); }
-:is(.pin, .dot)[data-side="n"] > span:last-child { bottom: calc(100% + 0.45rem); left: 50%; transform: translateX(-50%); }
-:is(.pin, .dot)[data-side="s"] > span:last-child { top: calc(100% + 0.45rem); left: 50%; transform: translateX(-50%); }
+/* Label sides, shared by pins and dots. Physical on purpose: geography.
+   Gaps are in --k on pins, so they shrink with the map like the type does. */
+.dot { --k: 1rem; }
+:is(.pin, .dot)[data-side="e"] > span:last-child { left: calc(100% + var(--k) * 0.55); top: 50%; transform: translateY(-50%); }
+:is(.pin, .dot)[data-side="w"] > span:last-child { right: calc(100% + var(--k) * 0.55); top: 50%; transform: translateY(-50%); }
+:is(.pin, .dot)[data-side="n"] > span:last-child { bottom: calc(100% + var(--k) * 0.45); left: 50%; transform: translateX(-50%); }
+:is(.pin, .dot)[data-side="s"] > span:last-child { top: calc(100% + var(--k) * 0.45); left: 50%; transform: translateX(-50%); }
+/* Above, starting just west of the pin's centre: for a city boxed in on the
+   west and east (Essaouira, between the loupe and Marrakech). */
+:is(.pin, .dot)[data-side="ne"] > span:last-child { bottom: calc(100% + var(--k) * 0.45); left: 28%; transform: none; }
 
 /* Phones: pins shrink to dots; only the active city is named on the map.
    The loupe points take their spread-out phone positions, and each pin gets
@@ -355,7 +368,7 @@
    overlap, the tap goes to the nearer centre (see MapExplorer). */
 @media (max-width: 47.99rem) {
   .dot, .pin { left: var(--px); top: var(--py); }
-  .pin { --d: 0.85rem; }
+  .pin { --k: 1rem; --d: 0.85rem; }
   .pin[data-count="2"] { --d: 1rem; }
   .pin[data-count="3"] { --d: 1.15rem; }
   .pin::before {
@@ -374,6 +387,13 @@
   .pinDisc::after { inset: -0.3rem; }
   .pinLabel { display: none; font-size: 0.8rem; }
   .pin[data-active] .pinLabel { display: block; }
+  /* Only the active label shows, so phones take their own sides. */
+  .map .pin[data-pside] > .pinLabel { inset: auto; transform: none; }
+  .map .pin[data-pside="e"] > .pinLabel { left: calc(100% + 0.55rem); top: 50%; transform: translateY(-50%); }
+  .map .pin[data-pside="w"] > .pinLabel { right: calc(100% + 0.55rem); top: 50%; transform: translateY(-50%); }
+  .map .pin[data-pside="n"] > .pinLabel { bottom: calc(100% + 0.45rem); left: 50%; transform: translateX(-50%); }
+  .map .pin[data-pside="s"] > .pinLabel { top: calc(100% + 0.45rem); left: 50%; transform: translateX(-50%); }
+  .map .pin[data-pside="ne"] > .pinLabel { bottom: 100%; left: 35%; }
   .dot { inline-size: 0.4rem; block-size: 0.4rem; margin: -0.2rem 0 0 -0.2rem; border-width: 1px; }
   .dotLabel { display: none; }
   .loupeLabel { font-size: 0.625rem; letter-spacing: 0.08em; }
@@ -388,11 +408,29 @@
   .mapCol { display: flex; justify-content: center; }
   .panel {
     position: absolute;
+    z-index: 3;
     margin: 0;
     left: auto;
     right: 0;
     bottom: 2%;
-    inline-size: min(42%, 22rem);
+    inline-size: min(46%, 22rem);
+    /* Never higher than Marrakech's label (36% down the map): a city with
+       five programmes scrolls its list instead of covering the map. */
+    display: flex;
+    flex-direction: column;
+    max-block-size: 62%;
+  }
+  .panelInner { min-block-size: 0; grid-template-rows: auto minmax(0, 1fr); }
+  .progs {
+    min-block-size: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    /* A soft lower edge says "there is more"; the padding lets the last
+       row scroll clear of it. */
+    padding-block-end: 1.25rem;
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 1.5rem), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 1.5rem), transparent);
   }
 }
 
@@ -451,8 +489,11 @@
 .progText { display: grid; gap: 0.2rem; min-inline-size: 0; }
 .progName { font-weight: 600; font-size: 0.95rem; line-height: 1.2; }
 .progMeta { font-size: var(--text-label); color: var(--color-ink-mute); line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.progMeta [data-delivered] { color: var(--color-olive-deep); font-weight: 600; }
-.progPrice { font-size: 0.8125rem; font-variant-numeric: tabular-nums; color: var(--color-ink-soft); white-space: nowrap; }
+/* The client's status wording runs long ("En promotion · Remise 6 %",
+   "En cours de construction"): its own line, allowed to wrap, never cut. */
+.progStatus { font-size: var(--text-label); color: var(--color-ochre-deep); line-height: 1.3; text-wrap: balance; }
+.progStatus[data-delivered] { color: var(--color-olive-deep); font-weight: 600; }
+.progPrice { font-size: 0.8125rem; font-variant-numeric: tabular-nums; color: var(--color-ink-soft); }
 .progGo {
   display: grid;
   place-items: center;

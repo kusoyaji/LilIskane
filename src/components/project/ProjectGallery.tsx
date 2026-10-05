@@ -10,6 +10,8 @@ const COPY: Record<
   {
     count: (n: number) => string;
     more: (n: number) => string;
+    /** Spoken name of the last tile: it opens on its own picture, then n more follow. */
+    andMore: (n: number) => string;
     open: string;
     dialog: string;
     close: string;
@@ -18,8 +20,9 @@ const COPY: Record<
   }
 > = {
   fr: {
-    count: (n) => `${n} images`,
+    count: (n) => (n === 1 ? "1 image" : `${n} images`),
     more: (n) => `+${n}`,
+    andMore: (n) => (n === 1 ? "et 1 autre image" : `et ${n} autres images`),
     open: "Voir toutes les images",
     dialog: "Galerie d'images",
     close: "Fermer",
@@ -27,8 +30,10 @@ const COPY: Record<
     next: "Image suivante",
   },
   ar: {
-    count: (n) => `${n} صورة`,
+    // Arabic counted nouns: dual for 2, plural for 3–10, singular from 11.
+    count: (n) => (n === 1 ? "صورة واحدة" : n === 2 ? "صورتان" : n <= 10 ? `${n} صور` : `${n} صورة`),
     more: (n) => `+${n}`,
+    andMore: (n) => (n === 1 ? "وصورة أخرى" : n === 2 ? "وصورتان أخريان" : n <= 10 ? `و${n} صور أخرى` : `و${n} صورة أخرى`),
     open: "عرض جميع الصور",
     dialog: "معرض الصور",
     close: "إغلاق",
@@ -51,19 +56,35 @@ const SPREAD = 7;
  */
 export function ProjectGallery({
   locale,
-  images,
+  images: all,
+  onPage = [],
+  note,
   delivered,
 }: {
   locale: Locale;
   images: GalleryRef[];
+  /**
+   * Keys of pictures the page already shows elsewhere (hero, tour posters,
+   * film poster). Those frames move behind the "+N" tile — still in the
+   * viewer, never twice in one scroll. A gallery with nothing new is omitted.
+   */
+  onPage?: string[];
+  /** What the photographs show, when that needs saying (see Project.galleryNote). */
+  note?: string;
   /** Only a delivered programme may be titled "Livré": show-flat photographs are photographs too. */
   delivered: boolean;
 }) {
-  if (images.length === 0) return null;
+  const seen = new Set(onPage);
+  const repeat = (image: GalleryRef) => seen.has(image.key) || (image.sameAs !== undefined && seen.has(image.sameAs));
+  const fresh = all.filter((image) => !repeat(image));
+  if (fresh.length === 0) return null;
+  const images = [...fresh, ...all.filter(repeat)];
   const c = projectCopy[locale];
   const g = COPY[locale];
   const allPhotos = images.every((image) => image.nature === "photograph");
-  const shown = images.slice(0, SPREAD);
+  // Repeats never take a tile: the spread holds only new pictures, and the
+  // last of them carries the "+N" that leads on to the rest.
+  const shown = images.slice(0, Math.min(SPREAD, fresh.length));
   const hidden = images.length - shown.length;
 
   const items: LightboxItem[] = images.map((image) => {
@@ -102,6 +123,7 @@ export function ProjectGallery({
           <h2 id="gallery-title" className={`u-display ${s.title}`} data-reveal="mask">
             <span className="reveal-inner">{allPhotos && delivered ? c.galleryTitleDelivered : c.galleryTitleRender}</span>
           </h2>
+          {note && <p className={s.lede}>{note}</p>}
           {images.length > 1 && (
             <button type="button" className={`${s.openAll} u-press u-enter`} data-gallery-index={0}>
               {g.open}
@@ -122,7 +144,7 @@ export function ProjectGallery({
                     type="button"
                     className={s.tile}
                     data-gallery-index={index}
-                    aria-label={last ? `${g.open} (${g.count(images.length)})` : image.alt[locale]}
+                    aria-label={last ? `${image.alt[locale]} — ${g.andMore(hidden)}` : image.alt[locale]}
                   >
                     <GalleryFigure
                       ref_={image}

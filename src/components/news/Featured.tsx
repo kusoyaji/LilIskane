@@ -25,7 +25,10 @@ export function Featured({ locale, project, previous }: { locale: Locale; projec
     { label: t.bedrooms, value: t.bedroomsValue(project.bedroomsMin, project.bedroomsMax) },
   ];
   if (project.deliveryYear) facts.push({ label: t.delivery, value: String(project.deliveryYear) });
-  if (project.tours.length > 0) facts.push({ label: t.tours, value: t.toursValue(project.tours.length) });
+  // Count the programme's own flats: a tour borrowed from a delivered earlier
+  // phase (Riad Garden I's, on Riad Garden II) is not one of them.
+  const ownTours = project.tours.filter((tour) => !tour.ofDelivered).length || project.tours.length;
+  if (ownTours > 0) facts.push({ label: t.tours, value: t.toursValue(ownTours) });
 
   return (
     <section className={s.featured} aria-labelledby="featured-title">

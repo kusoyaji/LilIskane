@@ -118,6 +118,11 @@
   color: var(--color-ochre-deep);
   white-space: nowrap;
 }
+/* Land: the smallest lot, its total and its monthly — a sentence, so it wraps. */
+.monthlyLand {
+  inline-size: 100%;
+  white-space: normal;
+}
 
 .specs {
   display: flex;

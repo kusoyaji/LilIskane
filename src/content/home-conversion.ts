@@ -79,8 +79,8 @@ export const budgetCopy: Copy<BudgetCopy> = {
     plot: "Lot de terrain",
     relaxed:
       "Aucun programme ne tient encore dans ce budget. Voici les plus accessibles — un apport plus élevé ou une durée plus longue les rapproche.",
-    cta: "Voir les {n} projets",
-    ctaOne: "Voir le projet",
+    cta: "Voir les {n} programmes",
+    ctaOne: "Voir le programme",
     disclaimer:
       "Simulation indicative, sans valeur d'offre de crédit. Les conditions réelles dépendent de votre banque et de votre dossier. Visuels marqués « Rendu » : images non contractuelles.",
     basis: "Base de calcul : taux {rate} %, assurance {ins} % par an incluse.",
@@ -112,14 +112,14 @@ export const budgetCopy: Copy<BudgetCopy> = {
     bestMatches: "الأقرب إلى ميزانيتكم",
     closestMatches: "الأقل ثمناً",
     from: "ابتداءً من",
-    render: "تصور",
+    render: "تصوّر",
     plot: "بقعة أرضية",
     relaxed:
       "لا يوجد بعد مشروع ضمن هذه الميزانية. إليكم الأقل ثمناً — مساهمة أكبر أو مدة أطول تقرّبكم منها.",
     cta: "عرض المشاريع ({n})",
     ctaOne: "عرض المشروع",
     disclaimer:
-      "محاكاة إرشادية لا تُعدّ عرض قرض. تتوقف الشروط الفعلية على بنككم وملفكم. الصور المعلَّمة «تصور»: صور غير تعاقدية.",
+      "محاكاة إرشادية لا تُعدّ عرض قرض. تتوقف الشروط الفعلية على بنككم وملفكم. الصور المعلَّمة «تصوّر»: صور غير تعاقدية.",
     basis: "أساس الحساب: نسبة فائدة {rate}٪، مع احتساب تأمين {ins}٪ سنوياً.",
     sliderMinLabel: "2 000",
     sliderMaxLabel: "20 000",
@@ -172,7 +172,7 @@ export const servicesCopy: Copy<ServicesCopy> = {
     },
     simulator: {
       title: "Simulateur de crédit",
-      body: "Votre mensualité, votre apport, votre durée : le coût réel de votre crédit, poste par poste.",
+      body: "Votre mensualité, votre apport, votre durée : une estimation du coût de votre crédit, poste par poste.",
       action: "Simuler",
       example: "Exemple : {deposit} DH d'apport, {years} ans",
       perMonth: "DH / mois",
@@ -181,7 +181,7 @@ export const servicesCopy: Copy<ServicesCopy> = {
     },
     tours: {
       title: "Visites virtuelles 360°",
-      body: "Parcourez les appartements témoins de Riad Garden II, et un appartement déjà livré, depuis chez vous.",
+      body: "Parcourez depuis chez vous les appartements témoins de Riad Garden II, et celui de Riad Garden I, déjà livré.",
       action: "Lancer une visite",
       caption: "Appartement livré, Riad Garden I",
     },
@@ -208,7 +208,7 @@ export const servicesCopy: Copy<ServicesCopy> = {
     },
     simulator: {
       title: "محاكي القرض",
-      body: "قسطكم الشهري ومساهمتكم ومدة القرض: الكلفة الحقيقية لقرضكم، بنداً بنداً.",
+      body: "مبلغ القسط والمساهمة والمدة: تقدير لكلفة قرضكم، بنداً ببند.",
       action: "إجراء المحاكاة",
       example: "مثال: مساهمة شخصية {deposit} درهم، {years} سنة",
       perMonth: "درهم في الشهر",
@@ -217,7 +217,7 @@ export const servicesCopy: Copy<ServicesCopy> = {
     },
     tours: {
       title: "زيارات افتراضية 360°",
-      body: "تجوّلوا في الشقق النموذجية لرياض غاردن 2، وفي شقة سبق تسليمها، من منازلكم.",
+      body: "تجوّلوا من بيوتكم داخل الشقق النموذجية لرياض غاردن 2، وشقة رياض غاردن 1 المُسلَّم.",
       action: "بدء الزيارة",
       caption: "شقة مُسلَّمة، رياض غاردن 1",
     },
@@ -228,7 +228,7 @@ export const servicesCopy: Copy<ServicesCopy> = {
       caption: "رياض غاردن 1، مُسلَّم",
     },
     guaranteesEyebrow: "بعد التسليم",
-    guaranteesTitle: "ثلاث ضمانات تحميكم.",
+    guaranteesTitle: "ثلاثة ضمانات تحميكم.",
     guaranteesLead: "الضمانات القانونية التي ترافق كل مسكن يتم تسليمه.",
     unit: (years) => (years === 1 ? "سنة" : years === 2 ? "سنتان" : "سنوات"),
   },

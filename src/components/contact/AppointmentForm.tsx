@@ -288,7 +288,11 @@ export function AppointmentForm({
   /* ------------------------------------------------------------ success -- */
   if (status === "done") {
     const rows: Array<[string, React.ReactNode]> = [];
-    if (project) rows.push([t.success.project, `${project.name} · ${project.cityName}`]);
+    if (project)
+      rows.push([
+        t.success.project,
+        `${project.name} · ${project.cityName}${project.plan ? ` · ${project.plan.label}` : ""}`,
+      ]);
     if (values.type) rows.push([t.success.type, t.types[values.type]]);
     if (values.city && (!project || project.cityId !== values.city)) rows.push([t.success.city, cityName(values.city)]);
     if (values.mode) rows.push([t.success.mode, t.modes[values.mode]]);
@@ -383,6 +387,7 @@ export function AppointmentForm({
             <span className={s.aboutName}>
               {project.name}
               <span className={s.aboutCity}> · {project.cityName}</span>
+              {project.plan && <span className={s.aboutCity}> · {project.plan.label}</span>}
             </span>
             <button
               type="button"
@@ -395,6 +400,7 @@ export function AppointmentForm({
               </svg>
             </button>
             <input type="hidden" name="projet" value={project.slug} />
+            {project.plan && <input type="hidden" name="plan" value={project.plan.id} />}
           </div>
         )}
       </header>

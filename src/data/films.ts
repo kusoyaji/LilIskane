@@ -65,14 +65,9 @@ export const essaouiraFilm: Film = {
 export const projects2026Film: Film = {
   youtubeId: same("-HLsqhzvkZU"),
   title: { fr: "Les projets Chaabi Lil Iskane 2026", ar: "مشاريع الشعبي للإسكان 2026" },
-  poster: {
-    key: "yt_-HLsqhzvkZU",
-    nature: "photograph",
-    alt: {
-      fr: "Image du film : une chambre d'appartement témoin de Riad Garden, à Marrakech, lit bleu et grande baie sur la terrasse.",
-      ar: "لقطة من الفيلم: غرفة نوم في شقة نموذجية برياض غاردن بمراكش، سرير أزرق ونافذة واسعة على التراس.",
-    },
-  },
+  // A photograph of a delivered Riad Garden I bedroom: the channel's own frame
+  // carries the video's lower-third, logo and halftone border.
+  poster: still("riad-garden-i", "rg1_DSC08588"),
 };
 
 /** One film per programme, the most recent the client published for it. */
@@ -114,7 +109,7 @@ export const programmeFilms: Record<string, Film> = {
   },
   "dyar-al-bahia-2": {
     youtubeId: same("kr7c_UtBAl4"),
-    title: { fr: "Dyar Al Bahia II, Témara", ar: "ديار البهية 2، تمارة" },
+    title: { fr: "Dyar Al Bahia II, Témara", ar: "ديار الباهية 2، تمارة" },
     poster: still("dyar-al-bahia-2", "g_dyar_al_bahia_2_05"),
   },
   "assalam-tg": {

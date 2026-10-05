@@ -12,7 +12,7 @@ import s from "./Guide.module.css";
  */
 export function FinancingDetail({ locale }: { locale: Locale }) {
   const t = guide[locale].finance;
-  const pct = locale === "fr" ? " %" : "%";
+  const pct = locale === "fr" ? " %" : "٪";
   const aid = milestones.find((m) => m.year === 2024);
 
   return (

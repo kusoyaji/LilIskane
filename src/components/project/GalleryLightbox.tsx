@@ -55,8 +55,23 @@ export function GalleryLightbox({
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [index, setIndex] = useState<number | null>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
   const pointerX = useRef<number | null>(null);
+  /** The last press was a swipe or drag: its trailing click must not close the viewer. */
+  const swiped = useRef(false);
+  /** The root's inline overflow from before the lock, or null while unlocked. */
+  const locked = useRef<string | null>(null);
   const count = items.length;
+
+  const unlock = useCallback(() => {
+    if (locked.current === null) return;
+    const root = document.documentElement;
+    root.style.overflow = locked.current;
+    root.style.scrollbarGutter = "";
+    locked.current = null;
+  }, []);
 
   const step = useCallback(
     (delta: number) => setIndex((i) => (i === null ? null : (i + delta + count) % count)),
@@ -68,14 +83,22 @@ export function GalleryLightbox({
     if (!dialog || index === null || dialog.open) return;
     dialog.showModal();
     const root = document.documentElement;
-    const previous = root.style.overflow;
+    if (locked.current === null) locked.current = root.style.overflow;
     root.style.overflow = "hidden";
+    // Keep the space of the (classic, Windows) scrollbar the lock removes, so
+    // the page behind the fading dialog does not jump sideways.
+    root.style.scrollbarGutter = "stable";
     const onClose = () => {
-      root.style.overflow = previous;
+      unlock();
       setIndex(null);
     };
     dialog.addEventListener("close", onClose, { once: true });
-  }, [index]);
+  }, [index, unlock]);
+
+  // The route can change while the viewer is open (browser or Android Back):
+  // the component then unmounts without "close" ever firing, so the lock must
+  // also be released here, or the next page inherits overflow: hidden.
+  useEffect(() => unlock, [unlock]);
 
   const onOpen = (event: React.MouseEvent) => {
     const tile = (event.target as HTMLElement).closest<HTMLElement>("[data-gallery-index]");
@@ -96,6 +119,7 @@ export function GalleryLightbox({
 
   const onPointerDown = (event: React.PointerEvent) => {
     pointerX.current = event.clientX;
+    swiped.current = false;
   };
   const onPointerUp = (event: React.PointerEvent) => {
     const start = pointerX.current;
@@ -103,6 +127,7 @@ export function GalleryLightbox({
     if (start === null) return;
     const dx = event.clientX - start;
     if (Math.abs(dx) < SWIPE) return;
+    swiped.current = true;
     // A leftward swipe advances in LTR and goes back in RTL.
     step((dx < 0 ? 1 : -1) * (dir === "rtl" ? -1 : 1));
   };
@@ -122,14 +147,24 @@ export function GalleryLightbox({
         data-lenis-prevent=""
         onKeyDown={onKeyDown}
         onClick={(event) => {
-          // A press on the backdrop (the dialog box itself, not its content) closes.
-          if (event.target === event.currentTarget) dialogRef.current?.close();
+          // A press on the empty dark field around the picture closes, as it
+          // does in any lightbox. The frame fills the whole dialog, so "empty"
+          // means the frame, the bar or the stage themselves — never the
+          // picture, a button or the caption — and never the end of a swipe.
+          const target = event.target;
+          const empty =
+            target === event.currentTarget ||
+            target === frameRef.current ||
+            target === barRef.current ||
+            target === stageRef.current;
+          if (empty && !swiped.current) dialogRef.current?.close();
+          swiped.current = false;
         }}
       >
         {current && index !== null && (
-          <div className={s.frame}>
-            <div className={s.bar}>
-              <p className={s.count} aria-live="polite">
+          <div className={s.frame} ref={frameRef}>
+            <div className={s.bar} ref={barRef}>
+              <p className={s.count} aria-hidden>
                 <bdi dir="ltr">
                   {index + 1} / {count}
                 </bdi>
@@ -147,7 +182,7 @@ export function GalleryLightbox({
               </button>
             </div>
 
-            <div className={s.stage} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
+            <div className={s.stage} ref={stageRef} onPointerDown={onPointerDown} onPointerUp={onPointerUp}>
               {window_.map((i) => {
                 const item = items[i];
                 return (
@@ -189,6 +224,10 @@ export function GalleryLightbox({
               )}
             </div>
 
+            {/* What a screen reader hears on every step: position and description. */}
+            <p className="u-visually-hidden" aria-live="polite" aria-atomic="true">
+              {`${index + 1} / ${count} — ${current.render ? `${labels.render}, ` : ""}${current.alt}`}
+            </p>
             <p className={s.caption}>
               {current.render && <span className={s.render}>{labels.render}</span>}
               <span>{current.alt}</span>

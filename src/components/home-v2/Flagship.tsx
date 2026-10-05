@@ -2,16 +2,13 @@ import { coreRef, Figure } from "@/components/media/Figure";
 import { getCity } from "@/data/cities";
 import { getProject } from "@/data/projects";
 import type { Amenity, MediaRef } from "@/data/types";
-import { formatNumber, isolateRun, type Locale } from "@/i18n/config";
+import { isolateRun, type Locale } from "@/i18n/config";
 import { formatPrice, formatRange, formatSurfaceRange, statusLabel } from "@/lib/format";
 import { flagshipCopy } from "@/content/home-opening";
 import { shared } from "@/content/shared";
 import { LinkButton } from "@/components/v2";
 import { Strip } from "./flagship/Strip";
 import s from "./flagship/Flagship.module.css";
-
-/** Distance between the two phases, as the project data states it. */
-const PHASE_DISTANCE_M = 200;
 
 /** Amenities worth naming on the home page, in the order a buyer asks. */
 const SHOWN_AMENITIES: Amenity[] = [
@@ -22,7 +19,6 @@ const SHOWN_AMENITIES: Amenity[] = [
   "commerces",
   "parking-sous-sol",
   "ascenseur",
-  "securite",
 ];
 
 type Room = { key: keyof (typeof flagshipCopy)["fr"]["rooms"]; media: MediaRef; shape: "wide" | "tall" };
@@ -35,7 +31,7 @@ type Room = { key: keyof (typeof flagshipCopy)["fr"]["rooms"]; media: MediaRef; 
  * depths, the figures a buyer asks for first (all from the project record —
  * price through `formatPrice`, surfaces through `formatSurfaceRange`), the
  * rooms drifting past, and the one fact that makes buying off-plan safe: the
- * first phase is already built and lived in, two hundred metres away.
+ * first phase is already built and lived in, on the same avenue.
  *
  * Every render carries its non-contractual note; the one photograph is
  * labelled as the delivered building it is.
@@ -205,7 +201,7 @@ export function Flagship({ locale }: { locale: Locale }) {
               </p>
             )}
             <h3 className={`u-display ${s.phaseTitle}`} data-reveal="mask">
-              <span className="reveal-inner">{t.phase1Title(formatNumber(PHASE_DISTANCE_M, locale))}</span>
+              <span className="reveal-inner">{t.phase1Title}</span>
             </h3>
             <p className={`u-enter ${s.phaseBody}`}>{t.phase1Body}</p>
             <div className={`u-enter ${s.actions}`}>

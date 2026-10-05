@@ -269,15 +269,15 @@ export const media = {
   },
   "yt_LNZ-H3M0mH0": {
     src: "/media/yt_LNZ-H3M0mH0.jpg",
-    width: 1280,
-    height: 720,
-    blur: "data:image/webp;base64,UklGRm4AAABXRUJQVlA4IGIAAADwAwCdASoUAAsAPxF0sFCsJqSisAgBgCIJQBOgBFOs1I1ZHKvJI+UAAP3jXrV1sp+ygH+F1S3rYah274m8XrCDsel1AKM7WwIgmUGy2JqvCe8lsUiHfzS8NSxEtO2Eq/AAAA==",
+    width: 800,
+    height: 450,
+    blur: "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAACwAwCdASoUAAsAPxFwsFAsJiSisAgBgCIJQBYdhFJNyK9+HZTMAAD3zN/NYeuefpeTgfp5RjoS7OmRUZLCV+a39WYKDrDrIdIoWcKdwr2ruQn/fIAC3QAgzwAAAA==",
   },
   "yt_eRqSNZToeig": {
     src: "/media/yt_eRqSNZToeig.jpg",
-    width: 1280,
-    height: 720,
-    blur: "data:image/webp;base64,UklGRn4AAABXRUJQVlA4IHIAAABwAwCdASoUAAsAPxFysVAsJqSisAgBgCIJagC7AA8g+fP++iAA/mnEPQokSXE3acMeZoa6Iu4GvdMoGNJhOBNLgaRndccAMviDW3NUURRDz3iFfLp7SX3cZjSurXf242V2lsKvVbp+XRvg86BC0wAAAAA=",
+    width: 1000,
+    height: 563,
+    blur: "data:image/webp;base64,UklGRn4AAABXRUJQVlA4IHIAAADQAwCdASoUAAsAPxFwsFAsJiSisAgBgCIJZgCsACBWzv1zDBNQ7AAA/o75w7KZ7Zw5E9Jougqluyf8ylAQxw8L3hC47srvBhQQ82Srf41rR3It8S5PeWUa41PtOmr/4saKIt3wnXvZt1CYCHOVW+5uzAA=",
   },
 } as const satisfies Record<string, MediaAsset>;
 
