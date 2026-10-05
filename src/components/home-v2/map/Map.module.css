@@ -1,0 +1,479 @@
+/* Presence — the map, on sand. Moving parts are transform/opacity only. */
+
+.section {
+  position: relative;
+  isolation: isolate;
+  color: var(--color-ink);
+  padding-block: clamp(5rem, 12vh, 9rem);
+}
+/* The page ground (Field) begins blending towards the ink of the next
+   section while this section's list and legend are still on screen, which
+   leaves ink text on olive. A sand plate under the lower part of the section
+   holds the ground steady; it is transparent at the top so the arrival from
+   the paper showcase above still blends. */
+.section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-sand);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 45%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 45%);
+  pointer-events: none;
+}
+
+.grid { inline-size: 100%; }
+
+.layout {
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 4rem);
+}
+@media (min-width: 64rem) {
+  .layout {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(2rem, 4vw, 5rem);
+    align-items: center;
+  }
+}
+
+/* ------------------------------------------------------------------ text -- */
+.textCol { display: grid; gap: clamp(1.75rem, 3.5vh, 2.5rem); align-content: center; }
+.intro { display: grid; gap: 1.25rem; }
+.title {
+  font-size: var(--text-display);
+  max-inline-size: 11ch;
+}
+/* Arabic dots and descenders sit well below the Latin baseline; the display
+   face's 0.9 leading clips them inside the word-by-word reveal boxes. */
+:global([lang="ar"]) .title { line-height: 1.15; }
+.lead {
+  font-size: var(--text-lead);
+  line-height: 1.5;
+  max-inline-size: 34ch;
+  color: var(--color-ink-soft);
+  text-wrap: pretty;
+}
+
+/* City index — the map as a list. Rows on desktop, pills on a phone. */
+.index {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-inline: calc(var(--gutter) * -1);
+  padding-inline: var(--gutter);
+  padding-block: 0.25rem;
+}
+.index::-webkit-scrollbar { display: none; }
+.index > li { flex: none; }
+.row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  min-block-size: 2.75rem;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--color-ink) 18%, transparent);
+  background: transparent;
+  color: var(--color-ink-soft);
+  font-size: var(--text-small);
+  font-weight: 500;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-ui) var(--ease-ui),
+    color var(--dur-ui) var(--ease-ui),
+    border-color var(--dur-ui) var(--ease-ui);
+}
+.rowCount { font-size: var(--text-label); color: var(--color-ink-mute); font-variant-numeric: tabular-nums; }
+.row[data-active] { background: var(--color-ink); border-color: var(--color-ink); color: var(--color-paper); }
+.row[data-active] .rowCount { color: var(--color-ochre-bright); }
+
+@media (min-width: 64rem) {
+  .index {
+    display: grid;
+    gap: 0;
+    overflow: visible;
+    margin-inline: 0;
+    padding: 0;
+    border-block-start: 1px solid color-mix(in oklab, var(--color-ink) 16%, transparent);
+    max-inline-size: 30rem;
+  }
+  .row {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    inline-size: 100%;
+    min-block-size: 3.1rem;
+    padding: 0.7rem 0;
+    padding-inline-start: 1.5rem;
+    border: 0;
+    border-block-end: 1px solid color-mix(in oklab, var(--color-ink) 16%, transparent);
+    border-radius: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.1rem, 1.35vw, 1.3rem);
+    font-stretch: 108%;
+    letter-spacing: -0.01em;
+    color: var(--color-ink-soft);
+  }
+  .row::before {
+    content: "";
+    position: absolute;
+    inset-inline-start: 0;
+    inset-block-start: 50%;
+    inline-size: 0.55rem;
+    block-size: 0.55rem;
+    margin-block-start: -0.275rem;
+    border-radius: 50%;
+    background: var(--color-ochre-deep);
+    transform: scale(0.45);
+    opacity: 0.45;
+    transition: transform var(--dur-mid) var(--ease-ui), opacity var(--dur-mid) var(--ease-ui);
+  }
+  .rowCount { font-family: var(--font-body); font-size: var(--text-small); font-stretch: 100%; letter-spacing: 0; }
+  .row[data-active] { background: transparent; color: var(--color-ink); }
+  .row[data-active]::before { transform: scale(1); opacity: 1; }
+  .row[data-active] .rowCount { color: var(--color-ochre-deep); }
+}
+@media (hover: hover) {
+  .row:not([data-active]):hover { color: var(--color-ink); }
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  font-size: var(--text-small);
+  color: var(--color-ink-mute);
+}
+.legendItem { display: inline-flex; align-items: center; gap: 0.6rem; }
+.legendPin {
+  inline-size: 0.85rem;
+  block-size: 0.85rem;
+  border-radius: 50%;
+  background: var(--color-ochre-deep);
+}
+.legendRing {
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-ink-mute);
+}
+
+/* ------------------------------------------------------------------- map -- */
+.mapCol { position: relative; }
+
+.map {
+  position: relative;
+  inline-size: 100%;
+  aspect-ratio: 1000 / 1066;
+  max-inline-size: 52rem;
+  margin-inline: auto;
+}
+@media (min-width: 64rem) {
+  .map { inline-size: min(100%, calc(min(86svh, 54rem) * 0.938)); }
+}
+
+.svg {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: hidden;
+}
+
+.landShape {
+  fill: var(--color-paper);
+  stroke: color-mix(in oklab, var(--color-ink) 28%, transparent);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+}
+.land { filter: drop-shadow(0 18px 30px rgb(28 30 20 / 0.12)); }
+
+.sourceRing {
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+}
+.tangent {
+  stroke: color-mix(in oklab, var(--color-ink) 40%, transparent);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.loupeWater { fill: color-mix(in oklab, var(--color-sand) 82%, var(--color-ink)); }
+.loupeLand {
+  fill: var(--color-paper);
+  stroke: color-mix(in oklab, var(--color-ink) 30%, transparent);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.loupeRing {
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.loupeLabel {
+  position: absolute;
+  transform: translate(-50%, 0.75rem);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-ink-soft);
+}
+:global([lang="ar"]) .loupeLabel { text-transform: none; font-size: var(--text-small); }
+
+/* Arrival: the lens and the pins come in after the land. Armed by JS only. */
+.lens, .loupeLabel { transition: opacity 700ms var(--ease-reveal) 200ms; }
+.map[data-armed]:not([data-in]) .lens,
+.map[data-armed]:not([data-in]) .loupeLabel { opacity: 0; }
+
+/* ------------------------------------------------------- footprint dots -- */
+.dot {
+  position: absolute;
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  margin: -0.3rem 0 0 -0.3rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-ink-mute);
+  background: var(--color-sand);
+  transition:
+    opacity 500ms var(--ease-reveal) calc(var(--i, 0) * 45ms + 350ms),
+    transform 500ms var(--ease-reveal) calc(var(--i, 0) * 45ms + 350ms);
+}
+.dotLabel {
+  position: absolute;
+  font-size: 0.75rem;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-ink-mute);
+}
+
+/* -------------------------------------------------------- programme pins -- */
+.pin {
+  --d: 1.6rem;
+  position: absolute;
+  inline-size: var(--d);
+  block-size: var(--d);
+  margin: calc(var(--d) / -2) 0 0 calc(var(--d) / -2);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-paper);
+  cursor: pointer;
+  z-index: 2;
+  transition:
+    opacity 520ms var(--ease-reveal) calc(var(--i, 0) * 70ms + 250ms),
+    transform 620ms cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i, 0) * 70ms + 250ms);
+}
+.pin[data-count="2"] { --d: 1.95rem; }
+.pin[data-count="3"] { --d: 2.3rem; }
+
+.map[data-armed]:not([data-in]) .pin,
+.map[data-armed]:not([data-in]) .dot {
+  opacity: 0;
+  transform: scale(0.3);
+}
+
+.pinDisc {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--color-ochre-deep);
+  box-shadow: 0 0 0 3px var(--color-sand), 0 6px 18px rgb(28 30 20 / 0.25);
+  transition: background-color var(--dur-ui) var(--ease-ui), transform var(--dur-mid) var(--ease-ui);
+}
+.pinDisc::after {
+  content: "";
+  position: absolute;
+  inset: -0.45rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-ink);
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity var(--dur-mid) var(--ease-ui), transform var(--dur-mid) var(--ease-ui);
+}
+.pinFigure {
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.pin[data-active] .pinDisc { background: var(--color-ink); transform: scale(1.12); }
+.pin[data-active] .pinDisc::after { opacity: 1; transform: scale(1); animation: ping 2.4s var(--ease-reveal) 600ms infinite; }
+@keyframes ping {
+  0% { opacity: 0.9; transform: scale(1); }
+  70%, 100% { opacity: 0; transform: scale(1.7); }
+}
+@media (hover: hover) {
+  .pin:not([data-active]):hover .pinDisc { transform: scale(1.12); }
+}
+.pin:focus-visible { outline: none; }
+.pin:focus-visible .pinDisc { outline: 2px solid var(--color-ink); outline-offset: 4px; }
+
+.pinLabel {
+  position: absolute;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--color-ink);
+  text-shadow: 0 0 6px var(--color-paper), 0 0 2px var(--color-paper);
+  pointer-events: none;
+}
+.pin[data-active] .pinLabel { color: var(--color-ochre-deep); }
+
+/* Label sides, shared by pins and dots. Physical on purpose: geography. */
+:is(.pin, .dot)[data-side="e"] > span:last-child { left: calc(100% + 0.55rem); top: 50%; transform: translateY(-50%); }
+:is(.pin, .dot)[data-side="w"] > span:last-child { right: calc(100% + 0.55rem); top: 50%; transform: translateY(-50%); }
+:is(.pin, .dot)[data-side="n"] > span:last-child { bottom: calc(100% + 0.45rem); left: 50%; transform: translateX(-50%); }
+:is(.pin, .dot)[data-side="s"] > span:last-child { top: calc(100% + 0.45rem); left: 50%; transform: translateX(-50%); }
+
+/* Phones: pins shrink to dots; only the active city is named on the map. */
+@media (max-width: 47.99rem) {
+  .pin { --d: 0.85rem; }
+  .pin[data-count="2"] { --d: 1rem; }
+  .pin[data-count="3"] { --d: 1.15rem; }
+  .pin::before { content: ""; position: absolute; inset: -0.7rem; }
+  .pinFigure { display: none; }
+  .pinDisc { box-shadow: 0 0 0 2px var(--color-sand); }
+  .pinDisc::after { inset: -0.3rem; }
+  .pinLabel { display: none; font-size: 0.8rem; }
+  .pin[data-active] .pinLabel { display: block; }
+  .dot { inline-size: 0.4rem; block-size: 0.4rem; margin: -0.2rem 0 0 -0.2rem; border-width: 1px; }
+  .dotLabel { display: none; }
+  .loupeLabel { font-size: 0.625rem; letter-spacing: 0.08em; }
+}
+
+/* ----------------------------------------------------------------- panel -- */
+.panel { min-inline-size: 0; }
+@media (min-width: 64rem) {
+  /* Desktop: the panel lives in the empty south-east of the map box — the
+     outline never reaches there, so it covers nothing. Physical placement for
+     the same reason as the pins. */
+  .mapCol { display: flex; justify-content: center; }
+  .panel {
+    position: absolute;
+    margin: 0;
+    left: auto;
+    right: 0;
+    bottom: 2%;
+    inline-size: min(42%, 22rem);
+  }
+}
+
+.panelInner {
+  display: grid;
+  gap: 0.75rem;
+  padding: clamp(1rem, 1.4vw, 1.35rem);
+  border-radius: 4px;
+  background: var(--color-paper);
+  box-shadow: 0 24px 60px rgb(28 30 20 / 0.14), 0 0 0 1px color-mix(in oklab, var(--color-ink) 7%, transparent);
+  animation: panelIn 420ms var(--ease-reveal) both;
+}
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+.panelHead { display: grid; gap: 0.45rem; padding-block-end: 0.2rem; }
+.panelCount { color: var(--color-ochre-deep); }
+.panelTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 2.3vw, 2.25rem);
+  font-weight: 500;
+  font-stretch: 112%;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+.progs { list-style: none; margin: 0; padding: 0; display: grid; }
+.prog {
+  display: grid;
+  grid-template-columns: 3.25rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.8rem;
+  padding-block: 0.6rem;
+  border-block-start: 1px solid color-mix(in oklab, var(--color-ink) 12%, transparent);
+  color: inherit;
+  text-decoration: none;
+}
+.thumb {
+  position: relative;
+  display: block;
+  inline-size: 3.25rem;
+  block-size: 3.25rem;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--color-paper-warm);
+}
+.thumbImg { inline-size: 100%; block-size: 100%; object-fit: cover; }
+.thumbLand {
+  position: absolute;
+  inset: 0;
+  isolation: isolate;
+  background: var(--color-ink);
+}
+.thumbLand :global(svg) { opacity: 0.32; mask-image: none; -webkit-mask-image: none; }
+.progText { display: grid; gap: 0.2rem; min-inline-size: 0; }
+.progName { font-weight: 600; font-size: 0.95rem; line-height: 1.2; }
+.progMeta { font-size: var(--text-label); color: var(--color-ink-mute); line-height: 1.35; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.progMeta [data-delivered] { color: var(--color-olive-deep); font-weight: 600; }
+.progPrice { font-size: 0.8125rem; font-variant-numeric: tabular-nums; color: var(--color-ink-soft); white-space: nowrap; }
+.progGo {
+  display: grid;
+  place-items: center;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  border-radius: 50%;
+  border: 1px solid color-mix(in oklab, var(--color-ink) 22%, transparent);
+  transition: background-color var(--dur-ui) var(--ease-ui), color var(--dur-ui) var(--ease-ui);
+}
+@media (hover: hover) {
+  .prog:hover .progName { text-decoration: underline; text-underline-offset: 0.2em; }
+}
+
+.panelAll {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  justify-self: start;
+  padding-block-start: 0.25rem;
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ochre-deep);
+  text-decoration: none;
+}
+:global([lang="ar"]) .panelAll { text-transform: none; font-size: var(--text-small); }
+
+@media (prefers-reduced-motion: reduce) {
+  .pin, .dot, .lens, .loupeLabel { transition: none; }
+  .panelInner { animation: none; }
+  .pin[data-active] .pinDisc::after { animation: none; }
+}
+
+/* Phones: one column in reading order — heading, map, city picker, the
+   chosen city's programmes, legend, link. The two desktop columns dissolve
+   (display: contents) so their children can be ordered in a single grid. */
+@media (max-width: 63.99rem) {
+  .layout { gap: 1.5rem; }
+  .textCol, .mapCol { display: contents; }
+  .intro { order: 1; margin-block-end: 0.5rem; }
+  .map { order: 2; }
+  .index { order: 3; }
+  .panel { order: 4; }
+  .legend { order: 5; }
+  .cta { order: 6; }
+}

@@ -1,0 +1,197 @@
+import type { Segment } from "@/data/types";
+import type { Copy } from "./shared";
+
+/**
+ * Copy for the middle of the home page: the render/delivered comparison, the
+ * portfolio showcase and the map. Every figure that appears in these strings
+ * is injected from the data layer at render time (`{n}` placeholders) — no
+ * number is typed into the copy itself, so the words cannot drift from the
+ * catalogue.
+ */
+
+export const segmentLabels: Copy<Record<Segment, string>> = {
+  fr: {
+    economique: "Économique",
+    "moyen-standing": "Moyen standing",
+    "haut-standing": "Haut standing",
+    terrain: "Terrains",
+    commercial: "Locaux commerciaux",
+    bureaux: "Bureaux",
+  },
+  ar: {
+    economique: "السكن الاقتصادي",
+    "moyen-standing": "السكن المتوسط",
+    "haut-standing": "السكن الراقي",
+    terrain: "بقع أرضية",
+    commercial: "محلات تجارية",
+    bureaux: "مكاتب",
+  },
+};
+
+export const proofCopy: Copy<{
+  eyebrow: string;
+  titleA: string;
+  titleB: string;
+  /** {render} = render project, {year} = its delivery year, {source} = delivered project, {sourceYear}. */
+  lead: string;
+  drag: string;
+  renderTag: string;
+  renderNote: string;
+  deliveryWord: string;
+  realTag: string;
+  realNote: string;
+  sliderLabel: string;
+  /** {n} = percentage of the frame showing the render. */
+  sliderValue: string;
+  pairsLabel: string;
+  legal: string;
+  seeProject: string;
+}> = {
+  fr: {
+    eyebrow: "Le rendu et le réel",
+    titleA: "Ce que nous dessinons,",
+    titleB: "nous le livrons.",
+    lead: "À gauche, le rendu de {render}, livraison {year}. À droite, {source}, livré en {sourceYear} à deux cents mètres, par les mêmes équipes et avec les mêmes finitions. Faites glisser.",
+    drag: "Glisser",
+    renderTag: "Rendu",
+    renderNote: "Image non contractuelle",
+    deliveryWord: "livraison",
+    realTag: "Livré",
+    realNote: "Photographie",
+    sliderLabel: "Comparer le rendu et la photographie du livré",
+    sliderValue: "{n} % rendu",
+    pairsLabel: "Choisir la pièce à comparer",
+    legal: "Rendu — image non contractuelle. Photographies prises à Riad Garden I, programme livré.",
+    seeProject: "Voir Riad Garden II",
+  },
+  ar: {
+    eyebrow: "التصور والواقع",
+    titleA: "ما نرسمه،",
+    titleB: "نُسلّمه.",
+    lead: "على اليمين، تصور {render}، التسليم {year}. وعلى اليسار، {source}، سُلّم سنة {sourceYear} على بعد مائتي متر، بنفس الفرق ونفس التشطيبات. اسحبوا للمقارنة.",
+    drag: "اسحب",
+    renderTag: "تصور",
+    renderNote: "صورة غير تعاقدية",
+    deliveryWord: "التسليم",
+    realTag: "مُسلَّم",
+    realNote: "صورة فوتوغرافية",
+    sliderLabel: "قارن بين التصور وصورة المشروع المُسلَّم",
+    sliderValue: "{n} ٪ تصور",
+    pairsLabel: "اختاروا الفضاء للمقارنة",
+    legal: "تصور — صورة غير تعاقدية. الصور الفوتوغرافية مأخوذة في رياض غاردن 1، المشروع المُسلَّم.",
+    seeProject: "اكتشفوا رياض غاردن 2",
+  },
+};
+
+export const showcaseCopy: Copy<{
+  eyebrow: string;
+  title: string;
+  /** {n} = programme count, {cities} = city count. */
+  lead: string;
+  filterLabel: string;
+  all: string;
+  renderNote: string;
+  landKicker: string;
+  /** {n} = smallest lot in m². */
+  lotsFrom: string;
+  perSqm: string;
+  allTitle: string;
+  allBody: string;
+  scrollHint: string;
+  deliveredIn: string;
+  deliveryIn: string;
+}> = {
+  fr: {
+    eyebrow: "Nos programmes",
+    title: "Choisissez votre adresse.",
+    lead: "{n} programmes au catalogue, dans {cities} villes — appartements de haut et moyen standing, et lots de terrain viabilisés.",
+    filterLabel: "Filtrer par catégorie",
+    all: "Tous",
+    renderNote: "Rendu — image non contractuelle",
+    landKicker: "Lots de terrain",
+    lotsFrom: "Lots à partir de {n} m²",
+    perSqm: "le m²",
+    allTitle: "Tous nos programmes",
+    allBody: "Filtrez par ville, budget, nombre de chambres et date de livraison.",
+    scrollHint: "Faire défiler",
+    deliveredIn: "Livré en",
+    deliveryIn: "Livraison",
+  },
+  ar: {
+    eyebrow: "مشاريعنا",
+    title: "اختاروا عنوانكم.",
+    lead: "{n} مشروعاً في الكتالوج، في {cities} مدن — شقق من المستوى الراقي والمتوسط، وبقع أرضية مجهّزة.",
+    filterLabel: "التصفية حسب الفئة",
+    all: "الكل",
+    renderNote: "تصور — صورة غير تعاقدية",
+    landKicker: "بقع أرضية",
+    lotsFrom: "بقع ابتداءً من {n} م²",
+    perSqm: "للمتر المربع",
+    allTitle: "جميع مشاريعنا",
+    allBody: "صفّوا حسب المدينة والميزانية وعدد الغرف وتاريخ التسليم.",
+    scrollHint: "مرّروا",
+    deliveredIn: "سُلّم سنة",
+    deliveryIn: "التسليم",
+  },
+};
+
+export const mapCopy: Copy<{
+  eyebrow: string;
+  /** {n} = company.citiesCount. */
+  title: string;
+  /** {first} = founding year, {n} = programmes on the map, {cities} = their cities. */
+  lead: string;
+  legendProgramme: string;
+  legendCity: string;
+  loupe: string;
+  /** Singular / plural programme count. */
+  one: string;
+  many: string;
+  listLabel: string;
+  panelHint: string;
+  seeAll: string;
+}> = {
+  fr: {
+    eyebrow: "Présence",
+    title: "Présents dans {n} villes du Royaume.",
+    lead: "Depuis {first}, Chaabi Lil Iskane construit à travers le Maroc. La carte situe les {n} programmes de notre catalogue actuel, dans {cities} villes.",
+    legendProgramme: "Programmes au catalogue",
+    legendCity: "Villes d'implantation",
+    loupe: "Axe Rabat – Casablanca",
+    one: "programme",
+    many: "programmes",
+    listLabel: "Villes et programmes",
+    panelHint: "Choisissez une ville sur la carte ou dans la liste.",
+    seeAll: "Voir tous les programmes",
+  },
+  ar: {
+    eyebrow: "حضورنا",
+    title: "حاضرون في {n} مدينة عبر المملكة.",
+    lead: "منذ {first}، يبني الشعبي للإسكان عبر ربوع المغرب. تحدّد الخريطة {n} مشروعاً من الكتالوج الحالي، في {cities} مدن.",
+    legendProgramme: "مشاريع في الكتالوج",
+    legendCity: "مدن الحضور",
+    loupe: "محور الرباط – الدار البيضاء",
+    one: "مشروع",
+    many: "مشاريع",
+    listLabel: "المدن والمشاريع",
+    panelHint: "اختاروا مدينة على الخريطة أو من القائمة.",
+    seeAll: "عرض جميع المشاريع",
+  },
+};
+
+/** Replaces `{key}` placeholders. Values are expected to be pre-formatted runs. */
+export function fill(template: string, values: Record<string, string>): string {
+  return template.replace(/\{(\w+)\}/g, (match, key: string) => values[key] ?? match);
+}
+
+/**
+ * "3 programmes" / "3 مشاريع". Arabic agrees the noun with the number (dual,
+ * 3–10 plural, 11+ singular accusative), so this cannot be one template.
+ */
+export function programmeCount(n: number, locale: "fr" | "ar", format: (v: number) => string): string {
+  if (locale === "fr") return `${format(n)} ${n > 1 ? "programmes" : "programme"}`;
+  if (n === 1) return "مشروع واحد";
+  if (n === 2) return "مشروعان";
+  if (n <= 10) return `${format(n)} مشاريع`;
+  return `${format(n)} مشروعاً`;
+}

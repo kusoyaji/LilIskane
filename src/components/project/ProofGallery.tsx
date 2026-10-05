@@ -5,6 +5,7 @@ import { Figure } from "@/components/media/Figure";
 import { getDictionary } from "@/i18n";
 import type { Locale } from "@/i18n/config";
 import type { ProofPair } from "@/data/types";
+import st from "./ProofGallery.module.css";
 
 type Props = {
   locale: Locale;
@@ -34,128 +35,93 @@ export function ProofGallery({ locale, pairs }: Props) {
   if (!pair) return null;
 
   return (
-    <section
-      aria-labelledby="proof-gallery-title"
-      className="u-shell"
-      style={{ paddingBlock: "clamp(4rem, 9vw, 7rem)" }}
-    >
-      <div className="max-w-[52ch]">
-        <p className="u-eyebrow u-enter" style={{ color: "var(--color-ochre-deep)" }}>
-          {t.project.proofEyebrow}
-        </p>
-        <h2
-          id="proof-gallery-title"
-          className="u-display u-enter mt-5"
-          data-reveal="mask"
-          data-step="1"
-          style={{ fontSize: "var(--text-display)" }}
-        >
-          <span className="reveal-inner">{t.project.proofTitle}</span>
-        </h2>
-        <p className="u-body u-enter mt-6" data-step="2" style={{ color: "var(--color-ink-soft)" }}>
-          {t.project.proofBody}
-        </p>
+    <section aria-labelledby="proof-gallery-title" className={`u-shell ${st.section}`}>
+      <header className={st.head}>
+        <div className={st.headText}>
+          <p className="u-eyebrow u-enter" style={{ color: "var(--color-ochre-deep)" }}>
+            {t.project.proofEyebrow}
+          </p>
+          <h2 id="proof-gallery-title" className={`u-display ${st.title}`} data-reveal="mask">
+            <span className="reveal-inner">{t.project.proofTitle}</span>
+          </h2>
+        </div>
+        <p className={`u-enter ${st.lead}`}>{t.project.proofBody}</p>
+      </header>
+
+      {/* Which room you are comparing — a numbered index rather than pills. */}
+      <div role="tablist" aria-label={t.project.proofEyebrow} className={st.tabs}>
+        {pairs.map((item, itemIndex) => {
+          const selected = itemIndex === index;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              role="tab"
+              aria-selected={selected}
+              onClick={() => {
+                setIndex(itemIndex);
+                setPosition(50);
+              }}
+              className={st.tab}
+            >
+              <span className={`u-numeric ${st.tabIndex}`}>{String(itemIndex + 1).padStart(2, "0")}</span>
+              <span>{item.shortLabel[locale]}</span>
+            </button>
+          );
+        })}
       </div>
 
-      <div className="mt-12">
-        <div
-          className="compare relative overflow-hidden"
-          style={{ ["--x" as string]: `${position}%`, background: "var(--color-paper-warm)" }}
-        >
+      <div
+        className={`compare relative overflow-hidden ${st.frame}`}
+        style={{ ["--x" as string]: `${position}%` }}
+      >
+        <Figure
+          key={`${pair.id}-render`}
+          ref_={pair.render}
+          locale={locale}
+          sizes="(min-width: 96rem) 88rem, 100vw"
+          ratio="16 / 9"
+          className="h-full w-full object-cover"
+        />
+
+        <div className="compare__photo absolute inset-0">
           <Figure
-            key={`${pair.id}-render`}
-            ref_={pair.render}
+            key={`${pair.id}-photo`}
+            ref_={pair.photograph}
             locale={locale}
-            sizes="(min-width: 64rem) 90vw, 100vw"
+            sizes="(min-width: 96rem) 88rem, 100vw"
             ratio="16 / 9"
             className="h-full w-full object-cover"
           />
-
-          <div className="compare__photo absolute inset-0">
-            <Figure
-              key={`${pair.id}-photo`}
-              ref_={pair.photograph}
-              locale={locale}
-              sizes="(min-width: 64rem) 90vw, 100vw"
-              ratio="16 / 9"
-              className="h-full w-full object-cover"
-            />
-          </div>
-
-          <div aria-hidden className="compare__seam" />
-
-          <label htmlFor={sliderId} className="u-visually-hidden">
-            {t.project.proofToggle}
-          </label>
-          <input
-            id={sliderId}
-            type="range"
-            min={0}
-            max={100}
-            step={1}
-            value={position}
-            onChange={(event) => setPosition(Number(event.target.value))}
-            className="compare__range absolute inset-0 h-full w-full"
-            aria-valuetext={`${position}% ${t.project.proofReal}`}
-          />
-
-          <span
-            className="u-eyebrow pointer-events-none absolute bottom-4 start-4 rounded-full px-4 py-2"
-            style={{ background: "color-mix(in oklab, var(--color-ink) 78%, transparent)", color: "var(--color-paper)" }}
-          >
-            {t.project.proofRender}
-          </span>
-          <span
-            className="u-eyebrow u-numeric pointer-events-none absolute bottom-4 end-4 rounded-full px-4 py-2"
-            style={{ background: "var(--color-ochre-deep)", color: "var(--color-paper)" }}
-          >
-            {t.project.proofReal} — {pair.sourceProject[locale]}, {pair.sourceYear}
-          </span>
         </div>
 
-        <p className="mt-4" style={{ fontSize: "var(--text-small)", color: "var(--color-ink-mute)" }}>
-          {pair.caption[locale]}
-        </p>
+        <div aria-hidden className="compare__seam" />
 
-        {/* Which room you are comparing. Labelled as a tab set so the
-            relationship to the frame above is announced, not implied. */}
-        <div
-          role="tablist"
-          aria-label={t.project.proofEyebrow}
-          className="mt-6 flex flex-wrap gap-2"
-        >
-          {pairs.map((item, itemIndex) => {
-            const selected = itemIndex === index;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                role="tab"
-                aria-selected={selected}
-                onClick={() => {
-                  setIndex(itemIndex);
-                  setPosition(50);
-                }}
-                className="u-eyebrow inline-flex min-h-11 items-center rounded-full px-4 py-2.5 u-press"
-                style={{
-                  background: selected ? "var(--color-ink)" : "transparent",
-                  color: selected ? "var(--color-paper)" : "var(--color-ink-soft)",
-                  border: `1px solid ${selected ? "var(--color-ink)" : "color-mix(in oklab, var(--color-ink) 20%, transparent)"}`,
-                }}
-              >
-                {item.shortLabel[locale]}
-              </button>
-            );
-          })}
-        </div>
+        <label htmlFor={sliderId} className="u-visually-hidden">
+          {t.project.proofToggle}
+        </label>
+        <input
+          id={sliderId}
+          type="range"
+          min={0}
+          max={100}
+          step={1}
+          value={position}
+          onChange={(event) => setPosition(Number(event.target.value))}
+          className="compare__range absolute inset-0 h-full w-full"
+          aria-valuetext={`${position}% ${t.project.proofReal}`}
+        />
+
+        <span className={`u-eyebrow ${st.chip} ${st.chipRender}`}>{t.project.proofRender}</span>
+        <span className={`u-eyebrow u-numeric ${st.chip} ${st.chipReal}`}>
+          {t.project.proofReal} — {pair.sourceProject[locale]}, {pair.sourceYear}
+        </span>
       </div>
 
-      <p
-        className="u-body mt-10"
-        style={{ fontSize: "var(--text-small)", color: "var(--color-ink-mute)" }}
-      >
-        {t.project.legalRenders}
-      </p>
+      <div className={st.foot}>
+        <p className={st.caption}>{pair.caption[locale]}</p>
+        <p className={st.legal}>{t.project.legalRenders}</p>
+      </div>
     </section>
   );
 }

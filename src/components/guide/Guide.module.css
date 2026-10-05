@@ -1,0 +1,723 @@
+/* Guide d'achat — every section on this page.
+   Grounds are painted by the Field (data-tone on the page wrappers); only the
+   ink stages that must stay dark under any blend paint themselves.
+   Tokens only. Logical properties only. */
+
+/* ============================================================== media ==== */
+.media { margin: 0; display: grid; gap: 0.9rem; min-inline-size: 0; }
+.mediaFrame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--color-paper-warm);
+}
+.mediaImg {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.mediaCaption {
+  font-size: var(--text-small);
+  line-height: 1.45;
+  color: var(--color-ink-mute);
+  max-inline-size: 56ch;
+}
+.renderNote {
+  position: absolute;
+  inset-block-end: 0.9rem;
+  inset-inline-end: 0.9rem;
+  padding: 0.4rem 0.65rem;
+  border-radius: 2px;
+  background: rgb(28 30 20 / 0.62);
+  color: var(--color-paper);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+}
+
+/* ============================================================ pillars ==== */
+.pillars {
+  display: grid;
+  gap: clamp(2.5rem, 6vw, 4rem);
+  padding-block: clamp(5rem, 12vh, 9rem);
+  color: var(--color-ink);
+}
+@media (min-width: 64rem) {
+  .pillars {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: clamp(3rem, 7vw, 8rem);
+    align-items: center;
+  }
+}
+/* On desktop the photograph holds still while the three pillars pass beside it. */
+@media (min-width: 64rem) {
+  .pillars { align-items: start; }
+  .pillarsMedia { position: sticky; inset-block-start: calc(var(--nav-h) + 2rem); }
+}
+@media (max-width: 63.99rem) {
+  .pillarsMedia > div { aspect-ratio: 4 / 3 !important; }
+}
+.pillarsText { display: grid; gap: clamp(2.5rem, 5vh, 3.5rem); align-content: center; }
+.pillarsText h2 { max-inline-size: 13ch; }
+
+.pillarList { list-style: none; margin: 0; padding: 0; display: grid; }
+.pillar {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  gap: 1.25rem;
+  padding-block: clamp(1.4rem, 3vh, 2rem);
+  border-block-start: 1px solid color-mix(in oklab, var(--color-ink) 16%, transparent);
+}
+.pillar:last-child { border-block-end: 1px solid color-mix(in oklab, var(--color-ink) 16%, transparent); }
+.pillarNum {
+  font-family: var(--font-display);
+  font-size: var(--text-title);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-ochre-deep);
+}
+.pillarTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-title);
+  font-weight: 500;
+  font-stretch: 108%;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+.pillarBody {
+  margin-block-start: 0.7rem;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  color: var(--color-ink-soft);
+  max-inline-size: 46ch;
+}
+.pillarSteps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin-block-start: 1.1rem;
+  color: var(--color-ink-mute);
+}
+.pillarSteps > span { margin-inline-end: 0.35rem; }
+.pillarChip {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 2.75rem;
+  min-block-size: 2.75rem;
+  padding-inline: 0.5rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--color-ink) 22%, transparent);
+  color: var(--color-ink);
+  font-size: var(--text-small);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+  transition: background-color var(--dur-ui) var(--ease-ui), color var(--dur-ui) var(--ease-ui), border-color var(--dur-ui) var(--ease-ui);
+}
+@media (hover: hover) {
+  .pillarChip:hover { background: var(--color-ink); color: var(--color-paper); border-color: var(--color-ink); }
+}
+
+/* ============================================================ chapter ==== */
+.chapter {
+  display: grid;
+  padding-block: clamp(2rem, 5vh, 4rem) clamp(4rem, 10vh, 8rem);
+  color: var(--color-ink);
+}
+@media (min-width: 64rem) {
+  .chapter {
+    grid-template-columns: minmax(14rem, 18rem) minmax(0, 1fr);
+    column-gap: clamp(3rem, 6vw, 7.5rem);
+  }
+}
+
+/* The aside holds both index forms; each hides at the other's widths. */
+.aside {
+  position: sticky;
+  inset-block-start: var(--nav-h);
+  z-index: 4;
+  align-self: start;
+  margin-inline: calc(var(--gutter) * -1);
+  margin-block-end: 1rem;
+}
+@media (min-width: 64rem) {
+  .aside {
+    inset-block-start: calc(var(--nav-h) + 3rem);
+    margin-inline: 0;
+    margin-block-end: 0;
+  }
+}
+
+/* ---- mobile bar ---- */
+.bar {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.85rem var(--gutter) 0;
+  background: color-mix(in oklab, var(--color-paper) 92%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+@media (min-width: 64rem) { .bar { display: none; } }
+.barRow { display: flex; align-items: baseline; gap: 0.9rem; min-inline-size: 0; }
+.barCount {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ochre-deep);
+  white-space: nowrap;
+}
+.barTotal { color: var(--color-ink-mute); font-weight: 500; }
+.barTitle {
+  font-size: var(--text-small);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.barTrack {
+  display: block;
+  block-size: 2px;
+  background: color-mix(in oklab, var(--color-ink) 12%, transparent);
+}
+.barFill {
+  display: block;
+  block-size: 100%;
+  background: var(--color-ochre);
+  transform-origin: left center;
+  transition: transform var(--dur-mid) var(--ease-ui);
+}
+:global([dir="rtl"]) .barFill { transform-origin: right center; }
+
+/* ---- desktop index ---- */
+.index { display: none; }
+@media (min-width: 64rem) {
+  .index { display: grid; gap: 1.75rem; }
+}
+.indexBody { position: relative; padding-inline-start: 1.5rem; }
+.indexTrack {
+  position: absolute;
+  inset-block: 0.35rem;
+  inset-inline-start: 0;
+  inline-size: 2px;
+  background: color-mix(in oklab, var(--color-ink) 12%, transparent);
+}
+.indexFill {
+  position: absolute;
+  inset: 0;
+  background: var(--color-ochre);
+  transform-origin: center top;
+  transition: transform var(--dur-mid) var(--ease-ui);
+}
+.indexPhases, .indexList { list-style: none; margin: 0; padding: 0; }
+.indexPhases { display: grid; gap: 1.5rem; }
+.indexPhase {
+  margin-block-end: 0.5rem;
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-ink-mute);
+}
+.indexLink {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: 0.6rem;
+  align-items: baseline;
+  padding-block: 0.42rem;
+  color: var(--color-ink-mute);
+  text-decoration: none;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  transition: color var(--dur-ui) var(--ease-ui);
+}
+.indexNum {
+  font-size: var(--text-small);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.indexDone { color: var(--color-ink-soft); }
+.indexOn { color: var(--color-ink); font-weight: 600; }
+.indexOn .indexNum { color: var(--color-ochre-deep); }
+@media (hover: hover) {
+  .indexLink:hover { color: var(--color-ink); }
+}
+.indexCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-block-size: 3rem;
+  padding-inline: 1.25rem;
+  border-radius: 999px;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+:global([lang="ar"]) .indexCta, :global([lang="ar"]) .indexPhase { text-transform: none; font-size: var(--text-small); }
+@media (hover: hover) {
+  .indexCta:hover { background: var(--color-olive); }
+}
+
+/* --------------------------------------------------------------- steps ---- */
+.steps { min-inline-size: 0; }
+.step {
+  padding-block: clamp(3.5rem, 9vh, 6.5rem);
+  border-block-start: 1px solid color-mix(in oklab, var(--color-ink) 14%, transparent);
+  scroll-margin-block-start: calc(var(--nav-h) + 4.5rem);
+}
+.step:first-child { border-block-start: 0; padding-block-start: 1.5rem; }
+.step:last-child { padding-block-end: 0; }
+@media (min-width: 64rem) {
+  .step { scroll-margin-block-start: calc(var(--nav-h) + 1.5rem); }
+  .step:first-child { padding-block-start: 0; }
+}
+
+.stepHead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-block-end: clamp(1.25rem, 3vh, 2rem);
+}
+.stepNum {
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 11vw, 10rem);
+  font-weight: 500;
+  font-stretch: 112%;
+  line-height: 0.78;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ochre);
+}
+/* Numerals are Latin in both builds; keep the Latin face for them. */
+:global([lang="ar"]) .stepNum,
+:global([lang="ar"]) .barCount,
+:global([lang="ar"]) .criteriaNum,
+:global([lang="ar"]) .guaranteeFigure > span:first-child,
+:global([lang="ar"]) .aidYear {
+  font-family: var(--font-archivo), "Archivo", system-ui, sans-serif;
+}
+.stepMeta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.6rem;
+  padding-block-end: 0.4rem;
+  color: var(--color-ink-mute);
+  text-align: end;
+}
+.stepDot {
+  inline-size: 4px;
+  block-size: 4px;
+  border-radius: 50%;
+  background: var(--color-ochre);
+}
+.stepTitle {
+  font-size: clamp(2.1rem, 4vw, 3.75rem);
+  max-inline-size: 18ch;
+}
+
+.stepGrid {
+  display: grid;
+  gap: 2.25rem;
+  margin-block-start: clamp(1.75rem, 4vh, 2.75rem);
+}
+@media (min-width: 48rem) {
+  .stepGrid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: clamp(2rem, 4vw, 4rem);
+    align-items: start;
+  }
+}
+.stepText { min-inline-size: 0; }
+.stepLead {
+  font-size: var(--text-lead);
+  line-height: 1.4;
+  font-weight: 500;
+  max-inline-size: 30ch;
+}
+.stepBody {
+  margin-block-start: 1.1rem;
+  color: var(--color-ink-soft);
+  max-inline-size: 46ch;
+}
+
+/* The "what to prepare" card: a recessed well, the checklist you'd print. */
+.check {
+  padding: clamp(1.5rem, 2.5vw, 2.25rem);
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--color-sand) 42%, var(--color-paper));
+}
+.checkOnWarm { background: var(--color-paper); }
+.checkTitle { color: var(--color-ochre-deep); }
+.checkList {
+  list-style: none;
+  margin: 1.1rem 0 0;
+  padding: 0;
+  display: grid;
+}
+.checkList li {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  gap: 0.75rem;
+  padding-block: 0.8rem;
+  line-height: 1.45;
+  border-block-start: 1px solid color-mix(in oklab, var(--color-ink) 12%, transparent);
+}
+.checkList li:first-child { border-block-start: 0; padding-block-start: 0.2rem; }
+.checkMark { margin-block-start: 0.1rem; color: var(--color-olive-deep); }
+
+.stepMedia { margin-block-start: clamp(2.5rem, 6vh, 4rem); }
+
+/* ================================================================= sim ==== */
+.sim {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--color-paper);
+  background: var(--color-ink);
+  padding-block-start: clamp(5rem, 12vh, 9rem);
+  scroll-margin-block-start: var(--nav-h);
+}
+.simHead { display: grid; gap: 1.25rem; }
+.simTitle { font-size: var(--text-mega); max-inline-size: 14ch; }
+.simLead {
+  font-size: var(--text-lead);
+  line-height: 1.45;
+  max-inline-size: 46ch;
+  opacity: 0.85;
+}
+
+/* CreditSimulator opens with its project-page intro ("pour ce projet",
+   pre-filled with Riad Garden II). That intro is replaced by the heading
+   above, so it is taken out here; the instrument itself is untouched. Its
+   own section background is cleared so the lattice reads continuously. */
+.simEmbed > section { background: transparent !important; }
+.simEmbed > section > div {
+  padding-block-start: clamp(2.5rem, 6vh, 4rem) !important;
+}
+.simEmbed > section > div > div:first-child { display: none; }
+.simEmbed > section > div > div:nth-child(2) { margin-block-start: 0; }
+
+/* ============================================================= finance ==== */
+.finance {
+  display: grid;
+  gap: clamp(3.5rem, 9vh, 6rem);
+  padding-block: clamp(5rem, 12vh, 9rem);
+  color: var(--color-ink);
+}
+.financeHead {
+  display: grid;
+  gap: 1.75rem 4rem;
+  align-items: end;
+}
+@media (min-width: 64rem) {
+  .financeHead { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+}
+.financeHead h2 { max-inline-size: 12ch; }
+.financeLead {
+  font-size: var(--text-lead);
+  line-height: 1.5;
+  max-inline-size: 42ch;
+  color: var(--color-ink-soft);
+}
+
+.ratios {
+  display: grid;
+  gap: 2.5rem;
+  padding-block-start: clamp(2rem, 5vh, 3rem);
+  border-block-start: 1px solid color-mix(in oklab, var(--color-ink) 18%, transparent);
+}
+@media (min-width: 48rem) {
+  .ratios { grid-template-columns: 1fr 1fr; gap: clamp(2rem, 6vw, 6rem); }
+}
+/* Stat figures are dir="ltr" runs: hug their content so they sit on the
+   reading side in Arabic instead of being pushed to the left edge. */
+.ratio > div > span:first-child,
+.early > div > span:first-child { justify-self: start; }
+.ratio > div > span:first-child {
+  font-size: clamp(5rem, 13vw, 11rem);
+  color: var(--color-ink);
+}
+.ratio > div > span:last-child {
+  font-size: 1.0625rem;
+  max-inline-size: 32ch;
+  color: var(--color-ink-soft);
+  opacity: 1;
+}
+
+.criteria { display: grid; gap: 1.75rem; }
+.criteriaTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-title);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  max-inline-size: 32ch;
+}
+.criteriaList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  column-gap: clamp(1.5rem, 3vw, 3rem);
+}
+@media (min-width: 48rem) { .criteriaList { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 80rem) { .criteriaList { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.criteriaList li {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr);
+  gap: 0.75rem;
+  padding-block: 1.4rem;
+  border-block-start: 1px solid color-mix(in oklab, var(--color-ink) 16%, transparent);
+  font-size: 1.0625rem;
+  line-height: 1.45;
+}
+.criteriaNum {
+  font-size: var(--text-small);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ochre-deep);
+  padding-block-start: 0.15rem;
+}
+
+.compare {
+  display: grid;
+  gap: 3rem;
+  align-items: center;
+}
+@media (min-width: 64rem) {
+  .compare { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); column-gap: clamp(3rem, 7vw, 7rem); }
+}
+.compareText { display: grid; gap: 1.5rem; }
+.compareTitle { font-size: var(--text-display); max-inline-size: 16ch; }
+.compareBody { color: var(--color-ink-soft); font-size: 1.0625rem; }
+.early {
+  padding: clamp(1.75rem, 3vw, 2.75rem);
+  border-radius: 2px;
+  border: 1px solid color-mix(in oklab, var(--color-ink) 18%, transparent);
+}
+.early > div > span:first-child { font-size: clamp(5rem, 11vw, 9rem); color: var(--color-ochre-deep); }
+.early > div > span:last-child { font-size: 1rem; max-inline-size: 34ch; color: var(--color-ink-soft); opacity: 1; }
+
+.aid {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  gap: 1.75rem;
+  padding: clamp(2rem, 5vw, 4.5rem);
+  border-radius: 2px;
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+@media (min-width: 64rem) {
+  .aid {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: clamp(2.5rem, 5vw, 5rem);
+  }
+}
+.aidYear {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 9vw, 8rem);
+  font-weight: 500;
+  font-stretch: 112%;
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  color: var(--color-ochre-bright);
+}
+.aidText { display: grid; gap: 0.9rem; }
+.aidTitle { font-size: var(--text-title); line-height: 1.05; max-inline-size: 22ch; }
+.aidBody { line-height: 1.6; max-inline-size: 56ch; opacity: 0.84; }
+
+/* ========================================================== guarantees ==== */
+.guarantees {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--color-paper);
+  background: var(--color-ink);
+  padding-block: clamp(5.5rem, 13vh, 9.5rem);
+  scroll-margin-block-start: var(--nav-h);
+}
+.guaranteesHead {
+  display: grid;
+  gap: 1.75rem 4rem;
+  align-items: end;
+  margin-block-end: clamp(3.5rem, 8vh, 6rem);
+}
+@media (min-width: 64rem) {
+  .guaranteesHead { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+}
+.guaranteesHead h2 { max-inline-size: 13ch; }
+.guaranteesLead { font-size: var(--text-lead); line-height: 1.5; max-inline-size: 40ch; opacity: 0.8; }
+.guaranteeList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0 clamp(2rem, 4vw, 4rem);
+}
+@media (min-width: 48rem) { .guaranteeList { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.guarantee {
+  display: grid;
+  align-content: start;
+  gap: 0.9rem;
+  padding-block: 2rem;
+  border-block-start: 1px solid color-mix(in oklab, var(--color-paper) 22%, transparent);
+}
+.guaranteeFigure {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-block-end: 0.75rem;
+}
+.guaranteeFigure > span:first-child {
+  font-family: var(--font-display);
+  font-size: clamp(5.5rem, 12vw, 10rem);
+  font-weight: 500;
+  font-stretch: 112%;
+  line-height: 0.8;
+  letter-spacing: -0.05em;
+  color: var(--color-ochre-bright);
+}
+.guaranteeUnit { font-size: var(--text-title); font-weight: 500; opacity: 0.9; }
+.guaranteeTitle {
+  font-family: var(--font-display);
+  font-size: var(--text-title);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+.guaranteeBody { line-height: 1.55; max-inline-size: 34ch; opacity: 0.78; }
+
+/* ========================================================= conventions ==== */
+.conventions {
+  display: grid;
+  color: var(--color-ink);
+}
+@media (min-width: 64rem) {
+  .conventions { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-block-size: 90svh; }
+}
+.conventionsMedia { gap: 0; }
+.conventionsFrame {
+  border-radius: 0;
+  aspect-ratio: 4 / 3 !important;
+}
+@media (min-width: 64rem) {
+  .conventionsMedia { position: relative; min-block-size: 36rem; }
+  .conventionsFrame { position: absolute; inset: 0; aspect-ratio: auto !important; }
+}
+.conventionsText {
+  display: grid;
+  align-content: center;
+  gap: 1.75rem;
+  padding: clamp(4rem, 10vh, 7rem) var(--gutter);
+}
+@media (min-width: 64rem) {
+  .conventionsText { padding-inline: clamp(3rem, 6vw, 7rem) var(--gutter); max-inline-size: 48rem; }
+}
+.conventionsText h2 { max-inline-size: 14ch; }
+.conventionsBody {
+  font-size: var(--text-lead);
+  line-height: 1.5;
+  max-inline-size: 40ch;
+  color: var(--color-ink-soft);
+}
+.points { margin: 0.5rem 0 0; display: grid; }
+.point {
+  display: grid;
+  gap: 0.5rem;
+  padding-block: 1.15rem;
+  border-block-start: 1px solid color-mix(in oklab, var(--color-ink) 18%, transparent);
+}
+@media (min-width: 40rem) {
+  .point { grid-template-columns: 11rem minmax(0, 1fr); gap: 1.5rem; align-items: baseline; }
+}
+.point dt { color: var(--color-ochre-deep); }
+.point dd { margin: 0; font-size: 1.125rem; line-height: 1.4; font-weight: 500; }
+
+/* ============================================================ overview ==== */
+/* Continues the ink hero on the same ground, so hero + overview read as one
+   opening screen. */
+.overview {
+  position: relative;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  padding-block: 0 clamp(3.5rem, 9vh, 6rem);
+}
+.overviewPhases {
+  list-style: none;
+  margin-block: 0;
+  display: grid;
+  gap: 2.25rem;
+}
+@media (min-width: 64rem) {
+  .overviewPhases {
+    grid-template-columns: 3fr 3fr 2fr;
+    gap: 0 clamp(1rem, 2vw, 2rem);
+  }
+}
+.overviewPhase { min-inline-size: 0; }
+.overviewPhaseLabel {
+  padding-block: 1.1rem 1.4rem;
+  border-block-start: 2px solid var(--color-ochre);
+  color: var(--color-ochre-bright);
+}
+.overviewList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem 1rem;
+}
+@media (min-width: 64rem) {
+  .overviewList { grid-template-columns: repeat(var(--count), minmax(0, 1fr)); gap: 0 clamp(1rem, 2vw, 2rem); }
+}
+.overviewLink {
+  display: grid;
+  gap: 0.6rem;
+  color: inherit;
+  text-decoration: none;
+}
+.overviewNum {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 3.6vw, 3.25rem);
+  font-weight: 500;
+  font-stretch: 112%;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklab, var(--color-paper) 92%, transparent);
+  transition: color var(--dur-ui) var(--ease-ui);
+}
+:global([lang="ar"]) .overviewNum { font-family: var(--font-archivo), "Archivo", system-ui, sans-serif; }
+.overviewTitle {
+  font-size: 0.95rem;
+  line-height: 1.35;
+  max-inline-size: 18ch;
+  color: color-mix(in oklab, var(--color-paper) 76%, transparent);
+  transition: color var(--dur-ui) var(--ease-ui);
+}
+@media (hover: hover) {
+  .overviewLink:hover .overviewNum { color: var(--color-ochre-bright); }
+  .overviewLink:hover .overviewTitle { color: var(--color-paper); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barFill, .indexFill, .indexLink, .pillarChip, .overviewNum, .overviewTitle { transition: none; }
+}
+
+/* Numerals are dir="ltr" runs inside grid cells: hug the content so in Arabic
+   they sit on the reading (right) edge of their cell, aligned with the label. */
+.overviewNum, .criteriaNum, .indexNum { justify-self: start; }

@@ -11,6 +11,8 @@ type Props = {
   title: string;
   captions: string[];
   altText: string;
+  /** Small print under the title, e.g. the non-contractual render note. */
+  note?: string;
 };
 
 /** Chosen after mount, so the server always renders the safe static shell. */
@@ -52,7 +54,7 @@ const PRELOAD_MARGIN = "0px 0px -12% 0px";
  * - `static` — reduced motion, and the server render. Poster frame with every
  *              caption listed at once. No video is fetched at all.
  */
-export function CinematicSequence({ cinematic, eyebrow, title, captions, altText }: Props) {
+export function CinematicSequence({ cinematic, eyebrow, title, captions, altText, note }: Props) {
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [mode, setMode] = useState<Mode>("static");
@@ -234,6 +236,14 @@ export function CinematicSequence({ cinematic, eyebrow, title, captions, altText
           >
             {title}
           </h2>
+          {note && (
+            <p
+              className="mt-4"
+              style={{ fontSize: "var(--text-label)", color: "color-mix(in oklab, var(--color-paper) 70%, transparent)" }}
+            >
+              {note}
+            </p>
+          )}
         </div>
 
         {/* Captions crossfade on the same progress value that drives the

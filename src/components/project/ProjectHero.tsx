@@ -1,160 +1,172 @@
 import Link from "next/link";
 import { Figure } from "@/components/media/Figure";
+import { LinkButton, Lattice } from "@/components/v2";
+import { company } from "@/data/company";
 import { getCity } from "@/data/cities";
-import { getDictionary } from "@/i18n";
-import type { Locale } from "@/i18n/config";
-import {
-  formatMonthly,
-  formatPrice,
-  formatRange,
-  formatSurfaceRange,
-  statusColor,
-  statusLabel,
-} from "@/lib/format";
 import type { Project } from "@/data/types";
+import { getDictionary } from "@/i18n";
+import { formatNumber, isolateRun, type Locale } from "@/i18n/config";
+import { shared } from "@/content/shared";
+import { projectCopy, STATUS_LABELS } from "@/content/projects";
+import { effectiveTotal, formatMonthly, formatPrice, formatRange } from "@/lib/format";
+import { LandPlan } from "./LandPlan";
+import { heroMode, statusTone, year } from "./view";
+import s from "./ProjectHero.module.css";
 
 /**
- * Arrival. The price is above the fold and is not negotiable.
+ * Arrival. Name, place, price and the way to book — all before any scrolling.
  *
- * The whole page is built to end in a booked visit, and the fastest way to lose
- * someone is to make them hunt for what it costs. So the price, the monthly
- * equivalent, the surface range, the storey count and the delivery year are all
- * visible before any scrolling, alongside the two things that convert: the
- * phone number and the visit form.
+ * Three grounds, chosen from the data rather than per programme:
+ * a full-bleed image when the master is large enough to carry it; an ink
+ * panel with the image framed at a size it can hold when it is not; and, for
+ * land, a drawn plan in place of a photograph nobody should see. The key-facts
+ * bar is the same in all three and only lists the fields the programme has.
  */
 export function ProjectHero({ locale, project }: { locale: Locale; project: Project }) {
   const t = getDictionary(locale);
+  const c = projectCopy[locale];
   const city = getCity(project.cityId);
+  const mode = heroMode(project.hero.key, project.segment);
+  const land = mode === "land";
+  const sqm = t.common.sqm;
 
-  const facts = [
-    { label: t.project.typologySurface, value: formatSurfaceRange(project, locale) },
-    { label: t.common.rooms, value: formatRange(project.bedroomsMin, project.bedroomsMax, locale) },
-    ...(project.floors ? [{ label: "Type", value: project.floors }] : []),
-    // Years are printed raw. Running them through the number formatter groups
-    // the digits and turns 2027 into "2 027".
-    ...(project.deliveryYear
-      ? [{ label: t.project.deliveryLabel, value: String(project.deliveryYear) }]
+  const surfaces = `${formatRange(project.surfaceMin, project.surfaceMax, locale)} ${sqm}`;
+  const facts: { label: string; value: string }[] = [
+    { label: land ? c.factPlots : c.factSurfaces, value: surfaces },
+    ...(project.bedroomsMax > 0
+      ? [{ label: c.factBedrooms, value: formatRange(project.bedroomsMin, project.bedroomsMax, locale) }]
       : []),
+    ...(project.floors ? [{ label: c.factFloors, value: isolateRun(project.floors, locale) }] : []),
     ...(project.deliveredYear
-      ? [{ label: t.common.delivered, value: String(project.deliveredYear) }]
-      : []),
+      ? [{ label: c.factDelivered, value: year(project.deliveredYear) }]
+      : project.deliveryYear
+        ? [{ label: c.factDelivery, value: year(project.deliveryYear) }]
+        : []),
   ];
 
-  return (
-    <section data-nav-media className="relative isolate flex min-h-[100svh] flex-col justify-end overflow-hidden">
-      <div className="absolute inset-0" style={{ background: "var(--color-ink)" }}>
-        <Figure
-          ref_={project.hero}
-          locale={locale}
-          sizes="100vw"
-          priority
-          className="h-full w-full object-cover"
-        />
+  const priceSub = land
+    ? c.smallestLot(`${formatNumber(effectiveTotal(project.price), locale)} ${t.common.currency}`)
+    : `${c.monthlyApprox} ${formatMonthly(project.price, locale)}`;
+
+  const name = project.name[locale];
+  const longName = name.length > (mode === "full" ? 18 : 12);
+
+  const head = (
+    <>
+      <nav aria-label={c.crumbProjects} className={`u-eyebrow ${s.crumbs}`}>
+        <Link href={`/${locale}`}>{shared[locale].home}</Link>
+        <span aria-hidden>/</span>
+        <Link href={`/${locale}/projets`}>{c.crumbProjects}</Link>
+        <span aria-hidden>/</span>
+        <Link href={`/${locale}/projets?ville=${project.cityId}`}>{city.name[locale]}</Link>
+      </nav>
+
+      <p className={s.status}>
+        <span className={s.statusDot} style={{ background: statusTone(project.status, true) }} aria-hidden />
+        <span className="u-eyebrow">{STATUS_LABELS[project.status][locale]}</span>
+      </p>
+
+      <h1 className={`u-display ${s.name} ${longName ? s.nameLong : ""}`} data-reveal="mask">
+        <span className="reveal-inner">{name}</span>
+      </h1>
+      <p className={`u-enter ${s.place}`}>
+        {city.name[locale]} <span aria-hidden className={s.placeSep}>—</span> {project.neighbourhood[locale]}
+      </p>
+    </>
+  );
+
+  const actions = (
+    <div className={`u-enter ${s.actions}`}>
+      <LinkButton href={`/${locale}/contact?projet=${project.slug}`} variant="light">
+        {c.bookVisit}
+      </LinkButton>
+      <LinkButton href={company.phoneHref} variant="outline" arrow={false}>
+        {isolateRun(company.phone, locale)}
+      </LinkButton>
+    </div>
+  );
+
+  const factsBar = (
+    <div className={`u-enter ${s.bar}`}>
+      <div className={s.price}>
+        <p className={`u-eyebrow ${s.factLabel}`}>{land ? c.perSqm : c.fromPrice}</p>
+        <p className={`u-numeric ${s.priceValue}`}>{formatPrice(project.price, locale)}</p>
+        <p className={`u-numeric ${s.priceSub}`}>{priceSub}</p>
       </div>
 
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to top, color-mix(in oklab, var(--color-ink) 84%, transparent) 0%, color-mix(in oklab, var(--color-ink) 48%, transparent) 30%, color-mix(in oklab, var(--color-ink) 12%, transparent) 60%, transparent 82%)",
-        }}
-      />
+      <dl className={s.facts}>
+        {facts.map((fact) => (
+          <div key={fact.label} className={s.fact}>
+            <dt className={`u-eyebrow ${s.factLabel}`}>{fact.label}</dt>
+            <dd className={`u-numeric ${s.factValue}`}>{fact.value}</dd>
+          </div>
+        ))}
+      </dl>
 
-      <div
-        className="on-media relative"
-        style={{ padding: "var(--gutter)", paddingBlockEnd: "clamp(2rem, 4vw, 3rem)" }}
-      >
-        <nav aria-label={t.project.backToProjects}>
-          <Link
-            href={`/${locale}/projets`}
-            className="u-eyebrow inline-flex min-h-11 items-center gap-2"
-            style={{ color: "color-mix(in oklab, var(--color-paper) 72%, transparent)" }}
-          >
-            ← {t.project.backToProjects}
-          </Link>
-        </nav>
+    </div>
+  );
 
-        <div className="mt-6 flex flex-wrap items-baseline gap-x-5 gap-y-2">
-          <p className="u-eyebrow" style={{ color: statusColor(project, true) }}>
-            {statusLabel(project, locale)}
-          </p>
-          <p className="u-eyebrow" style={{ color: "color-mix(in oklab, var(--color-paper) 78%, transparent)" }}>
-            {city.name[locale]} — {project.neighbourhood[locale]}
-          </p>
+  if (mode === "full") {
+    return (
+      <section className={`${s.hero} ${s.full}`} data-nav-media>
+        <div className={s.backdrop} data-parallax="0.25">
+          <Figure ref_={project.hero} locale={locale} sizes="100vw" priority className={s.backdropImg} />
+        </div>
+        <div aria-hidden className={s.scrim} />
+        {project.hero.nature === "render" && (
+          <p className={s.renderNote}>{c.renderNote}</p>
+        )}
+        <div className={`u-shell ${s.fullInner}`}>
+          <div className={s.head}>
+            {head}
+            {actions}
+          </div>
+          {factsBar}
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className={`${s.hero} ${s.panel}`} data-nav-media>
+      {/* The drawn plan is already a lattice; a second one behind it is noise. */}
+      {!land && <Lattice />}
+      <div className={`u-shell ${s.panelInner}`}>
+        <div className={s.head}>
+          {head}
+          {actions}
         </div>
 
-        <h1
-          className="u-display u-enter mt-4"
-          data-reveal="mask"
-          data-step="1"
-          style={{ fontSize: "var(--text-mega)", color: "var(--color-paper)" }}
-        >
-          <span className="reveal-inner">{project.name[locale]}</span>
-        </h1>
-
-        <div
-          className="u-enter mt-9 grid gap-x-12 gap-y-8 pt-8 lg:grid-cols-[auto_1fr_auto] lg:items-end"
-          data-step="2"
-          style={{ borderBlockStart: "1px solid color-mix(in oklab, var(--color-paper) 28%, transparent)" }}
-        >
-          <div>
-            <p className="u-eyebrow" style={{ color: "color-mix(in oklab, var(--color-paper) 70%, transparent)" }}>
-              {t.project.fromPrice}
-            </p>
-            <p
-              className="u-display-tight u-numeric mt-3"
-              style={{ fontSize: "var(--text-title)", color: "var(--color-paper)" }}
-            >
-              {formatPrice(project.price, locale)}
-            </p>
-            <p
-              className="u-numeric mt-2"
-              style={{
-                fontSize: "var(--text-small)",
-                color: "color-mix(in oklab, var(--color-paper) 76%, transparent)",
-              }}
-            >
-              {t.project.monthlyFrom} {formatMonthly(project.price, locale)}
-            </p>
-          </div>
-
-          <dl className="flex flex-wrap gap-x-10 gap-y-5">
-            {facts.map((fact) => (
-              <div key={fact.label}>
-                <dt
-                  className="u-eyebrow"
-                  style={{ color: "color-mix(in oklab, var(--color-paper) 62%, transparent)" }}
-                >
-                  {fact.label}
-                </dt>
-                <dd className="u-numeric mt-2" style={{ color: "var(--color-paper)" }}>
-                  {fact.value}
-                </dd>
+        <div className={s.visual}>
+          {land ? (
+            <div className={s.plan}>
+              <LandPlan
+                minLabel={`${formatNumber(project.surfaceMin, locale)} ${sqm}`}
+                maxLabel={`${formatNumber(project.surfaceMax, locale)} ${sqm}`}
+              />
+              <p className={`u-eyebrow ${s.planCaption}`}>
+                {c.plotRange(`${formatRange(project.surfaceMin, project.surfaceMax, locale)} ${sqm}`)}
+              </p>
+            </div>
+          ) : (
+            <figure className={s.frame}>
+              <div className={s.frameMedia}>
+                <Figure
+                  ref_={project.hero}
+                  locale={locale}
+                  sizes="(min-width: 64rem) 30rem, 92vw"
+                  priority
+                  className={s.frameImg}
+                />
               </div>
-            ))}
-          </dl>
-
-          <div className="flex flex-wrap items-center gap-3">
-            <Link
-              href="#visite"
-              className="u-eyebrow rounded-full px-7 py-4 u-press"
-              style={{ background: "var(--color-paper)", color: "var(--color-ink)" }}
-            >
-              {t.project.bookVisit}
-            </Link>
-            <a
-              href={t.nav.phoneHref}
-              className="u-eyebrow u-numeric rounded-full px-7 py-4 u-press"
-              style={{
-                color: "var(--color-paper)",
-                border: "1px solid color-mix(in oklab, var(--color-paper) 45%, transparent)",
-              }}
-            >
-              {t.nav.phone}
-            </a>
-          </div>
+              {project.hero.nature === "render" && (
+                <figcaption className={s.frameNote}>{c.renderNote}</figcaption>
+              )}
+            </figure>
+          )}
         </div>
+
+        <div className={s.panelBar}>{factsBar}</div>
       </div>
     </section>
   );

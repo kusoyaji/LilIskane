@@ -1,0 +1,30 @@
+.section {
+  padding-block: clamp(5rem, 12vh, 9rem);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.5rem 3rem;
+  margin-block-end: clamp(2.5rem, 6vh, 4rem);
+}
+.headText {
+  display: grid;
+  gap: 1.25rem;
+}
+.title {
+  font-size: var(--text-display);
+}
+
+.grid {
+  display: grid;
+  gap: clamp(2.5rem, 4vw, 2rem) clamp(1rem, 2vw, 1.75rem);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+}
+@media (min-width: 64rem) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 30rem));
+  }
+}

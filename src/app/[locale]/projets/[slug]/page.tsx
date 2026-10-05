@@ -1,18 +1,24 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { BookingForm } from "@/components/project/BookingForm";
+import { CtaBand } from "@/components/v2";
+import { Amenities } from "@/components/project/Amenities";
 import { CinematicSequence } from "@/components/project/CinematicSequence";
-import { CreditSimulator } from "@/components/project/CreditSimulator";
-import { LocationAndAmenities } from "@/components/project/LocationAndAmenities";
+import { ProjectGallery } from "@/components/project/ProjectGallery";
 import { ProjectHero } from "@/components/project/ProjectHero";
+import { ProjectLocation } from "@/components/project/ProjectLocation";
+import { ProjectOverview } from "@/components/project/ProjectOverview";
 import { ProofGallery } from "@/components/project/ProofGallery";
-import { SequenceStage } from "@/components/project/SequenceStage";
+import { RelatedProjects } from "@/components/project/RelatedProjects";
+import { SimulatorSection } from "@/components/project/SimulatorSection";
 import { TourCards } from "@/components/project/TourCards";
 import { Typologies } from "@/components/project/Typologies";
-import { getCity } from "@/data/cities";
+import { getCity, cityById } from "@/data/cities";
+import { toListItems } from "@/data/list";
 import { getProject, projects } from "@/data/projects";
+import type { MediaRef, Project } from "@/data/types";
 import { getDictionary } from "@/i18n";
 import { isLocale, LOCALES, type Locale } from "@/i18n/config";
+import { projectCopy, STATUS_LABELS } from "@/content/projects";
 import { effectiveTotal, formatPrice } from "@/lib/format";
 
 export function generateStaticParams() {
@@ -43,6 +49,58 @@ export async function generateMetadata({
   };
 }
 
+/** The other phase of the same programme, in either direction. */
+function siblingOf(project: Project): { project: Project; relation: "previous" | "next" } | undefined {
+  if (project.previousPhaseSlug) {
+    const previous = getProject(project.previousPhaseSlug);
+    if (previous) return { project: previous, relation: "previous" };
+  }
+  const next = projects.find((p) => p.previousPhaseSlug === project.slug);
+  return next ? { project: next, relation: "next" } : undefined;
+}
+
+/**
+ * Three programmes worth seeing next: same city first, then the same
+ * standing, then the closest price — so a buyer looking at a 485 000 DH flat
+ * is not sent to a 2.4 M DH one.
+ */
+function relatedTo(project: Project, exclude: Set<string>): Project[] {
+  const price = effectiveTotal(project.price);
+  const ranked = projects
+    .filter((p) => p.slug !== project.slug && !exclude.has(p.slug))
+    .map((p) => ({
+      p,
+      score:
+        (p.cityId === project.cityId ? 4 : 0) +
+        (p.segment === project.segment ? 2 : 0) +
+        (p.status !== "livre" ? 0.5 : 0),
+      distance: Math.abs(Math.log(effectiveTotal(p.price) / price)),
+    }))
+    .sort((a, b) => b.score - a.score || a.distance - b.distance)
+    .map(({ p }) => p);
+
+  // Never three land programmes in a row: three drawn plans side by side read
+  // as a placeholder, and a land buyer is often weighing a flat as well.
+  const picked: Project[] = [];
+  for (const candidate of ranked) {
+    if (picked.length === 3) break;
+    const land = picked.filter((p) => p.segment === "terrain").length;
+    if (candidate.segment === "terrain" && land >= 2) continue;
+    picked.push(candidate);
+  }
+  return picked;
+}
+
+/** Atmosphere for the closing band on land pages — stock, never captioned as a programme. */
+const LAND_CTA_MEDIA: MediaRef = {
+  key: "st_facade_beige",
+  nature: "photograph",
+  alt: {
+    fr: "Façade claire aux volumes en porte-à-faux sous un ciel bleu — image d'ambiance.",
+    ar: "واجهة فاتحة بأحجام بارزة تحت سماء زرقاء — صورة للأجواء.",
+  },
+};
+
 export default async function ProjectPage({
   params,
 }: {
@@ -56,83 +114,122 @@ export default async function ProjectPage({
   if (!project) notFound();
 
   const t = getDictionary(typedLocale);
-
-  // The camera path: street, then gardens, then the pool. Falls back to
-  // whatever gallery imagery exists for the lighter-weight programmes.
-  const sequenceSource = [
-    project.gallery.find((m) => m.key.includes("Commerce")),
-    project.gallery.find((m) => m.key.includes("jardin")),
-    project.gallery.find((m) => m.key.includes("TypeB")),
-  ].filter(Boolean);
-
-  const frames = (sequenceSource.length === 3 ? sequenceSource : project.gallery.slice(0, 3)).map(
-    (media, index) => ({
-      media: media!,
-      caption: [
-        t.project.sequenceCaption1,
-        t.project.sequenceCaption2,
-        t.project.sequenceCaption3,
-      ][index],
-    }),
+  const c = projectCopy[typedLocale];
+  const sibling = siblingOf(project);
+  const related = toListItems(
+    relatedTo(project, new Set(sibling ? [sibling.project.slug] : [])),
+    typedLocale,
   );
 
+  const otherCities = [...new Set(projects.map((p) => p.cityId))]
+    .filter((id) => id !== project.cityId)
+    .map((id) => cityById.get(id))
+    .filter((city) => city !== undefined)
+    .map((city) => ({ id: city.id, lat: city.lat, lng: city.lng }));
+
+  const sameCity = projects
+    .filter((p) => p.cityId === project.cityId && p.slug !== project.slug)
+    .map((p) => ({
+      slug: p.slug,
+      name: p.name[typedLocale],
+      status: p.deliveredYear
+        ? c.delivered(String(p.deliveredYear))
+        : p.deliveryYear
+          ? c.delivery(String(p.deliveryYear))
+          : STATUS_LABELS[p.status][typedLocale],
+    }));
+
+  const allToursDelivered = project.tours.length > 0 && project.tours.every((tour) => tour.ofDelivered);
+  // The proof set already shows every render of the flagship; the gallery is
+  // for programmes whose pictures are not shown anywhere else on the page.
+  const gallery = project.proof.length > 0 ? [] : project.gallery;
+
+  // Dark sections (hero, film, simulator, closing band) paint their own
+  // ground and are tagged as paper, so the field only ever blends between the
+  // light tones. Letting it blend paper into ink darkened the tail of every
+  // light section while its dark type was still on screen.
   return (
     <>
-      <ProjectHero locale={typedLocale} project={project} />
+      <div data-tone="paper">
+        <ProjectHero locale={typedLocale} project={project} />
+      </div>
 
-      {/* Where a camera move exists it replaces the still sequence outright —
-          the stills were only ever standing in for the move. Projects without
-          footage keep the cross-faded frames. */}
-      {project.cinematic ? (
-        <CinematicSequence
-          locale={typedLocale}
-          cinematic={project.cinematic}
-          eyebrow={t.project.sequenceEyebrow}
-          title={t.project.sequenceTitle}
-          captions={[
-            t.project.sequenceCaption1,
-            t.project.sequenceCaption2,
-            t.project.sequenceCaption3,
-          ]}
-          altText={project.hero.alt[typedLocale]}
-        />
-      ) : (
-        frames.length > 1 && (
-          <SequenceStage
+      {/* The camera move replaces stills outright where it exists. */}
+      {project.cinematic && (
+        <div data-tone="paper">
+          <CinematicSequence
             locale={typedLocale}
+            cinematic={project.cinematic}
             eyebrow={t.project.sequenceEyebrow}
             title={t.project.sequenceTitle}
-            frames={frames}
+            captions={[t.project.sequenceCaption1, t.project.sequenceCaption2, t.project.sequenceCaption3]}
+            altText={project.hero.alt[typedLocale]}
+            note={c.renderNote}
           />
-        )
+        </div>
       )}
 
-      {/* Cards rather than one embedded room: the set is visible before you
-          commit to any of it, and no WebGL context exists until you open one.
-          The full-bleed `VirtualTour` it replaces is kept in the tree for now —
-          it is the reference implementation of the on-approach iframe dissolve
-          and is worth reading before changing the loading behaviour here. */}
-      {project.tours.length > 0 && <TourCards locale={typedLocale} tours={project.tours} />}
+      <div data-tone="paper">
+        <ProjectOverview locale={typedLocale} project={project} sibling={sibling} />
+      </div>
 
-      {project.proof.length > 0 && <ProofGallery locale={typedLocale} pairs={project.proof} />}
+      {gallery.length > 0 && (
+        <div data-tone="paper">
+          <ProjectGallery locale={typedLocale} images={gallery} />
+        </div>
+      )}
 
-      <Typologies locale={typedLocale} typologies={project.typologies} />
+      {project.typologies.length > 0 && (
+        <div data-tone="warm">
+          <Typologies locale={typedLocale} typologies={project.typologies} slug={project.slug} />
+        </div>
+      )}
 
-      <LocationAndAmenities
-        locale={typedLocale}
-        nearby={project.nearby}
-        amenities={project.amenities}
-        title={t.project.locationTitle}
-        body={t.project.locationBody}
-      />
+      {project.tours.length > 0 && (
+        <div data-tone="paper">
+          <TourCards
+            locale={typedLocale}
+            tours={project.tours}
+            body={allToursDelivered ? c.toursBodyDelivered : undefined}
+            renderNote={c.renderShort}
+          />
+        </div>
+      )}
 
-      <CreditSimulator
-        locale={typedLocale}
-        basePrice={effectiveTotal(project.price)}
-        typologies={project.typologies}
-      />
+      {project.proof.length > 0 && (
+        <div data-tone="paper">
+          <ProofGallery locale={typedLocale} pairs={project.proof} />
+        </div>
+      )}
 
-      <BookingForm locale={typedLocale} />
+      <div data-tone="warm">
+        <Amenities locale={typedLocale} amenities={project.amenities} />
+      </div>
+
+      <div data-tone="paper">
+        <ProjectLocation
+          locale={typedLocale}
+          project={project}
+          otherCities={otherCities}
+          sameCity={sameCity}
+        />
+      </div>
+
+      <div data-tone="paper">
+        <SimulatorSection locale={typedLocale} project={project} />
+      </div>
+
+      <div data-tone="paper">
+        <RelatedProjects locale={typedLocale} items={related} />
+      </div>
+
+      <div data-tone="paper">
+        <CtaBand
+          locale={typedLocale}
+          title={c.ctaTitle(project.name[typedLocale])}
+          media={project.segment === "terrain" ? LAND_CTA_MEDIA : undefined}
+        />
+      </div>
     </>
   );
 }

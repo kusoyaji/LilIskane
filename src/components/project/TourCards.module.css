@@ -1,0 +1,33 @@
+/* One tour: no pinned pan, the card is the section's image. */
+.single :global(.tours__stage) {
+  block-size: auto;
+  padding-block: clamp(5rem, 12vh, 9rem);
+  display: grid;
+  gap: 2.5rem;
+}
+@media (min-width: 64rem) {
+  .single :global(.tours__stage) {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: center;
+    max-inline-size: 96rem;
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+    column-gap: clamp(3rem, 6vw, 6rem);
+  }
+  .single :global(.tours__head) {
+    padding-inline: 0;
+  }
+  .single :global(.tours__track) {
+    padding-inline: 0;
+  }
+}
+.single :global(.tours__slot) {
+  inline-size: 100%;
+}
+.slotSmall {
+  inline-size: min(80vw, 30rem);
+}
+.single .slotSmall {
+  inline-size: 100%;
+  max-inline-size: 30rem;
+}

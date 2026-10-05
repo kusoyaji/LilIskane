@@ -1,0 +1,275 @@
+import type { Copy } from "./shared";
+import { company } from "@/data/company";
+import { formatNumber, isolateRun, type Locale } from "@/i18n/config";
+
+/**
+ * Copy for /a-propos.
+ *
+ * Every figure is read from `src/data/company.ts` rather than typed here, so the
+ * page cannot drift from the single source of facts. Years go through
+ * `isolateRun` (no grouping: "1948", never "1 948"); counts go through
+ * `formatNumber`. The source text is the client's own "Chaabi Lil Iskane" page,
+ * rewritten — the facts are theirs, the voice is ours.
+ */
+
+const y = (year: number, locale: Locale) => isolateRun(String(year), locale);
+
+const build = (l: Locale) => ({
+  units: formatNumber(company.essaouira.units, l),
+  ha: formatNumber(company.essaouira.hectares, l),
+  founded: y(company.founded, l),
+  iso: y(company.isoSince, l),
+  iso2015: y(company.iso2015Since, l),
+  prize: y(company.arabLeaguePrize, l),
+  gold: y(company.goldLaunch, l),
+});
+const fr = build("fr");
+const ar = build("ar");
+
+type Item = { title: string; note: string };
+type Seal = { mark: string; meta: string; title: string; body: string };
+
+export const about: Copy<{
+  metaTitle: string;
+  metaDescription: string;
+  crumb: string;
+  hero: { eyebrow: string; title: string; lead: string; caption: string };
+  who: {
+    eyebrow: string;
+    title: string;
+    p1: string;
+    p2: string;
+    trades: Item[];
+    tradesLabel: string;
+    conception: string;
+    conceptionNote: string;
+    delivery: string;
+    deliveryNote: string;
+    stats: { founded: string; years: string; cities: string; units: string };
+  };
+  chrono: {
+    eyebrow: string;
+    title: string;
+    /** One-word chapter per milestone, keyed by year. Our framing, not a fact. */
+    chapters: Record<number, string>;
+    jump: string;
+    of: string;
+  };
+  next: { eyebrow: string; title: string; body: (deliveryYear: string) => string; cta: string; renderNote: string };
+  values: { eyebrow: string; title: string; lead: string; caption: string };
+  seals: { eyebrow: string; title: string; lead: string; items: Seal[] };
+  guarantees: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    year: string;
+    years: string;
+    scale: string;
+    after: string;
+    sav: string;
+    guide: string;
+  };
+}> = {
+  fr: {
+    metaTitle: "Chaabi Lil Iskane — bâtisseurs depuis 1948",
+    metaDescription: `Filiale du Groupe Ynna, Chaabi Lil Iskane conçoit et livre des logements au Maroc depuis ${fr.founded} : plus de 75 ans d'expérience, ISO 9001 depuis ${fr.iso}, 1er Prix de la Ligue Arabe de l'Habitat en ${fr.prize}.`,
+    crumb: "Chaabi Lil Iskane",
+    hero: {
+      eyebrow: "Chaabi Lil Iskane · Groupe Ynna",
+      title: `Bâtisseurs depuis ${fr.founded}.`,
+      lead: "Plus de 75 ans de promotion immobilière au Maroc. Du logement économique au haut standing, d'une ville nouvelle à Essaouira aux résidences de Marrakech — avec la même exigence, de la conception à la livraison.",
+      caption: "Riad Garden I, Marrakech · piscine livrée en 2023",
+    },
+    who: {
+      eyebrow: "Qui sommes-nous",
+      title: "De la conception à la livraison, un seul métier.",
+      p1: `Filiale du Groupe Ynna, Chaabi Lil Iskane est une référence de la promotion immobilière au Maroc depuis ${fr.founded}. Nous concevons et développons des programmes résidentiels — économique, moyen et haut standing — ainsi que des projets d'immobilier d'entreprise et industriel, au Maroc et à l'international.`,
+      p2: "De l'aménagement à la construction, des équipes pluridisciplinaires pilotent chaque projet avec la même exigence : qualité d'exécution, maîtrise des délais, sécurité, respect de l'environnement. Notre ambition : des cadres de vie et de travail attractifs, un meilleur équilibre qualité/prix, et un accompagnement de proximité à chaque étape.",
+      tradesLabel: "Nos métiers",
+      trades: [
+        { title: "Résidentiel économique", note: "Une offre adaptée en 2024 à l'aide directe au logement" },
+        { title: "Moyen standing", note: "Programmes à Tanger, Mohammedia, Essaouira et Témara" },
+        { title: "Haut standing", note: `La marque Chaabi Lil Iskane GOLD, depuis ${fr.gold}` },
+        { title: "Immobilier d'entreprise", note: "Bureaux, commerces, équipements, hôtellerie, sites industriels" },
+      ],
+      conception: "Concevoir",
+      conceptionNote: "Maquette d'étude d'un programme Chaabi Lil Iskane",
+      delivery: "Livrer",
+      deliveryNote: "Riad Garden I, Marrakech · façade livrée en 2023",
+      stats: {
+        founded: "Création de l'AFCA, structure fondatrice",
+        years: "ans d'expérience",
+        cities: "villes du Royaume",
+        units: `logements environ à Essaouira El Jadida, sur ${fr.ha} hectares`,
+      },
+    },
+    chrono: {
+      eyebrow: "Dates clés",
+      title: `De ${fr.founded} à 2025, dix dates.`,
+      chapters: {
+        1948: "Fondation",
+        2000: "Urbanisme",
+        2002: "Engagement",
+        2003: "Distinction",
+        2004: "Solidarité",
+        2005: "Qualité",
+        2006: "International",
+        2013: "Haut standing",
+        2024: "Accession",
+        2025: "Environnement",
+      },
+      jump: "Aller à l'année",
+      of: "sur",
+    },
+    next: {
+      eyebrow: "Aujourd'hui",
+      title: "La suite s'écrit à Marrakech.",
+      body: (year) => `Riad Garden II, deuxième tranche de Riad Garden, à deux cents mètres de la première. En lancement — livraison prévue en ${year}.`,
+      cta: "Découvrir Riad Garden II",
+      renderNote: "Rendu — image non contractuelle",
+    },
+    values: {
+      eyebrow: "Nos valeurs",
+      title: "Quatre valeurs, depuis la création.",
+      lead: "Elles orientent nos décisions au quotidien et forment le socle commun de toutes nos équipes.",
+      caption: "Riad Garden I · chambre et salle d'eau d'un appartement livré",
+    },
+    seals: {
+      eyebrow: "Certifications & distinctions",
+      title: "La qualité n'est pas une promesse. C'est une démarche.",
+      lead: "Structurée, mesurée, pilotée dans la durée — et reconnue par des tiers.",
+      items: [
+        {
+          mark: "ISO 9001",
+          meta: `AFNOR · depuis ${fr.iso}`,
+          title: "Management de la qualité",
+          body: `Certifiée par AFNOR (France) sur l'ensemble de ses activités depuis ${fr.iso}, parmi les premiers promoteurs certifiés au Maroc. En ${fr.iso2015}, le système est aligné sur la version ISO 9001:2015 : analyse du contexte, gestion des risques et opportunités, implication de toutes les équipes.`,
+        },
+        {
+          mark: "1er Prix",
+          meta: `Le Caire · ${fr.prize}`,
+          title: "Ligue Arabe de l'Habitat",
+          body: `Décerné par le Conseil des Ministres Arabes de l'Habitat pour le programme novateur de la ville nouvelle d'Essaouira El Jadida : ${fr.units} unités.`,
+        },
+        {
+          mark: "HQE",
+          meta: "Témara · 2025",
+          title: "Résidence Beethoven",
+          body: "Label HQE, niveau Exceptionnel : la qualité environnementale et la performance énergétique du programme, reconnues sur l'ensemble de son cycle de vie.",
+        },
+      ],
+    },
+    guarantees: {
+      eyebrow: "Garanties & durabilité",
+      title: "Chaque logement est garanti, jusqu'à dix ans.",
+      lead: "Acheter un logement est une étape majeure. Chaque bien est protégé par les garanties prévues par le cadre légal marocain, à compter de la réception des travaux.",
+      year: "an",
+      years: "ans",
+      scale: "Durée de couverture après réception",
+      after: "après réception",
+      sav: "En complément, un service après-vente structuré — réserves, interventions correctives, suivi — pour une prise en charge rapide et traçable.",
+      guide: "Lire le guide d'achat",
+    },
+  },
+  ar: {
+    metaTitle: "الشعبي للإسكان — نبني منذ 1948",
+    metaDescription: `الشعبي للإسكان، فرع مجموعة ينا، يصمّم ويسلّم المساكن بالمغرب منذ ${ar.founded}: أكثر من 75 سنة من الخبرة، شهادة إيزو 9001 منذ ${ar.iso}، والجائزة الأولى للجامعة العربية للإسكان سنة ${ar.prize}.`,
+    crumb: "الشعبي للإسكان",
+    hero: {
+      eyebrow: "الشعبي للإسكان · مجموعة ينا",
+      title: `نبني منذ ${ar.founded}.`,
+      lead: "أكثر من 75 سنة من الإنعاش العقاري بالمغرب. من السكن الاقتصادي إلى السكن الراقي، ومن مدينة جديدة بالصويرة إلى إقامات مراكش — بالصرامة نفسها، من التصميم إلى التسليم.",
+      caption: `رياض غاردن 1، مراكش · مسبح سُلّم سنة ${y(2023, "ar")}`,
+    },
+    who: {
+      eyebrow: "من نحن",
+      title: "من التصميم إلى التسليم، مهنة واحدة.",
+      p1: `الشعبي للإسكان، فرع مجموعة ينا، مرجع في الإنعاش العقاري بالمغرب منذ ${ar.founded}. نصمّم ونطوّر مشاريع سكنية — اقتصادية ومتوسطة وراقية — إلى جانب مشاريع عقار المقاولات والعقار الصناعي، داخل المغرب وخارجه.`,
+      p2: "من التهيئة إلى البناء، تقود فرق متعددة التخصصات كل مشروع بالصرامة ذاتها: جودة التنفيذ، والتحكم في الآجال، والسلامة، واحترام البيئة. طموحنا: فضاءات عيش وعمل جذابة، وتوازن أفضل بين الجودة والثمن، ومواكبة قريبة لزبنائنا في كل مرحلة.",
+      tradesLabel: "مهننا",
+      trades: [
+        { title: "السكن الاقتصادي", note: `عرض مُلاءَم سنة ${y(2024, "ar")} مع برنامج الدعم المباشر للسكن` },
+        { title: "السكن المتوسط", note: "مشاريع بطنجة والمحمدية والصويرة وتمارة" },
+        { title: "السكن الراقي", note: `علامة الشعبي للإسكان GOLD منذ ${ar.gold}` },
+        { title: "عقار المقاولات", note: "مكاتب، محلات تجارية، تجهيزات، فنادق، مواقع صناعية" },
+      ],
+      conception: "نصمّم",
+      conceptionNote: "مجسّم دراسة لأحد مشاريع الشعبي للإسكان",
+      delivery: "نسلّم",
+      deliveryNote: `رياض غاردن 1، مراكش · واجهة سُلّمت سنة ${y(2023, "ar")}`,
+      stats: {
+        founded: "تأسيس الجمعية العقارية والتجارية الإفريقية، النواة الأولى",
+        years: "سنة من الخبرة",
+        cities: "مدينة عبر المملكة",
+        units: `مسكن تقريباً بالصويرة الجديدة، على ${ar.ha} هكتاراً`,
+      },
+    },
+    chrono: {
+      eyebrow: "تواريخ مفصلية",
+      title: `من ${ar.founded} إلى ${y(2025, "ar")}، عشرة تواريخ.`,
+      chapters: {
+        1948: "التأسيس",
+        2000: "التعمير",
+        2002: "الالتزام",
+        2003: "التتويج",
+        2004: "التضامن",
+        2005: "الجودة",
+        2006: "الانفتاح الدولي",
+        2013: "السكن الراقي",
+        2024: "الولوج إلى الملكية",
+        2025: "البيئة",
+      },
+      jump: "الانتقال إلى سنة",
+      of: "من",
+    },
+    next: {
+      eyebrow: "اليوم",
+      title: "والحكاية تتواصل في مراكش.",
+      body: (year) => `رياض غاردن 2، الشطر الثاني من رياض غاردن، على بعد مائتي متر من الأول. في طور الإطلاق — والتسليم مرتقب سنة ${year}.`,
+      cta: "اكتشفوا رياض غاردن 2",
+      renderNote: "تصور — صورة غير تعاقدية",
+    },
+    values: {
+      eyebrow: "قيمنا",
+      title: "أربع قيم، منذ التأسيس.",
+      lead: "توجّه قراراتنا اليومية، وتشكّل الأساس المشترك لكل فرقنا.",
+      caption: "رياض غاردن 1 · غرفة نوم وحمّام في شقة مُسلَّمة",
+    },
+    seals: {
+      eyebrow: "الشهادات والتتويجات",
+      title: "الجودة ليست وعداً، بل منهج عمل.",
+      lead: "منهج منظَّم ومقيس ومتابَع على المدى الطويل — تعترف به جهات مستقلة.",
+      items: [
+        {
+          mark: "ISO 9001",
+          meta: `AFNOR · منذ ${ar.iso}`,
+          title: "نظام تدبير الجودة",
+          body: `حاصلة على شهادة AFNOR (فرنسا) لجميع أنشطتها منذ ${ar.iso}، ومن أوائل المنعشين العقاريين المعتمدين بالمغرب. وفي ${ar.iso2015}، مُلاءَمة النظام مع صيغة ISO 9001:2015: تحليل السياق، وتدبير المخاطر والفرص، وإشراك جميع الفرق.`,
+        },
+        {
+          mark: "الجائزة الأولى",
+          meta: `القاهرة · ${ar.prize}`,
+          title: "الجامعة العربية للإسكان",
+          body: `منحها مجلس وزراء الإسكان العرب عن البرنامج المبتكر للمدينة الجديدة الصويرة الجديدة: ${ar.units} وحدة سكنية.`,
+        },
+        {
+          mark: "HQE",
+          meta: `تمارة · ${y(2025, "ar")}`,
+          title: "إقامة بيتهوفن",
+          body: "علامة HQE بمستوى استثنائي: اعتراف بالجودة البيئية والنجاعة الطاقية للمشروع على امتداد دورة حياته.",
+        },
+      ],
+    },
+    guarantees: {
+      eyebrow: "الضمانات والاستدامة",
+      title: "كل مسكن مضمون، لمدة تصل إلى عشر سنوات.",
+      lead: "اقتناء مسكن خطوة كبرى. لذلك يحظى كل عقار بالضمانات التي ينص عليها الإطار القانوني المغربي، ابتداءً من تسلّم الأشغال.",
+      year: "سنة",
+      years: "سنوات",
+      scale: "مدة الضمان بعد التسلّم",
+      after: "بعد التسلّم",
+      sav: "وإلى جانب هذه الضمانات، خدمة ما بعد البيع منظَّمة — تحفّظات، وتدخلات تصحيحية، وتتبّع — لتكفّل سريع وقابل للتتبع.",
+      guide: "اطّلعوا على دليل الشراء",
+    },
+  },
+};

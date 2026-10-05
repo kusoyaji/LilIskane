@@ -1,0 +1,284 @@
+/* Services — paper ground (painted by the Field), ink type.
+   An editorial 7/5 · 5/7 checkerboard, then the guarantees as a confidence strip. */
+
+.section {
+  position: relative;
+  color: var(--color-ink);
+  padding-block: clamp(5.5rem, 13vh, 9.5rem) clamp(6rem, 16vh, 10rem);
+}
+
+/* ------------------------------------------------------------------ head */
+.head {
+  display: grid;
+  gap: 1.75rem 4rem;
+  align-items: end;
+  margin-block-end: clamp(3rem, 7vh, 5.5rem);
+}
+@media (min-width: 64rem) {
+  .head { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+}
+.head h2 { max-inline-size: 14ch; }
+.lead {
+  font-size: var(--text-lead);
+  line-height: 1.5;
+  max-inline-size: 40ch;
+  color: var(--color-ink-soft);
+}
+
+/* ------------------------------------------------------------------ grid */
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: clamp(3rem, 7vw, 4.5rem) clamp(1.5rem, 2.5vw, 2.5rem);
+}
+@media (min-width: 48rem) {
+  .grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .item:nth-child(1) { grid-column: 1 / span 7; }
+  .item:nth-child(2) { grid-column: 8 / span 5; }
+  .item:nth-child(3) { grid-column: 1 / span 5; }
+  .item:nth-child(4) { grid-column: 6 / span 7; }
+}
+
+.item { min-inline-size: 0; }
+
+.card {
+  display: grid;
+  gap: 1.5rem;
+  color: inherit;
+  text-decoration: none;
+}
+.card:focus-visible { outline-offset: 6px; }
+
+/* Equal row heights: a 7-col frame at 4:3 is as tall as a 5-col frame at
+   (5/7)·(4/3) ≈ 0.95. Gaps are small enough relative to the columns that the
+   difference is under a pixel or two at every desktop width. */
+.frame {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 2px;
+  aspect-ratio: 4 / 3;
+  background: var(--color-paper-warm);
+}
+@media (min-width: 48rem) {
+  .frame { aspect-ratio: auto; block-size: clamp(22rem, 38vw, 38rem); }
+}
+.img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-camera) var(--ease-camera);
+}
+@media (hover: hover) {
+  .card:hover .img { transform: scale(1.04); }
+}
+
+.caption {
+  position: absolute;
+  inset-block-end: 0.9rem;
+  inset-inline-start: 0.9rem;
+  padding: 0.4rem 0.65rem;
+  border-radius: 2px;
+  background: rgb(28 30 20 / 0.62);
+  color: var(--color-paper);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+/* The simulator panel: ink, lattice, the three inputs as words. */
+.tile {
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(1.75rem, 3vw, 2.75rem);
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+.tileWords {
+  display: grid;
+  gap: 0.15em;
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 4.6vw, 4.5rem);
+  font-weight: 500;
+  font-stretch: 112%;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+}
+.tileWord { color: color-mix(in oklab, var(--color-paper) 42%, transparent); }
+.tileWord[data-accent] { color: var(--color-paper); }
+.tileRail {
+  position: relative;
+  display: block;
+  block-size: 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-paper) 16%, transparent);
+}
+.tileRailFill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 38%;
+  border-radius: 999px;
+  background: var(--color-ochre);
+}
+.tileRailThumb {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 38%;
+  inline-size: 2.25rem;
+  block-size: 2.25rem;
+  margin-block-start: -1.125rem;
+  margin-inline-start: -1.125rem;
+  border-radius: 50%;
+  background: var(--color-paper);
+  border: 0.45rem solid var(--color-ochre);
+}
+
+/* Text under each frame: index, title, body, action. */
+.text {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+.index {
+  padding-block-start: 0.45rem;
+  font-size: var(--text-small);
+  font-weight: 600;
+  color: var(--color-ochre-deep);
+}
+.body {
+  display: grid;
+  gap: 0.75rem;
+  border-block-start: 1px solid color-mix(in oklab, var(--color-ink) 16%, transparent);
+  padding-block-start: 1rem;
+}
+.title {
+  font-family: var(--font-display);
+  font-size: var(--text-title);
+  font-weight: 500;
+  font-stretch: 108%;
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+}
+.desc {
+  max-inline-size: 46ch;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  color: var(--color-ink-soft);
+}
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-block-start: 0.35rem;
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-ochre-deep);
+}
+.action svg { transition: transform var(--dur-mid) var(--ease-ui); }
+@media (hover: hover) {
+  .card:hover .action svg { transform: translateX(4px); }
+  :global([dir="rtl"]) .card:hover .action svg { transform: scaleX(-1) translateX(4px); }
+}
+
+/* ------------------------------------------------------------ guarantees */
+.guarantees {
+  display: grid;
+  gap: 2.5rem 4rem;
+  margin-block-start: clamp(5rem, 12vh, 8rem);
+  padding-block-start: clamp(2.5rem, 5vh, 3.5rem);
+  border-block-start: 1px solid color-mix(in oklab, var(--color-ink) 20%, transparent);
+}
+@media (min-width: 64rem) {
+  .guarantees { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); }
+}
+.gHead { display: grid; gap: 1rem; align-content: start; }
+.gTitle {
+  font-size: clamp(2rem, 3.4vw, 3.25rem);
+  max-inline-size: 12ch;
+}
+.gLead {
+  max-inline-size: 34ch;
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  color: var(--color-ink-soft);
+}
+
+.gList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+@media (min-width: 48rem) {
+  .gList { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.5rem, 2.5vw, 2.5rem); }
+}
+.gItem {
+  display: grid;
+  gap: 1.25rem;
+  align-content: start;
+  padding-block: 1.75rem;
+  border-block-end: 1px solid color-mix(in oklab, var(--color-ink) 14%, transparent);
+}
+.gItem:last-child { border-block-end: 0; }
+@media (max-width: 47.99rem) {
+  .gItem {
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+  }
+}
+@media (min-width: 48rem) {
+  .gItem {
+    padding-block: 0;
+    border-block-end: 0;
+    border-block-start: 2px solid var(--color-ink);
+    padding-block-start: 1.5rem;
+  }
+}
+.gFigure {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  color: var(--color-ochre-deep);
+}
+.gNumber {
+  font-family: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  font-size: clamp(4rem, 7.5vw, 7.5rem);
+  font-weight: 500;
+  font-stretch: 112%;
+  line-height: 0.82;
+  letter-spacing: -0.05em;
+}
+.gUnit {
+  font-size: var(--text-lead);
+  font-weight: 600;
+}
+.gName {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.gBody {
+  margin-block-start: 0.5rem;
+  font-size: var(--text-small);
+  line-height: 1.55;
+  color: var(--color-ink-soft);
+  max-inline-size: 30ch;
+}
+
+:global([lang="ar"]) .caption,
+:global([lang="ar"]) .action {
+  text-transform: none;
+  font-size: var(--text-small);
+}

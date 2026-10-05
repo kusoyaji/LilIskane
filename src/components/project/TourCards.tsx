@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { gsap } from "@/components/motion/gsap";
+import { gsap, ScrollTrigger } from "@/components/motion/gsap";
 import { Figure } from "@/components/media/Figure";
+import { media } from "@/data/media.generated";
+import st from "./TourCards.module.css";
 import { getDictionary } from "@/i18n";
 import type { Locale } from "@/i18n/config";
 import type { VirtualTour as Tour } from "@/data/types";
@@ -10,6 +12,10 @@ import type { VirtualTour as Tour } from "@/data/types";
 type Props = {
   locale: Locale;
   tours: Tour[];
+  /** Replaces the default introduction (which speaks of a show flat). */
+  body?: string;
+  /** Shown on posters that are renders, e.g. "Rendu — image non contractuelle". */
+  renderNote?: string;
 };
 
 type Connection = { saveData?: boolean; effectiveType?: string };
@@ -40,7 +46,7 @@ const APPROACH_MARGIN = "700px";
  * WebGL context at a time, origins preconnected on approach rather than at
  * mount, and a click gate that survives only for metered connections.
  */
-export function TourCards({ locale, tours }: Props) {
+export function TourCards({ locale, tours, body, renderNote }: Props) {
   const t = getDictionary(locale);
   const sectionRef = useRef<HTMLElement>(null);
   const cardRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
@@ -79,6 +85,8 @@ export function TourCards({ locale, tours }: Props) {
     const mm = gsap.matchMedia();
 
     mm.add("(prefers-reduced-motion: no-preference)", () => {
+      // A single tour has nothing to pan to: it is laid out as one large card.
+      if (tours.length < 2) return;
       const stage = section.querySelector<HTMLElement>(".tours__stage");
       if (!stage) return;
 
@@ -119,7 +127,25 @@ export function TourCards({ locale, tours }: Props) {
         },
       });
 
+      // The pin is measured once; anything above it that changes height later
+      // (a late web font, an image without reserved space) would leave it
+      // pinning at the wrong scroll position and covering the sections above.
+      // Re-measure whenever the document height changes.
+      let timer = 0;
+      let lastHeight = document.documentElement.scrollHeight;
+      const observer = new ResizeObserver(() => {
+        const height = document.documentElement.scrollHeight;
+        if (Math.abs(height - lastHeight) < 2) return;
+        lastHeight = height;
+        window.clearTimeout(timer);
+        timer = window.setTimeout(() => ScrollTrigger.refresh(), 150);
+      });
+      observer.observe(document.body);
+      void document.fonts?.ready.then(() => ScrollTrigger.refresh());
+
       return () => {
+        observer.disconnect();
+        window.clearTimeout(timer);
         pan.scrollTrigger?.kill();
         pan.kill();
       };
@@ -243,7 +269,7 @@ export function TourCards({ locale, tours }: Props) {
     <section
       ref={sectionRef}
       aria-labelledby="tours-title"
-      className="tours"
+      className={tours.length === 1 ? `tours ${st.single}` : "tours"}
     >
       {approached && (
         <>
@@ -276,13 +302,17 @@ export function TourCards({ locale, tours }: Props) {
             data-step="2"
             style={{ color: "var(--color-ink-soft)", maxInlineSize: "38ch" }}
           >
-            {metered ? t.project.tourDataWarning : t.project.tourBody}
+            {metered ? t.project.tourDataWarning : (body ?? t.project.tourBody)}
           </p>
         </div>
 
         <ul ref={trackRef} className="tours__track" style={{ listStyle: "none", margin: 0 }}>
           {tours.map((tour, index) => (
-            <li key={tour.id} className="tours__slot">
+            <li
+              key={tour.id}
+              // Posters from small sources are never shown wider than 480 px.
+              className={media[tour.poster.key].width < 2000 ? `tours__slot ${st.slotSmall}` : "tours__slot"}
+            >
               <button
                 type="button"
                 ref={(node) => {
@@ -308,6 +338,18 @@ export function TourCards({ locale, tours }: Props) {
                   <span aria-hidden className="tours__enter u-eyebrow">
                     360°
                   </span>
+                  {renderNote && tour.poster.nature === "render" && (
+                    <span
+                      className="absolute bottom-3 end-3 rounded-full px-2.5 py-1"
+                      style={{
+                        fontSize: "0.6875rem",
+                        color: "var(--color-paper)",
+                        background: "rgb(28 30 20 / 0.55)",
+                      }}
+                    >
+                      {renderNote}
+                    </span>
+                  )}
                 </span>
 
                 <span className="tours__label">

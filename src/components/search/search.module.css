@@ -1,0 +1,537 @@
+/* /projets — map, controls, results. Tokens only. */
+
+.section {
+  padding-block: clamp(3rem, 8vh, 5rem) clamp(5rem, 12vh, 9rem);
+}
+
+.layout {
+  display: grid;
+  gap: 2rem;
+}
+@media (min-width: 64rem) {
+  .layout {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    column-gap: clamp(2.5rem, 4vw, 4rem);
+    align-items: start;
+  }
+  .mapCol {
+    position: sticky;
+    top: calc(var(--nav-h) + 1.25rem);
+  }
+}
+
+.listCol {
+  display: grid;
+  gap: clamp(2rem, 4vh, 2.75rem);
+  min-inline-size: 0;
+}
+
+/* ------------------------------------------------------------------ map -- */
+.mapPanel {
+  position: relative;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  padding: clamp(1.25rem, 2.2vw, 2rem);
+  display: grid;
+  gap: 1.25rem;
+}
+
+.mapHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+}
+.mapEyebrow {
+  color: var(--color-ochre-bright);
+}
+.mapHint {
+  font-size: var(--text-small);
+  color: color-mix(in oklab, var(--color-paper) 66%, transparent);
+}
+.mapToggle {
+  display: none;
+}
+
+.map {
+  inline-size: 100%;
+  max-block-size: calc(100svh - var(--nav-h) - 9rem);
+  margin-inline: auto;
+}
+
+@media (max-width: 63.99rem) {
+  .mapHint {
+    display: none;
+  }
+  .mapToggle {
+    display: inline-flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    padding-inline: 1.1rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--color-paper) 32%, transparent);
+    background: transparent;
+    color: var(--color-paper);
+    font-size: var(--text-small);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .mapBody {
+    display: none;
+  }
+  .mapPanel[data-open] .mapBody {
+    display: block;
+  }
+  .mapHead {
+    align-items: center;
+  }
+}
+
+.pin {
+  cursor: pointer;
+  outline: none;
+}
+.leader {
+  fill: none;
+  stroke: color-mix(in oklab, var(--color-paper) 26%, transparent);
+  stroke-width: 1.4;
+  transition: stroke 200ms var(--ease-ui);
+}
+.pinDot {
+  fill: var(--color-paper);
+  transition: fill 200ms var(--ease-ui), opacity 200ms var(--ease-ui);
+}
+.pinHalo {
+  fill: none;
+  stroke: var(--color-ochre-bright);
+  stroke-width: 2.5;
+  opacity: 0;
+  transition: opacity 200ms var(--ease-ui);
+}
+.pinLabel {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 500;
+  fill: color-mix(in oklab, var(--color-paper) 84%, transparent);
+  transition: fill 200ms var(--ease-ui);
+}
+.pinCount {
+  fill: var(--color-ochre-bright);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.pin[data-empty] .pinDot {
+  opacity: 0.32;
+}
+.pin[data-empty] .pinLabel {
+  fill: color-mix(in oklab, var(--color-paper) 38%, transparent);
+}
+.pin[data-empty] .pinCount {
+  fill: color-mix(in oklab, var(--color-paper) 38%, transparent);
+}
+.pin[data-lit] .pinHalo,
+.pin:focus-visible .pinHalo {
+  opacity: 1;
+}
+.pin[data-lit] .leader,
+.pin:focus-visible .leader {
+  stroke: var(--color-ochre-bright);
+}
+.pin[data-lit] .pinLabel,
+.pin:focus-visible .pinLabel {
+  fill: var(--color-paper);
+}
+.pin[data-on] .pinDot {
+  fill: var(--color-ochre-bright);
+  opacity: 1;
+}
+.pin[data-on] .pinLabel {
+  fill: var(--color-paper);
+  font-weight: 700;
+}
+.pin[data-on] .leader {
+  stroke: var(--color-ochre-bright);
+}
+@media (hover: hover) {
+  .pin:hover .pinHalo {
+    opacity: 1;
+  }
+  .pin:hover .pinLabel {
+    fill: var(--color-paper);
+  }
+}
+@media (max-width: 63.99rem) {
+  .pinLabel {
+    font-size: 36px;
+  }
+}
+
+/* ------------------------------------------------------------- controls -- */
+.controls {
+  display: grid;
+  gap: 1.75rem;
+  padding-block-end: clamp(1.75rem, 4vh, 2.5rem);
+  border-block-end: 1px solid var(--color-ink);
+}
+
+.label {
+  display: block;
+  color: var(--color-ink-mute);
+  margin-block-end: 0.85rem;
+  padding: 0;
+}
+
+.budget {
+  display: grid;
+  gap: 0.25rem;
+}
+.budgetTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+}
+.budgetTop .label {
+  margin-block-end: 0;
+}
+.budgetValue {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 3vw, 2.75rem);
+  font-weight: 500;
+  font-stretch: 108%;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.budgetUnit {
+  font-size: 0.42em;
+  letter-spacing: 0.04em;
+  font-stretch: 100%;
+}
+.budgetNone {
+  color: var(--color-ink-mute);
+}
+
+.range {
+  --fill: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  inline-size: 100%;
+  block-size: 2.75rem;
+  margin: 0.25rem 0 0;
+  background: transparent;
+  cursor: pointer;
+}
+.range::-webkit-slider-runnable-track {
+  block-size: 3px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--color-ochre-deep) var(--fill), color-mix(in oklab, var(--color-ink) 18%, transparent) var(--fill));
+}
+:global([dir="rtl"]) .range::-webkit-slider-runnable-track {
+  background: linear-gradient(to left, var(--color-ochre-deep) var(--fill), color-mix(in oklab, var(--color-ink) 18%, transparent) var(--fill));
+}
+.range::-moz-range-track {
+  block-size: 3px;
+  border-radius: 3px;
+  background: color-mix(in oklab, var(--color-ink) 18%, transparent);
+}
+.range::-moz-range-progress {
+  block-size: 3px;
+  background: var(--color-ochre-deep);
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  inline-size: 1.4rem;
+  block-size: 1.4rem;
+  margin-block-start: calc(-0.7rem + 1.5px);
+  border-radius: 50%;
+  background: var(--color-ink);
+  border: 3px solid var(--color-paper);
+  box-shadow: 0 0 0 1px var(--color-ink);
+  transition: transform var(--dur-release) var(--ease-ui);
+}
+.range::-moz-range-thumb {
+  inline-size: 1.2rem;
+  block-size: 1.2rem;
+  border-radius: 50%;
+  background: var(--color-ink);
+  border: 3px solid var(--color-paper);
+}
+.range:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+  transition-duration: var(--dur-press);
+}
+.range:focus-visible {
+  outline: none;
+}
+.range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px var(--color-ochre);
+}
+
+.budgetBottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.9rem;
+}
+.depositLabel {
+  font-size: var(--text-small);
+  color: var(--color-ink-mute);
+}
+.ceiling {
+  font-size: var(--text-small);
+  color: var(--color-ochre-deep);
+}
+
+.row {
+  display: grid;
+  gap: 1.75rem;
+}
+@media (min-width: 40rem) {
+  .row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 2rem;
+  }
+}
+
+.field {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0;
+}
+
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  inline-size: 100%;
+  min-block-size: 3rem;
+  padding-block: 0.7rem;
+  padding-inline: 1.1rem 2.75rem;
+  border: 1px solid color-mix(in oklab, var(--color-ink) 22%, transparent);
+  border-radius: 999px;
+  background-color: transparent;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--color-ink) 50%),
+    linear-gradient(135deg, var(--color-ink) 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.35rem) 52%,
+    calc(100% - 1.05rem) 52%;
+  background-size: 0.32rem 0.32rem;
+  background-repeat: no-repeat;
+  font-size: var(--text-body);
+  font-weight: 500;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+:global([dir="rtl"]) .select {
+  background-position:
+    1.05rem 52%,
+    1.35rem 52%;
+}
+.select:focus-visible {
+  outline: 2px solid var(--color-ochre);
+  outline-offset: 2px;
+}
+.selectSmall {
+  inline-size: auto;
+  min-block-size: 2.75rem;
+  padding-block: 0.45rem;
+  font-size: var(--text-small);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-block-size: 2.75rem;
+  padding-inline: 1rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--color-ink) 22%, transparent);
+  background: transparent;
+  color: var(--color-ink);
+  font-size: var(--text-small);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color var(--dur-ui) var(--ease-ui),
+    color var(--dur-ui) var(--ease-ui),
+    border-color var(--dur-ui) var(--ease-ui),
+    opacity var(--dur-ui) var(--ease-ui);
+}
+.chip:active {
+  transform: scale(0.97);
+}
+@media (hover: hover) {
+  .chip:hover {
+    border-color: var(--color-ink);
+  }
+}
+.chip[aria-pressed="true"] {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  color: var(--color-paper);
+}
+.chip[data-empty] {
+  opacity: 0.42;
+}
+.chipCount {
+  font-size: var(--text-label);
+  color: var(--color-ink-mute);
+}
+.chip[aria-pressed="true"] .chipCount {
+  color: color-mix(in oklab, var(--color-paper) 70%, transparent);
+}
+.chipRound {
+  min-inline-size: 3.25rem;
+  justify-content: center;
+}
+
+.mobileToggle {
+  display: none;
+}
+.rest {
+  display: grid;
+  gap: 1.75rem;
+}
+
+.utility {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.75rem;
+}
+.textButton {
+  min-block-size: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ochre-deep);
+  font-size: var(--text-small);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+  cursor: pointer;
+}
+
+@media (max-width: 63.99rem) {
+  .mobileToggle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-block-size: 3rem;
+    padding-inline: 1.1rem;
+    border: 1px solid color-mix(in oklab, var(--color-ink) 22%, transparent);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-ink);
+    font-size: var(--text-small);
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .mobileToggle .chev {
+    margin-inline-start: auto;
+    transition: transform var(--dur-ui) var(--ease-ui);
+  }
+  .mobileToggle[aria-expanded="true"] .chev {
+    transform: rotate(180deg);
+  }
+  .rest {
+    display: none;
+  }
+  .rest[data-open] {
+    display: grid;
+  }
+}
+.badge {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 1.5rem;
+  block-size: 1.5rem;
+  padding-inline: 0.4rem;
+  border-radius: 999px;
+  background: var(--color-ochre-deep);
+  color: var(--color-paper);
+  font-size: var(--text-label);
+}
+
+/* -------------------------------------------------------------- results -- */
+.results {
+  display: grid;
+  gap: 1.75rem;
+  transition: opacity var(--dur-ui) var(--ease-ui);
+}
+.results[data-pending] {
+  opacity: 0.5;
+}
+
+.resultsHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.count {
+  font-family: var(--font-display);
+  font-size: var(--text-title);
+  font-weight: 500;
+  font-stretch: 108%;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.relaxed {
+  padding: 1.1rem 1.4rem;
+  background: var(--color-paper-warm);
+  border-inline-start: 3px solid var(--color-ochre);
+  font-size: var(--text-small);
+  line-height: 1.6;
+  color: var(--color-ink-soft);
+}
+.relaxed strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.relaxed em {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--color-ochre-deep);
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: clamp(2.5rem, 4vw, 3rem) clamp(1rem, 2vw, 1.5rem);
+}
+@media (min-width: 40rem) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.gridItem {
+  min-inline-size: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .gridItem {
+    animation: card-in 560ms var(--ease-reveal) both;
+    animation-delay: calc(var(--i, 0) * 45ms);
+  }
+}
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

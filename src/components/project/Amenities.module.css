@@ -1,0 +1,69 @@
+.section {
+  padding-block: clamp(5rem, 12vh, 9rem);
+}
+
+.layout {
+  display: grid;
+  gap: clamp(2.5rem, 5vw, 4rem);
+}
+@media (min-width: 64rem) {
+  .layout {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    column-gap: clamp(3rem, 6vw, 6rem);
+    align-items: start;
+  }
+  .head {
+    position: sticky;
+    top: calc(var(--nav-h) + 2rem);
+  }
+}
+
+.head {
+  display: grid;
+  gap: 1.25rem;
+}
+.title {
+  font-size: var(--text-display);
+  max-inline-size: 10ch;
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-block-start: 1px solid color-mix(in oklab, var(--color-ink) 18%, transparent);
+  border-inline-start: 1px solid color-mix(in oklab, var(--color-ink) 18%, transparent);
+}
+@media (min-width: 48rem) {
+  .grid {
+    grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+  }
+  .grid[data-cols="1"] { --cols: 1; }
+  .grid[data-cols="2"] { --cols: 2; }
+  .grid[data-cols="3"] { --cols: 3; }
+  .grid[data-cols="4"] { --cols: 4; }
+  .grid[data-cols="5"] { --cols: 5; }
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+  min-block-size: clamp(8.5rem, 12vw, 11rem);
+  padding: clamp(1.1rem, 2vw, 1.75rem);
+  border-block-end: 1px solid color-mix(in oklab, var(--color-ink) 18%, transparent);
+  border-inline-end: 1px solid color-mix(in oklab, var(--color-ink) 18%, transparent);
+}
+
+.icon {
+  color: var(--color-ochre-deep);
+  display: inline-flex;
+}
+
+.label {
+  font-size: clamp(1.05rem, 1.5vw, 1.4rem);
+  line-height: 1.15;
+}
