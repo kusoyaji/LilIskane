@@ -30,6 +30,8 @@ type Values = {
   slot: SlotId | "";
   message: string;
   consent: boolean;
+  /** Separate, optional opt-in for information about the programmes (Loi 09-08). Never pre-checked. */
+  marketing: boolean;
 };
 
 /** Validated fields, in the order the visitor meets them — focus goes to the first wrong one. */
@@ -74,7 +76,6 @@ function validate(v: Values, t: FormCopy, today: string): Errors {
   const date = parseIso(v.date);
   if (!date) e.date = t.errors.date;
   else if (today && v.date < today) e.date = t.errors.datePast;
-  else if (date.getDay() === 0) e.date = t.errors.dateSunday;
   if (!v.slot) e.slot = t.errors.slot;
   if (!v.consent) e.consent = t.errors.consent;
   return e;
@@ -84,9 +85,10 @@ function validate(v: Values, t: FormCopy, today: string): Errors {
  * The appointment request — the one thing this site exists to produce.
  *
  * Four short steps on one card, no wizard: everything is visible, nothing is
- * hidden behind "next". The day is chosen from the next twelve open days, so a
- * Sunday or a past date simply cannot be picked; "another date" opens a native
- * picker for anything further out, validated the same way.
+ * hidden behind "next". The day is a wish, not a booking: it is chosen from the
+ * next twelve days (no opening days are assumed — a counsellor calls back to
+ * confirm), and "another date" opens a native picker for anything further out,
+ * validated the same way (never in the past).
  *
  * Validation runs on submit, then live on any field that has been flagged, so
  * a message disappears the moment it is answered and nobody is corrected while
@@ -128,6 +130,7 @@ export function AppointmentForm({
     slot: "",
     message: "",
     consent: false,
+    marketing: false,
   });
   const [errors, setErrors] = useState<Errors>({});
   const [attempted, setAttempted] = useState(false);
@@ -145,7 +148,7 @@ export function AppointmentForm({
     const d = new Date(now);
     while (list.length < UPCOMING_DAYS) {
       d.setDate(d.getDate() + 1);
-      if (d.getDay() !== 0) list.push(iso(d));
+      list.push(iso(d));
     }
     setToday(iso(now));
     setDays(list);
@@ -522,7 +525,6 @@ export function AppointmentForm({
             <div className={s.labelRow}>
               <p className={s.label} id={id("date-label")}>
                 {t.date}
-                <span className={s.labelAside}>{t.dateHint}</span>
               </p>
               <button
                 type="button"
@@ -537,6 +539,9 @@ export function AppointmentForm({
                 {customDate ? t.backToDays : t.otherDate}
               </button>
             </div>
+            <p id={id("date-hint")} className={s.hint}>
+              {t.dateHint}
+            </p>
 
             {customDate ? (
               <div className={s.customDate}>
@@ -552,7 +557,7 @@ export function AppointmentForm({
                   onChange={(e) => set("date", e.target.value)}
                   onBlur={() => onBlur("date")}
                   aria-invalid={errors.date ? true : undefined}
-                  aria-describedby={describedBy("date")}
+                  aria-describedby={describedBy("date", true)}
                   className={s.input}
                 />
                 {dateObj && !errors.date && <p className={s.hint}>{fmt.long.format(dateObj)}</p>}
@@ -562,7 +567,7 @@ export function AppointmentForm({
                 className={s.days}
                 role="radiogroup"
                 aria-labelledby={id("date-label")}
-                aria-describedby={describedBy("date")}
+                aria-describedby={describedBy("date", true)}
                 aria-invalid={errors.date ? true : undefined}
               >
                 {days.length === 0
@@ -675,6 +680,21 @@ export function AppointmentForm({
           </span>
         </label>
         {errorText("consent")}
+        <label className={s.consent}>
+          <input
+            type="checkbox"
+            name="marketing"
+            checked={values.marketing}
+            onChange={(e) => set("marketing", e.target.checked)}
+            className={s.srOnly}
+          />
+          <span className={s.box} aria-hidden>
+            <svg width="14" height="14" viewBox="0 0 24 24" focusable="false">
+              <path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+          <span className={s.consentText}>{t.marketing}</span>
+        </label>
       </div>
 
       <div className={s.submitRow}>

@@ -260,7 +260,7 @@ export const guide: Copy<GuideCopy> = {
         "Les conditions de remboursement anticipé",
       ],
       earlyLabel:
-        "Du capital restant dû : le plafond de l'indemnité de remboursement anticipé, qui équivaut généralement à un mois d'intérêts, selon la réglementation.",
+        "Du capital restant dû, au maximum : l'indemnité de remboursement anticipé correspond généralement à un mois d'intérêts, sans pouvoir dépasser ce plafond, selon la réglementation.",
       aidEyebrow: "Aide directe au logement",
       aidTitle: "Une offre adaptée à l'aide directe au logement.",
       aidBody: (year) =>
@@ -315,7 +315,7 @@ export const guide: Copy<GuideCopy> = {
           steps: [1, 5, 6],
         },
         {
-          title: "تأمين قانوني صارم",
+          title: "أمان قانوني تام",
           body: "يتحقق الموثّق من وضعية العقار ويُضفي الطابع الرسمي على البيع. لا شيء يُوقَّع دون أن يكون واضحاً.",
           steps: [4, 7],
         },
@@ -415,7 +415,7 @@ export const guide: Copy<GuideCopy> = {
       {
         phase: 2,
         short: "التوقيع لدى الموثق",
-        title: "صياغة الاتفاق وتأمين التوقيع",
+        title: "اتفقوا كتابةً ووقّعوا بأمان",
         lead: "كل شيء يجب أن يكون واضحاً ومكتوباً ومتّفقاً عليه قبل التوقيع.",
         body: "التوقيع لدى الموثّق يُضفي الطابع الرسمي على المعاملة ويحمي حقوقكم.",
         listTitle: "ما يجب تثبيته كتابةً",
@@ -424,9 +424,9 @@ export const guide: Copy<GuideCopy> = {
       {
         phase: 2,
         short: "التسليم والضمانات",
-        title: "التسليم، المحضر، خدمة ما بعد البيع والضمانات",
+        title: "تسلّموا مسكنكم وتابعوا الضمانات",
         lead: "يوم تسلّم المفاتيح، خذوا الوقت لمعاينة شاملة.",
-        body: "دوّنوا كل تحفّظ في محضر التسليم. بعد ذلك، تستفيدون من الضمانات المعمول بها ومن خدمة ما بعد البيع منظّمة للمتابعة.",
+        body: "دوّنوا كل تحفّظ في محضر التسليم. بعد ذلك، تستفيدون من الضمانات المعمول بها ومن خدمة ما بعد البيع المنظّمة للمتابعة.",
         listTitle: "يوم التسليم",
         list: ["معاينة شاملة للمسكن", "تدوين التحفّظات في المحضر", "المتابعة من طرف خدمة ما بعد البيع"],
       },
@@ -444,7 +444,7 @@ export const guide: Copy<GuideCopy> = {
     sim: {
       eyebrow: "محاكي القرض",
       title: "احسبوا قسطكم الشهري.",
-      lead: "أدخلوا ثمن العقار والمبلغ المتوفر، واختاروا المدة: يظهر القسط الشهري والتأمين التقديري والتكلفة الإجمالية للقرض فوراً. دون تسجيل.",
+      lead: "أدخلوا ثمن العقار ومساهمتكم الشخصية، واختاروا المدة: يظهر القسط الشهري والتأمين التقديري والتكلفة الإجمالية للقرض فوراً. دون تسجيل.",
     },
     finance: {
       eyebrow: "التمويل",
@@ -471,7 +471,7 @@ export const guide: Copy<GuideCopy> = {
         "شروط السداد المسبق",
       ],
       earlyLabel:
-        "من الرأسمال المتبقي: سقف تعويض السداد المسبق، الذي يعادل عموماً فوائد شهر واحد، وفق القانون الجاري به العمل.",
+        "من الرأسمال المتبقي كحد أقصى: يعادل تعويض السداد المسبق عادةً فوائد شهر واحد، دون أن يتجاوز هذا السقف، وفق القانون الجاري به العمل.",
       aidEyebrow: "الدعم المباشر للسكن",
       aidTitle: "عرض ملائم للدعم المباشر للسكن.",
       aidBody: (year) =>
@@ -481,7 +481,7 @@ export const guide: Copy<GuideCopy> = {
     guarantees: {
       eyebrow: "الضمانات",
       title: "بعد تسلّم المفاتيح، تظلّون محميين.",
-      lead: "تسري الضمانات المعمول بها ابتداءً من التسليم، مع خدمة ما بعد البيع منظّمة للمتابعة.",
+      lead: "تسري الضمانات المعمول بها ابتداءً من التسليم، مع خدمة ما بعد البيع المنظّمة للمتابعة.",
       unit: (years) => (years === 1 ? "سنة" : years === 2 ? "سنتان" : "سنوات"),
     },
     conventions: {

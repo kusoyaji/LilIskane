@@ -44,7 +44,7 @@ export function Pillars({ locale }: { locale: Locale }) {
           {t.pillars.items.map((item, i) => (
             <li key={item.title} className={`u-enter ${s.pillar}`}>
               <span className={s.pillarNum} aria-hidden>
-                {["I", "II", "III"][i]}
+                {(locale === "ar" ? ["01", "02", "03"] : ["I", "II", "III"])[i]}
               </span>
               <div>
                 <h3 className={s.pillarTitle}>{item.title}</h3>

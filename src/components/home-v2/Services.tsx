@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import { Figure } from "@/components/media/Figure";
 import { Arrow, SectionHeading } from "@/components/v2";
@@ -6,6 +7,8 @@ import { servicesCopy, type ServiceEntry } from "@/content/home-conversion";
 import { guarantees } from "@/data/company";
 import type { MediaRef } from "@/data/types";
 import { formatNumber, isolateRun, type Locale } from "@/i18n/config";
+import { CREDIT_DEFAULTS, maxAffordablePrice } from "@/lib/credit";
+import { DEFAULT_DEPOSIT, DEFAULT_MONTHLY, MONTHLY_MAX, MONTHLY_MIN } from "./budget/match";
 import s from "./services/Services.module.css";
 
 /** Delivered Riad Garden I photography — what was built, not a render. */
@@ -49,10 +52,23 @@ type Entry = {
  *
  * Three entries are delivered Riad Garden I photographs; the simulator is a
  * typographic ink panel, because a stock "calculator" picture would be the
- * one image on the page that says nothing.
+ * one image on the page that says nothing. The panel shows a real worked
+ * example — the finder's opening state run through src/lib/credit.ts — so it
+ * sells the tool with an answer rather than with the names of its inputs.
  */
 export function Services({ locale }: { locale: Locale }) {
   const t = servicesCopy[locale];
+
+  // The finder's opening state, worked through the same maths it uses —
+  // rounded to the thousand exactly as the finder displays its ceiling.
+  const exampleCeiling =
+    Math.round(
+      maxAffordablePrice(DEFAULT_MONTHLY, DEFAULT_DEPOSIT, CREDIT_DEFAULTS.annualRate, CREDIT_DEFAULTS.years) / 1_000,
+    ) * 1_000;
+  const exampleLabel = t.simulator.example
+    .replace("{deposit}", formatNumber(DEFAULT_DEPOSIT, locale))
+    .replace("{years}", formatNumber(CREDIT_DEFAULTS.years, locale));
+  const railPos = (DEFAULT_MONTHLY - MONTHLY_MIN) / (MONTHLY_MAX - MONTHLY_MIN);
 
   const entries: Entry[] = [
     { id: "guide", href: `/${locale}/guide-achat`, copy: t.guide, media: MEDIA.guide },
@@ -88,14 +104,27 @@ export function Services({ locale }: { locale: Locale }) {
                 ) : (
                   <span className={`${s.frame} ${s.tile}`} data-reveal="media">
                     <Lattice cell={30} />
-                    <span className={s.tileWords} aria-hidden>
-                      {t.simulator.words.map((w, i) => (
-                        <span key={w} className={s.tileWord} data-accent={i === 0 || undefined}>
-                          {w}
-                        </span>
-                      ))}
+                    <span className={s.tileExample} aria-hidden>
+                      {exampleLabel}
                     </span>
-                    <span className={s.tileRail} aria-hidden>
+                    <span className={s.tileFigures} aria-hidden>
+                      <span className={s.tileMonthly}>
+                        <span className={`${s.tileMonthlyFigure} u-numeric`} dir="ltr">
+                          {formatNumber(DEFAULT_MONTHLY, locale)}
+                        </span>
+                        <span className={s.tileMonthlyUnit}>{t.simulator.perMonth}</span>
+                      </span>
+                      <span className={s.tileCeiling}>
+                        <span className={s.tileCeilingLabel}>{t.simulator.ceilingLabel}</span>
+                        <span className={s.tileCeilingValue}>
+                          <span className={`${s.tileCeilingNumber} u-numeric`} dir="ltr">
+                            {formatNumber(exampleCeiling, locale)}
+                          </span>{" "}
+                          {t.simulator.currency}
+                        </span>
+                      </span>
+                    </span>
+                    <span className={s.tileRail} aria-hidden style={{ "--p": `${railPos * 100}%` } as CSSProperties}>
                       <span className={s.tileRailFill} />
                       <span className={s.tileRailThumb} />
                     </span>

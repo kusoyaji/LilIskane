@@ -37,7 +37,7 @@ export const filmCopy: Copy<{
     beat1Eyebrow: "Promoteur immobilier · Groupe Ynna",
     since: (year) => `depuis ${year}.`,
     beat1Lead: (years) =>
-      `Plus de ${years} ans à bâtir au Maroc. Faites défiler : nous vous faisons entrer dans notre nouvelle résidence, à Marrakech.`,
+      `Plus de ${years} ans à bâtir au Maroc. Entrez dans notre nouvelle résidence, à Marrakech.`,
     beat2Eyebrow: "Riad Garden II · Marrakech",
     beat2Title: "Une cour, un bassin, des palmiers.",
     beat2Lead: (place) =>
@@ -49,7 +49,10 @@ export const filmCopy: Copy<{
     ctaProject: "Découvrir Riad Garden II",
     scrollCue: "Faites défiler pour entrer",
     chapters: ["Depuis 1948", "Le lieu", "Chez vous"],
-    note: (year) => `Rendu 3D — Riad Garden II, Marrakech — livraison ${year} — image non contractuelle`,
+    /** The film is an AI-generated sequence made from the renders, not a render
+     *  itself — worded as the legal notice describes it. */
+    note: (year) =>
+      `Séquence d'ambiance réalisée à partir des rendus de Riad Garden II — livraison ${year} — non contractuelle`,
   },
   ar: {
     label: "الدخول إلى رياض غاردن 2",
@@ -58,17 +61,17 @@ export const filmCopy: Copy<{
     beat1Eyebrow: "منعش عقاري · مجموعة ينا",
     since: (year) => `منذ ${year}.`,
     beat1Lead: (years) =>
-      `أكثر من ${years} سنة من البناء بالمغرب. مرّروا الصفحة، ندخلكم إقامتنا الجديدة بمراكش.`,
+      `أكثر من ${years} سنة من البناء بالمغرب. ادخلوا إقامتنا الجديدة في مراكش.`,
     beat2Eyebrow: "رياض غاردن 2 · مراكش",
     beat2Title: "فناء، ومسبح، ونخيل.",
-    beat2Lead: (place) => `${place}. عمارات من طابقين حول مسبح وحدائق مغروسة.`,
+    beat2Lead: (place) => `${place}. عمارات من طابق أرضي وطابقين حول مسبح وحدائق مغروسة.`,
     beat3Eyebrow: "شقق بغرفتين وثلاث غرف",
     beat3Title: "وأخيراً، في بيتكم.",
     beat3Lead: (year) => `صالون مفتوح على الشرفة، وضوء مراكش يملأ المكان. التسليم سنة ${year}.`,
     ctaProject: "اكتشفوا رياض غاردن 2",
     scrollCue: "مرّروا للدخول",
     chapters: ["منذ 1948", "المكان", "بيتكم"],
-    note: (year) => `تصوّر ثلاثي الأبعاد — رياض غاردن 2، مراكش — التسليم ${year} — صورة غير تعاقدية`,
+    note: (year) => `مشهد إيحائي مُنجز انطلاقاً من تصوّرات رياض غاردن 2 — التسليم ${year} — غير تعاقدي`,
   },
 };
 
@@ -103,9 +106,9 @@ export const heritageCopy: Copy<{
   ar: {
     title: (years) => `أكثر من ${years} سنة من البناء، مدينةً بعد مدينة.`,
     lead: "الشعبي للإسكان، فرع مجموعة ينا، يصمّم مشاريعه وينجزها من التهيئة إلى تسليم المفاتيح — بالمغرب وخارجه.",
-    rangeLabel: "العرض",
+    rangeLabel: "عروضنا",
     range: ["السكن الاقتصادي", "السكن المتوسط", "السكن الراقي", "البقع الأرضية"],
-    foundedLabel: "تأسست سنة",
+    foundedLabel: "سنة التأسيس",
     statYears: "سنة من الخبرة",
     statCities: "مدينة بالمغرب",
     statUnits: (ha) => `مسكن بالصويرة الجديدة، مدينة جديدة على ${ha} هكتاراً`,
@@ -169,7 +172,7 @@ export const flagshipCopy: Copy<{
     phase1Body:
       "Mêmes équipes, mêmes finitions. Des familles y vivent déjà : venez la voir avant de vous engager sur Riad Garden II.",
     photoNote: (year) => `Photographie — Riad Garden I, livré en ${year}`,
-    amenitiesLabel: "Sur place",
+    amenitiesLabel: "Sur place et à proximité",
     amenities: {
       piscine: "Piscine",
       spa: "Spa",
@@ -208,7 +211,7 @@ export const flagshipCopy: Copy<{
     phase1Body:
       "نفس الفرق، نفس التشطيبات. عائلات تسكنه اليوم: تعالوا لرؤيته قبل الالتزام برياض غاردن 2.",
     photoNote: (year) => `صورة — رياض غاردن 1، سُلّم سنة ${year}`,
-    amenitiesLabel: "في عين المكان",
+    amenitiesLabel: "في عين المكان وبالقرب منه",
     amenities: {
       piscine: "مسبح",
       spa: "فضاء للعافية",

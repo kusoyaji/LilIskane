@@ -306,14 +306,26 @@
   .chapterLabel { display: none; }
   .actions { gap: 0.6rem; }
   .actions > * { flex: 1 1 100%; justify-content: space-between; }
-  /* The frame is portrait here; the cue sits in the open sky above the type
-     instead of beside it. */
+  /* The frame is portrait and the type fills its lower half, so there is no
+     room for the cue beside it. It sits under the header, centred, where the
+     top scrim is darkest — and its label carries its own dark pill, because
+     what is behind it there is a pale façade or sky, never a dark ground. */
   .cue {
     inset-inline: 0;
-    inset-block-start: 28%;
+    inset-block-start: calc(var(--nav-h) + 0.75rem);
     inset-block-end: auto;
     margin-inline: auto;
+    gap: 0.6rem;
   }
+  .cueLabel {
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    color: var(--color-paper);
+    background: color-mix(in oklab, var(--color-ink) 58%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+  .cueLine { block-size: 2.5rem; }
 }
 
 /* --------------------------------------------------------- reduced motion --- */

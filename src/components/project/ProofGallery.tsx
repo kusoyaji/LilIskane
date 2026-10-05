@@ -114,7 +114,9 @@ export function ProofGallery({ locale, pairs }: Props) {
 
         <span className={`u-eyebrow ${st.chip} ${st.chipRender}`}>{t.project.proofRender}</span>
         <span className={`u-eyebrow u-numeric ${st.chip} ${st.chipReal}`}>
-          {t.project.proofReal} — {pair.sourceProject[locale]}, {pair.sourceYear}
+          {t.project.proofReal} — {pair.sourceProject[locale]}
+          {locale === "ar" ? "، " : ", "}
+          {pair.sourceYear}
         </span>
       </div>
 

@@ -53,16 +53,16 @@ export const legalChrome: Copy<LegalChrome> = {
     toc: "Sommaire",
     nextEyebrow: "À lire aussi",
     questionsTitle: "Une question sur ces informations ?",
-    questionsBody: "Le service clientèle vous répond du lundi au samedi.",
+    questionsBody: "Le service clientèle de Chaabi Lil Iskane vous répond par téléphone.",
     callLabel: "Appeler le service clientèle",
     contactLabel: "Écrire ou prendre rendez-vous",
   },
   ar: {
     crumb: "معلومات قانونية",
     toc: "المحتويات",
-    nextEyebrow: "اقرأ أيضاً",
+    nextEyebrow: "اقرؤوا أيضاً",
     questionsTitle: "سؤال حول هذه المعلومات؟",
-    questionsBody: "تجيبكم خدمة الزبناء من الإثنين إلى السبت.",
+    questionsBody: "تجيبكم خدمة الزبناء للشعبي للإسكان عبر الهاتف.",
     callLabel: "الاتصال بخدمة الزبناء",
     contactLabel: "راسلونا أو احجزوا موعداً",
   },
@@ -99,7 +99,13 @@ export const mentions: Copy<LegalDoc> = {
       {
         id: "hebergement",
         title: "Hébergement",
-        blocks: [{ kind: "p", text: "Le site est hébergé par Vercel Inc., États-Unis (vercel.com)." }],
+        // HAND-OFF (before go-live): Chaabi's IT department must confirm the
+        // real host (name, address, country) and the CNDP receipt number. The
+        // client's own notice reads "conçu, développé et hébergé par Chaabi Lil
+        // Iskane" and the receipt is still "(en cours)". Do not name a third-party
+        // host here until IT confirms it: a foreign host also changes the Law
+        // 09-08 cross-border transfer wording on /donnees-personnelles.
+        blocks: [{ kind: "p", text: "Le site est conçu, édité et hébergé pour le compte de Chaabi Lil Iskane." }],
       },
       {
         id: "propriete-intellectuelle",
@@ -235,7 +241,8 @@ export const mentions: Copy<LegalDoc> = {
         id: "hebergement",
         title: "الاستضافة",
         blocks: [
-          { kind: "p", text: `يستضيف الموقعَ ${ar("Vercel Inc.")}، الولايات المتحدة الأمريكية (${ar("vercel.com")}).` },
+          // HAND-OFF: see the FR "hebergement" note above.
+          { kind: "p", text: "صُمِّم هذا الموقع ونُشر ويُستضاف لحساب الشعبي للإسكان." },
         ],
       },
       {

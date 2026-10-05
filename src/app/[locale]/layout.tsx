@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { archivo, plexArabic } from "@/lib/fonts";
 import { dirOf, isLocale, LOCALES, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
-import { Field } from "@/components/motion/Field";
 import { RevealRoot } from "@/components/motion/RevealRoot";
 import { ScrollChoreography } from "@/components/motion/ScrollChoreography";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
@@ -45,9 +44,13 @@ export async function generateMetadata({
       canonical: `/${locale}`,
       languages: { fr: "/fr", ar: "/ar" },
     },
+    // No og:title / og:description here on purpose. Child pages set their own
+    // `title` and `description` but no `openGraph` block, and Next inherits the
+    // layout's `openGraph` as a unit — so values set here became the share
+    // preview of every page (a WhatsApp share of Riad Garden II showed the
+    // generic home sentence). Without them, unfurlers fall back to each page's
+    // own <title> and meta description.
     openGraph: {
-      title: t.meta.homeTitle,
-      description: t.meta.homeDescription,
       locale: locale === "ar" ? "ar_MA" : "fr_MA",
       type: "website",
     },
@@ -79,17 +82,15 @@ export default async function LocaleLayout({
         </a>
         {/* Mounted here rather than inside template.tsx: the route wrapper is
             animated, and a transform there would become the containing block
-            for every fixed descendant — the field would stop being fixed to the
-            viewport for the length of each navigation.
+            for every fixed descendant. Headless: no wrapper element, so nothing
+            new becomes a containing block for the pinned stages.
 
-            Paper is the pre-hydration tone for every route. The home page opens
-            on ink, but its hero is opaque and full-height, so nothing of the
-            field is visible until the first toned section after it. */}
-        {/* Headless, like the two below it: no wrapper element, so nothing new
-            becomes a containing block for the pinned stages. */}
+            The fixed Field ground is no longer mounted: toned wrappers paint
+            their own ground (see GROUNDS in globals.css). A single colour
+            cannot serve two sections at once, and at every join it painted
+            half the viewport the wrong tone. */}
         <SmoothScroll />
         <ScrollChoreography />
-        <Field />
         {/* Still mounted: it sets `data-visible` on `.u-enter`, which the
             reduced-motion stylesheet depends on. Under motion the GSAP
             choreography owns the actual animation and the CSS transitions are

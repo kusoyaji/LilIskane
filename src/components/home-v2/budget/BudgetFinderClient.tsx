@@ -16,6 +16,9 @@ import { formatNumber, type Locale } from "@/i18n/config";
 import { CREDIT_DEFAULTS, maxAffordablePrice } from "@/lib/credit";
 import {
   DEFAULT_DEPOSIT,
+  DEFAULT_MONTHLY,
+  MONTHLY_MAX,
+  MONTHLY_MIN,
   effectiveTotal,
   matchBudget,
   searchMonthlyFor,
@@ -32,10 +35,10 @@ export type FinderItem = {
   isRender: boolean;
 };
 
-const MIN = 2_000;
-const MAX = 20_000;
+const MIN = MONTHLY_MIN;
+const MAX = MONTHLY_MAX;
 const STEP = 250;
-const START = 6_000;
+const START = DEFAULT_MONTHLY;
 const DURATIONS = [15, 20, 25] as const;
 const TICKS = [5_000, 10_000, 15_000];
 

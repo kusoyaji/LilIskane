@@ -33,7 +33,7 @@ export function Guarantees({ locale }: { locale: Locale }) {
               <li key={g.years} className={s.row} style={{ "--p": g.years / SPAN } as React.CSSProperties}>
                 <p className={s.rowNum}>
                   <span className={`u-display u-numeric ${s.rowFigure}`}>{formatNumber(g.years, locale)}</span>
-                  <span className={s.rowUnit}>{g.years > 1 ? t.years : t.year}</span>
+                  <span className={s.rowUnit}>{t.unit(g.years)}</span>
                 </p>
                 <div className={s.rowText}>
                   <h3 className={s.rowTitle}>{g.title[locale]}</h3>

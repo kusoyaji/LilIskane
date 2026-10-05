@@ -48,6 +48,7 @@ export type FormCopy = {
   consentBefore: string;
   consentLink: string;
   consentAfter: string;
+  marketing: string;
   submit: string;
   submitting: string;
   reassurance: string;
@@ -62,7 +63,6 @@ export type FormCopy = {
     phoneFormat: string;
     date: string;
     datePast: string;
-    dateSunday: string;
     slot: string;
     mode: string;
     consent: string;
@@ -157,7 +157,7 @@ export const contact: Copy<ContactCopy> = {
       title: "Vos données, vos droits.",
       lead: "Ce que nous faisons des informations que vous nous confiez, et comment en garder la maîtrise.",
       collected:
-        "Les informations demandées dans ce formulaire sont nécessaires pour traiter votre demande d'information ou de rendez-vous ; leur collecte est donc obligatoire. Elles font l'objet d'un traitement informatique et peuvent être utilisées à des fins de prospection commerciale.",
+        "Les champs non marqués « facultatif » sont nécessaires pour traiter votre demande. Si vous l'acceptez, vos coordonnées pourront aussi servir à vous informer de nos programmes ; vous pouvez vous y opposer à tout moment, sans frais.",
       rights:
         "Conformément à la loi n° 09-08 promulguée le 18 février 2009, relative à la protection des personnes physiques à l'égard du traitement des données à caractère personnel, vous bénéficiez d'un droit d'accès et de rectification aux informations qui vous concernent.",
       exercise: "Pour exercer ce droit",
@@ -202,10 +202,10 @@ export const contact: Copy<ContactCopy> = {
         telephone: "Un conseiller vous appelle au numéro indiqué.",
         visio: "Nous vous envoyons le lien de connexion avant le rendez-vous.",
       },
-      date: "Jour",
-      dateHint: "Du lundi au samedi",
+      date: "Date souhaitée",
+      dateHint: "Un conseiller vous rappelle pour confirmer un horaire.",
       otherDate: "Une autre date",
-      otherDateLabel: "Date souhaitée",
+      otherDateLabel: "Choisir une date",
       backToDays: "Revenir aux prochains jours",
       slot: "Créneau horaire",
       slots: {
@@ -220,6 +220,7 @@ export const contact: Copy<ContactCopy> = {
       consentBefore: "J'accepte que mes informations soient utilisées pour traiter ma demande, conformément à la loi n° 09-08. ",
       consentLink: "Données personnelles",
       consentAfter: "",
+      marketing: "J'accepte de recevoir des informations sur les programmes de Chaabi Lil Iskane (facultatif).",
       submit: "Demander mon rendez-vous",
       submitting: "Un instant…",
       reassurance: "Sans engagement. Nous vous rappelons pour confirmer.",
@@ -234,7 +235,6 @@ export const contact: Copy<ContactCopy> = {
         phoneFormat: "Numéro non reconnu — par exemple 06 12 34 56 78, ou +33 6 12 34 56 78 depuis l'étranger.",
         date: "Choisissez un jour.",
         datePast: "Cette date est passée — choisissez un jour à venir.",
-        dateSunday: "Nous ne recevons pas le dimanche — choisissez un autre jour.",
         slot: "Choisissez un créneau.",
         mode: "Choisissez comment nous rencontrer.",
         consent: "Cochez cette case pour que nous puissions traiter votre demande.",
@@ -289,7 +289,7 @@ export const contact: Copy<ContactCopy> = {
       title: "معطياتكم، حقوقكم.",
       lead: "ما نفعله بالمعلومات التي تأتمنوننا عليها، وكيف تحتفظون بالتحكم فيها.",
       collected:
-        "المعلومات المطلوبة في هذه الاستمارة ضرورية لمعالجة طلب المعلومات أو الموعد، ولذلك فإن جمعها إجباري. وهي تخضع لمعالجة معلوماتية، ويمكن استعمالها لأغراض الاستكشاف التجاري.",
+        "الحقول غير المشار إليها بعبارة «اختياري» ضرورية لمعالجة طلبكم. وإذا وافقتم على ذلك، يمكن أيضاً استعمال معلوماتكم لأغراض التسويق المباشر لإخباركم بمشاريعنا؛ ويمكنكم الاعتراض على ذلك في أي وقت ودون أي مصاريف.",
       rights: `طبقاً للقانون رقم ${L("09-08")} الصادر في ${L("18")} فبراير ${L("2009")}، المتعلق بحماية الأشخاص الذاتيين تجاه معالجة المعطيات ذات الطابع الشخصي، تتمتعون بحق الولوج إلى المعلومات التي تخصكم وتصحيحها.`,
       exercise: "لممارسة هذا الحق",
       byMail: "بالبريد",
@@ -333,10 +333,10 @@ export const contact: Copy<ContactCopy> = {
         telephone: "يتصل بكم مستشار على الرقم المذكور.",
         visio: "نرسل لكم رابط الاتصال قبل الموعد.",
       },
-      date: "اليوم",
-      dateHint: "من الإثنين إلى السبت",
+      date: "يوم الموعد",
+      dateHint: "يتصل بكم مستشار لتأكيد التوقيت.",
       otherDate: "تاريخ آخر",
-      otherDateLabel: "التاريخ المرغوب",
+      otherDateLabel: "اختيار تاريخ",
       backToDays: "العودة إلى الأيام القادمة",
       slot: "التوقيت",
       slots: {
@@ -351,6 +351,7 @@ export const contact: Copy<ContactCopy> = {
       consentBefore: `أوافق على استعمال معلوماتي لمعالجة طلبي، طبقاً للقانون رقم ${L("09-08")}. `,
       consentLink: "المعطيات الشخصية",
       consentAfter: "",
+      marketing: "أوافق على تلقي معلومات حول مشاريع الشعبي للإسكان (اختياري).",
       submit: "اطلبوا موعدكم",
       submitting: "لحظة من فضلكم…",
       reassurance: "دون أي التزام. نتصل بكم للتأكيد.",
@@ -365,7 +366,6 @@ export const contact: Copy<ContactCopy> = {
         phoneFormat: `رقم غير صحيح — مثلاً ${L("06 12 34 56 78")}، أو ${L("+33 6 12 34 56 78")} من الخارج.`,
         date: "يرجى اختيار يوم.",
         datePast: "هذا التاريخ قد مضى — اختاروا يوماً قادماً.",
-        dateSunday: "لا نستقبل يوم الأحد — اختاروا يوماً آخر.",
         slot: "يرجى اختيار توقيت.",
         mode: "يرجى اختيار طريقة اللقاء.",
         consent: "يرجى تأكيد الموافقة لنتمكن من معالجة طلبكم.",

@@ -6,7 +6,10 @@
   isolation: isolate;
   overflow: clip;
   color: var(--color-paper);
-  padding-block: clamp(6rem, 16vh, 11rem) clamp(12rem, 46vh, 28rem);
+  /* The bottom is an ordinary section margin, not half a screen of empty
+     ink: the content fades out as the ground turns (see Handoff.tsx), so it no
+     longer has to have scrolled away before the flagship's paper arrives. */
+  padding-block: clamp(6rem, 16vh, 11rem) clamp(3rem, 7vh, 5rem);
 }
 
 .inner {

@@ -15,7 +15,7 @@ export const fr = {
     skip: "Aller au contenu",
     home: "Accueil",
     projects: "Nos projets",
-    about: "Chaabi Lil Iskane",
+    about: "Qui sommes-nous",
     guide: "Guide d'achat",
     news: "Actualités",
     contact: "Contact",
@@ -143,7 +143,7 @@ export const fr = {
     tourEyebrow: "Visite immersive",
     tourTitle: "Entrez dans l'appartement.",
     tourBody:
-      "Déplacez-vous librement dans l'appartement témoin, pièce par pièce. Rien n'est masqué : les volumes, les hauteurs sous plafond et les vues sont ceux que vous aurez.",
+      "Parcourez l'appartement témoin pièce par pièce, en 360°, pour juger des volumes et de l'agencement. Visite indicative, non contractuelle.",
     tourStart: "Entrer dans la visite",
     tourLoading: "Ouverture de la visite",
     tour2br: "Témoin 2 chambres",
@@ -156,7 +156,7 @@ export const fr = {
     proofEyebrow: "Le rendu et le réel",
     proofTitle: "Voici ce que nous avons livré la dernière fois.",
     proofBody:
-      "À gauche, l'image de synthèse de Riad Garden II. À droite, la photographie du même espace à Riad Garden I, remis aux propriétaires en 2023. Nous vous laissons comparer.",
+      "À gauche, l'image de synthèse de Riad Garden II. À droite, un espace comparable photographié à Riad Garden I, livré en 2023. Nous vous laissons comparer.",
     proofRender: "Rendu",
     proofReal: "Livré",
     proofToggle: "Comparer rendu et livré",
@@ -173,8 +173,6 @@ export const fr = {
 
     locationEyebrow: "L'emplacement",
     locationTitle: "Sur la route d'Amezmiz, à Chrifia.",
-    locationBody:
-      "À 10 minutes de l'avenue Mohammed VI et du Golf Al Maaden, à l'écart du bruit mais dans la ville.",
     locationDrive: "en voiture",
     locationWalk: "à pied",
 
@@ -188,7 +186,7 @@ export const fr = {
     contactEyebrow: "Prendre rendez-vous",
     contactTitle: "Venez voir l'appartement témoin.",
     contactBody:
-      "Un conseiller vous accueille sur site, du lundi au samedi. Aucun engagement, aucune relance automatique.",
+      "Un conseiller vous accueille sur rendez-vous. Aucun engagement, aucune relance automatique.",
 
     legalRenders:
       "Les images de synthèse ont un caractère d'ambiance et ne sont pas contractuelles. Les photographies présentées comme livrées ont été prises à Riad Garden I, programme achevé du même promoteur.",
@@ -240,13 +238,13 @@ export const fr = {
     rate: "Taux",
     years: "ans",
     monthly: "Mensualité",
-    total: "Coût total du crédit",
+    total: "Total remboursé (capital + intérêts)",
     borrowed: "Montant emprunté",
     interest: "Intérêts",
     insurance: "Assurance estimée",
     depositTooLow: "L'apport habituel est d'au moins 10 % du prix.",
     disclaimer:
-      "Simulation indicative, hors assurance obligatoire et frais de dossier. Le taux réel dépend de votre banque et de votre dossier.",
+      "Simulation indicative au taux de 4,5 %, assurance emprunteur estimée (0,35 % par an) incluse dans la mensualité, hors frais de dossier et de garantie. Ne constitue pas une offre de crédit.",
   },
 
   form: {
@@ -270,12 +268,12 @@ export const fr = {
     successBody:
       "Un conseiller vous rappelle sous 24 heures ouvrées. Vous pouvez aussi nous joindre directement.",
     privacy:
-      "Vos coordonnées servent à traiter cette demande et peuvent être utilisées pour vous informer de nos programmes. Vous pouvez vous y opposer à tout moment.",
+      "Vos coordonnées servent uniquement à traiter cette demande. Elles ne sont utilisées à aucune autre fin sans votre accord.",
   },
 
   footer: {
     address: "239 Boulevard Mohammed V, Casablanca",
-    hours: "Lundi — Samedi, 9h à 18h",
+    hours: "En agence ou en visioconférence.",
     company: "Chaabi Lil Iskane",
     group: "Groupe Ynna",
     sitemap: "Plan du site",

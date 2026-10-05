@@ -237,6 +237,10 @@
 .map[data-armed]:not([data-in]) .loupeLabel { opacity: 0; }
 
 /* ------------------------------------------------------- footprint dots -- */
+/* Positions arrive as custom properties (--x/--y, and --px/--py for phones)
+   so one stylesheet rule can swap them; physical on purpose, like the map. */
+.dot, .pin { left: var(--x); top: var(--y); }
+
 .dot {
   position: absolute;
   inline-size: 0.6rem;
@@ -269,7 +273,9 @@
   background: none;
   color: var(--color-paper);
   cursor: pointer;
-  z-index: 2;
+  /* No z-index here on purpose: a pin must not be its own stacking context,
+     or a later pin's hit area would cover an earlier pin's disc. Instead every
+     hit area paints on one layer and every disc on the layer above it. */
   transition:
     opacity 520ms var(--ease-reveal) calc(var(--i, 0) * 70ms + 250ms),
     transform 620ms cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--i, 0) * 70ms + 250ms);
@@ -285,6 +291,7 @@
 
 .pinDisc {
   position: absolute;
+  z-index: 2;
   inset: 0;
   display: grid;
   place-items: center;
@@ -331,6 +338,7 @@
   color: var(--color-ink);
   text-shadow: 0 0 6px var(--color-paper), 0 0 2px var(--color-paper);
   pointer-events: none;
+  z-index: 2;
 }
 .pin[data-active] .pinLabel { color: var(--color-ochre-deep); }
 
@@ -340,12 +348,27 @@
 :is(.pin, .dot)[data-side="n"] > span:last-child { bottom: calc(100% + 0.45rem); left: 50%; transform: translateX(-50%); }
 :is(.pin, .dot)[data-side="s"] > span:last-child { top: calc(100% + 0.45rem); left: 50%; transform: translateX(-50%); }
 
-/* Phones: pins shrink to dots; only the active city is named on the map. */
+/* Phones: pins shrink to dots; only the active city is named on the map.
+   The loupe points take their spread-out phone positions, and each pin gets
+   an invisible 44px target centred on its disc. Targets sit on the layer
+   below every disc, so a disc is always its own pin's; where two targets
+   overlap, the tap goes to the nearer centre (see MapExplorer). */
 @media (max-width: 47.99rem) {
+  .dot, .pin { left: var(--px); top: var(--py); }
   .pin { --d: 0.85rem; }
   .pin[data-count="2"] { --d: 1rem; }
   .pin[data-count="3"] { --d: 1.15rem; }
-  .pin::before { content: ""; position: absolute; inset: -0.7rem; }
+  .pin::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    top: 50%;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    margin: -1.375rem 0 0 -1.375rem;
+    border-radius: 50%;
+  }
   .pinFigure { display: none; }
   .pinDisc { box-shadow: 0 0 0 2px var(--color-sand); }
   .pinDisc::after { inset: -0.3rem; }

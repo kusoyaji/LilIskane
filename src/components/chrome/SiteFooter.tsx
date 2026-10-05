@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getDictionary } from "@/i18n";
 import type { Locale } from "@/i18n/config";
 import { cities } from "@/data/cities";
+import { Wordmark } from "./Wordmark";
 import { projects } from "@/data/projects";
 
 /** Glyphs from Simple Icons (CC0), inlined so no icon library ships for three marks. */
@@ -53,7 +54,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
                 className="h-[4.5rem] w-auto rounded-[6px]"
               />
               <div className="flex flex-col gap-2.5">
-                <Image src="/brand/wordmark-paper.png" alt="" width={371} height={28} className="h-[0.95rem] w-auto" />
+                <Wordmark height="1.09rem" />
                 <span
                   lang="ar"
                   dir="rtl"

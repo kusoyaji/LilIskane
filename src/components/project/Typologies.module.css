@@ -181,3 +181,9 @@
   color: var(--color-ink-mute);
   max-inline-size: 70ch;
 }
+
+/* Plans without a published price. */
+.onRequest {
+  margin: 0;
+  color: var(--color-ink-soft);
+}

@@ -39,7 +39,7 @@ export function ProjectLocation({
           </p>
           <h2 id="location-title" className={`u-display ${s.title}`} data-reveal="mask">
             {/* One string, so the word splitter cannot break the line before the comma. */}
-            <span className="reveal-inner">{`${project.neighbourhood[locale]}, ${city.name[locale]}.`}</span>
+            <span className="reveal-inner">{`${project.neighbourhood[locale]}${locale === "ar" ? "، " : ", "}${city.name[locale]}.`}</span>
           </h2>
 
           {nearby.length > 0 ? (
@@ -51,7 +51,7 @@ export function ProjectLocation({
                 {nearby.map((place) => (
                   <li key={place.label.fr} className={`u-enter ${s.item}`}>
                     <span className={`u-numeric ${s.minutes}`}>
-                      {c.minutes(formatNumber(place.minutes, locale))}
+                      {c.minutes(place.minutes, formatNumber(place.minutes, locale))}
                     </span>
                     <span className={s.placeName}>{place.label[locale]}</span>
                     <span className={s.mode}>{place.mode === "walk" ? c.onFoot : c.byCar}</span>

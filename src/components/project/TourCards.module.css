@@ -31,3 +31,9 @@
   inline-size: 100%;
   max-inline-size: 30rem;
 }
+
+/* The opened tour is portalled to <body> and must sit above the fixed header
+   (z-index 50), whose phone link otherwise covered the close button. */
+.overlay {
+  z-index: 70;
+}

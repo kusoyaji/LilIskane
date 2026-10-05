@@ -8,8 +8,12 @@ import s from "./Chronology.module.css";
 
 export type ChronoEntry = { year: number; chapter: string; title: string; body: string };
 
-/** Scroll distance given to each date, as a fraction of the viewport height. */
-const STEP = 0.62;
+/**
+ * Scroll distance given to each date, as a fraction of the viewport height.
+ * Read at measure time (and on every refresh) so a rotation re-picks it.
+ */
+const step = () =>
+  typeof window !== "undefined" && window.matchMedia("(max-width: 47.99rem)").matches ? 0.28 : 0.36;
 const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
 /**
@@ -66,10 +70,11 @@ export function Chronology({
     const st = ScrollTrigger.create({
       trigger: stage,
       start: "top top",
-      end: () => `+=${Math.round(window.innerHeight * STEP * n)}`,
+      end: () => `+=${Math.round(window.innerHeight * step() * n)}`,
       pin: stage,
       anticipatePin: 1,
       invalidateOnRefresh: true,
+      refreshPriority: 1,
       onUpdate: (self) => {
         const i = Math.min(n - 1, Math.floor(self.progress * n));
         setActive((prev) => (prev === i ? prev : i));
@@ -79,12 +84,15 @@ export function Chronology({
     triggerRef.current = st;
     // The pin spacer changes the height of everything below it; every trigger
     // created before this one (reveals, the closing band's parallax) has to be
-    // remeasured or it fires a full history-length early.
+    // remeasured or it fires a full history-length early. Sorting by
+    // refreshPriority makes the pin measure first, before what sits below it.
+    ScrollTrigger.sort();
     ScrollTrigger.refresh();
 
     return () => {
       st.kill();
       triggerRef.current = null;
+      ScrollTrigger.sort();
       ScrollTrigger.refresh();
     };
   }, [pinned, n]);
@@ -129,7 +137,7 @@ export function Chronology({
                 <span key={k} className={s.reelWindow}>
                   <span
                     className={s.reel}
-                    style={{ transform: `translateY(${-Number(digit) * 10}%)`, transitionDelay: `${k * 55}ms` }}
+                    style={{ transform: `translateY(${-Number(digit) * 10}%)`, transitionDelay: `${k * 40}ms` }}
                   >
                     {DIGITS.map((d) => (
                       <span key={d}>{d}</span>

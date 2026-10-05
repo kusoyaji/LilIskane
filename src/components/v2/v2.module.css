@@ -144,12 +144,27 @@
   align-items: flex-end;
   padding-block: clamp(5rem, 14vh, 9rem) clamp(3.5rem, 9vh, 6rem);
 }
+/* The type column sits in the lower ~60% of the band. The old ramp left the
+   eyebrow on 0.4 ink over the brightest part of the photograph (a white
+   ceiling, a sky), where the ochre label all but disappeared. The floor is
+   unchanged; the middle and top carry a firmer veil. */
 .ctaScrim {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: linear-gradient(to top, rgb(28 30 20 / 0.9) 0%, rgb(28 30 20 / 0.55) 45%, rgb(28 30 20 / 0.2) 100%);
+  background: linear-gradient(to top, rgb(28 30 20 / 0.92) 0%, rgb(28 30 20 / 0.74) 50%, rgb(28 30 20 / 0.42) 100%);
 }
+.ctaEyebrow {
+  color: var(--color-ochre-bright);
+  margin-block-end: 1.4rem;
+  text-shadow: 0 1px 14px rgb(28 30 20 / 0.55);
+}
+/* Photograph-free close: the ink ground and the façade lattice. */
+.ctaLattice {
+  background: var(--color-ink);
+  min-block-size: 64svh;
+}
+.ctaLattice :global(svg) { opacity: 0.075; }
 .ctaPhone {
   display: inline-flex;
   align-items: baseline;

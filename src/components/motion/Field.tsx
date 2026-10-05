@@ -4,6 +4,12 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
 /**
+ * RETIRED — no longer mounted in the layout. A single fixed colour cannot
+ * serve two sections at once: at every join it painted half the viewport the
+ * wrong tone (measured 1.00:1 for the closing lines of five home sections).
+ * Toned wrappers now paint their own ground, feathered from the previous tone
+ * — see GROUNDS in globals.css. Kept for reference; do not remount.
+ *
  * The page's ground, owned by the page instead of by each section.
  *
  * Sections used to paint their own backgrounds, and that is what put a hard

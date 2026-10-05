@@ -3,7 +3,13 @@
 .flagship {
   position: relative;
   color: var(--color-ink);
-  padding-block: clamp(4rem, 9vh, 7rem) clamp(9rem, 30vh, 18rem);
+  /* Short margins at both joins. Coming in, the heritage panel fades as the
+     ground turns to paper; going out, this content fades as it turns back to
+     ink for the proof (Handoff.tsx), so neither end needs a void. */
+  padding-block: clamp(4rem, 9vh, 6.5rem) clamp(3rem, 7vh, 5rem);
+}
+
+.body {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: clamp(4.5rem, 12vh, 8.5rem);
@@ -375,7 +381,7 @@
 
 /* --------------------------------------------------------------- mobile ---- */
 @media (max-width: 47.99rem) {
-  .flagship { gap: 4rem; }
+  .body { gap: 4rem; }
   .name { font-size: clamp(3rem, 15.5vw, 4.5rem); line-height: 0.9; }
   :global([lang="ar"]) .name { font-size: clamp(3rem, 16vw, 4.75rem); }
   .place,

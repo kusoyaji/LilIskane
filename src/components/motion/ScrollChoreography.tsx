@@ -197,12 +197,30 @@ export function ScrollChoreography() {
         });
       });
 
-      // Images decoding late change section heights; without this every trigger
-      // below the fold is measured against a layout that no longer exists.
-      const refresh = () => ScrollTrigger.refresh();
+      // Order matters as much as timing. This component sits before <main>, so
+      // its triggers are created before the pins further down the page (the
+      // showcase rail, the chronology, the tour cards). ScrollTrigger refreshes
+      // in array order, and a trigger measured before a pin above it has added
+      // its spacer misses that spacer entirely — every reveal below the tour
+      // pin fired 400px early on the project page, and before the rail sorted
+      // itself, 4 000+ px early on home. `sort()` orders by refreshPriority,
+      // then by start position, so pins measure first; doing it two frames
+      // out lets every section's own effects (and pins) mount first.
+      //
+      // Images decoding late change section heights too; without the load
+      // refresh every trigger below the fold is measured against a layout that
+      // no longer exists.
+      const refresh = () => {
+        ScrollTrigger.sort();
+        ScrollTrigger.refresh();
+      };
+      let raf = requestAnimationFrame(() => {
+        raf = requestAnimationFrame(refresh);
+      });
       window.addEventListener("load", refresh);
 
       return () => {
+        cancelAnimationFrame(raf);
         window.removeEventListener("load", refresh);
         ctx.revert();
         document.documentElement.classList.remove("gsap-on");

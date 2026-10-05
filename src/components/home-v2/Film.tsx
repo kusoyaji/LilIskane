@@ -24,25 +24,49 @@ import s from "./film/Film.module.css";
  * Under reduced motion the track collapses to its content: no pin, the poster
  * as a still, and all three beats laid out in reading order.
  */
+/**
+ * The opening's own encodes, cut from the 1920×1080 master rather than the
+ * 720p files the project page shares: full HD for wide screens, and a
+ * portrait centre crop for phones — where only the middle third of a
+ * landscape frame is ever on screen, so a phone now gets ~600 source pixels
+ * across instead of ~330. Both keep a keyframe every 5 frames so they scrub.
+ */
+const OPENING = {
+  mp4: "/video/film/opening.mp4",
+  mp4Portrait: "/video/film/opening-portrait.mp4",
+  poster: "/video/film/opening-poster.jpg",
+  posterPortrait: "/video/film/opening-poster-portrait.jpg",
+} as const;
+
+/** Same breakpoint as the stage's own mobile rules. */
+const PHONE = "(max-width: 47.99rem)";
+const WIDE = "(min-width: 48rem)";
+
 export function Film({ locale }: { locale: Locale }) {
   const project = getProject("riad-garden-ii");
   if (!project?.cinematic || !project.deliveryYear) return null;
 
   const t = filmCopy[locale];
-  const cine = project.cinematic;
   const year = isolateRun(String(project.deliveryYear), locale);
   const founded = isolateRun(String(company.founded), locale);
   const place = project.neighbourhood[locale];
 
   return (
     <section className={s.film} data-nav-media aria-labelledby="film-title">
+      {/* The poster is the first screen's image: preload the one this viewport
+          will paint, at high priority, so it lands with the type rather than
+          after it. React hoists these into <head>. */}
+      <link rel="preload" as="image" href={OPENING.poster} media={WIDE} fetchPriority="high" />
+      <link rel="preload" as="image" href={OPENING.posterPortrait} media={PHONE} fetchPriority="high" />
       <FilmScrub
-        src={cine.mp4}
-        srcSmall={cine.mp4Small}
-        poster={cine.poster}
+        src={OPENING.mp4}
+        srcSmall={OPENING.mp4Portrait}
+        poster={OPENING.poster}
+        posterSmall={OPENING.posterPortrait}
+        phoneQuery={PHONE}
         alt={t.videoAlt}
       >
-        <div className={s.overlay}>
+        <div className={s.overlay} data-overlay>
           <div className={`u-shell ${s.beats}`}>
             {/* Beat 1 — who. The brand and the year, readable in the first
                 frame before anything has moved. */}

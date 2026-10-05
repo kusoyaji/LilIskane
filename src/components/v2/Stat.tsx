@@ -9,8 +9,8 @@ import s from "./v2.module.css";
  *
  * The count runs on a fast-start curve and lands on the exact value, so the
  * number a reader settles on is always the true one. Years (e.g. 1948) pass
- * `plain` so they are not grouped as "1 948". Under reduced motion the final
- * value is rendered immediately — there is nothing to watch, only to read.
+ * `plain`: they are not grouped as "1 948" and they never count — only
+ * quantities do. Under reduced motion the final value is rendered immediately.
  */
 export function Stat({
   value,
@@ -19,7 +19,7 @@ export function Stat({
   prefix = "",
   suffix = "",
   plain = false,
-  duration = 1600,
+  duration = 1100,
   size = "lg",
 }: {
   value: number;
@@ -39,16 +39,27 @@ export function Stat({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    // Years never count. A year tweened from value−60 spent a second and a half
+    // on screen as false dates — "1941 Création de l'AFCA", "1997 certifiée
+    // ISO" — beside facts the client's leadership knows by heart. A date is a
+    // fact to read, not a quantity to watch grow; the surrounding reveal
+    // (u-enter / mask) gives it its entrance.
+    if (plain) {
+      setShown(value);
+      return;
+    }
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    // Start from zero only once we know we will animate, so the server render
-    // (and any no-JS reader) shows the real figure.
-    setShown(plain ? Math.max(0, value - 60) : 0);
+    // Quantities start from 60% rather than zero: the count reads as arrival,
+    // and every intermediate figure stays in the right order of magnitude.
+    // Set only once we know we will animate, so the server render (and any
+    // no-JS reader) shows the real figure.
+    const from = Math.round(value * 0.6);
+    setShown(from);
     const io = new IntersectionObserver(
       ([entry]) => {
         if (!entry?.isIntersecting || started.current) return;
         started.current = true;
         io.disconnect();
-        const from = plain ? Math.max(0, value - 60) : 0;
         const t0 = performance.now();
         const tick = (now: number) => {
           const p = Math.min(1, (now - t0) / duration);

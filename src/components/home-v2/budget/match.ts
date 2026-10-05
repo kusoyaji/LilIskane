@@ -16,6 +16,14 @@ import type { Price } from "@/data/types";
 /** Mirrors `DEFAULT_DEPOSIT` in src/lib/filter.ts — kept equal so the URL omits it the same way. */
 export const DEFAULT_DEPOSIT = 150_000;
 
+/**
+ * The finder's monthly slider: range and opening value. Exported so the
+ * Services simulator tile shows the same worked example the finder opens on.
+ */
+export const MONTHLY_MIN = 2_000;
+export const MONTHLY_MAX = 20_000;
+export const DEFAULT_MONTHLY = 6_000;
+
 /** The duration /projets assumes (it has no duration parameter). */
 const SEARCH_YEARS = CREDIT_DEFAULTS.years;
 

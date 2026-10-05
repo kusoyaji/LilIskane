@@ -1,17 +1,19 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useId, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
 import { getDictionary } from "@/i18n";
 import type { Locale } from "@/i18n/config";
 import { useNavOverMedia } from "./useNavOverMedia";
+import { Wordmark } from "./Wordmark";
 
 export function SiteHeader({ locale }: { locale: Locale }) {
   const t = getDictionary(locale);
   const pathname = usePathname();
+  const router = useRouter();
   const overMedia = useNavOverMedia();
+  const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuId = useId();
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -29,6 +31,30 @@ export function SiteHeader({ locale }: { locale: Locale }) {
   // bilingual sites lose people mid-task.
   const otherLocale: Locale = locale === "fr" ? "ar" : "fr";
   const swappedPath = pathname.replace(new RegExp(`^/${locale}(?=/|$)`), `/${otherLocale}`);
+
+  // …including the query and the hash: a filtered search (?ville=), a prefilled
+  // booking (?projet=) or a deep link (#simulateur) must survive the switch.
+  // Read at click time rather than through useSearchParams, which would force
+  // the whole header out of the static render behind a Suspense boundary.
+  // Modified clicks (new tab) keep the plain path.
+  const swapLocale = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const rest = window.location.search + window.location.hash;
+    if (!rest) return;
+    event.preventDefault();
+    router.push(swappedPath + rest);
+  };
+
+  // Over dark sections the header used to keep only a top-of-page scrim, which
+  // does nothing on an ink ground: content scrolled straight through the logo
+  // and the nav. The scrim is now for the very top of a page only; once the
+  // page has moved, a real backing bar takes over (opacity only, ≤200ms).
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [pathname]);
 
   useEffect(() => setMenuOpen(false), [pathname]);
 
@@ -89,9 +115,23 @@ export function SiteHeader({ locale }: { locale: Locale }) {
         style={{
           insetInlineStart: 0,
           insetInlineEnd: 0,
-          opacity: light ? 1 : 0,
+          opacity: light && !scrolled ? 1 : 0,
           background:
             "linear-gradient(to bottom, color-mix(in oklab, var(--color-ink) 62%, transparent), transparent)",
+        }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-inline-0 top-0 h-[var(--nav-h)]"
+        style={{
+          insetInlineStart: 0,
+          insetInlineEnd: 0,
+          opacity: light && scrolled ? 1 : 0,
+          transition: "opacity 200ms var(--ease-ui)",
+          background: "color-mix(in oklab, var(--color-ink) 88%, transparent)",
+          backdropFilter: "blur(14px) saturate(1.1)",
+          WebkitBackdropFilter: "blur(14px) saturate(1.1)",
+          borderBlockEnd: "1px solid color-mix(in oklab, var(--color-paper) 10%, transparent)",
         }}
       />
       <div
@@ -120,13 +160,9 @@ export function SiteHeader({ locale }: { locale: Locale }) {
           aria-label={t.footer.company}
           style={{ lineHeight: 0, color: light ? "var(--color-paper)" : "var(--color-ink)" }}
         >
-          <Image
-            src={light ? "/brand/wordmark-paper.png" : "/brand/wordmark-ink.png"}
-            alt=""
-            width={371}
-            height={28}
-            priority
-            className={`h-[0.62rem] w-auto sm:h-[0.88rem] ${locale === "ar" ? "hidden sm:block" : ""}`}
+          <Wordmark
+            height="var(--wm-h)"
+            className={`[--wm-h:0.71rem] sm:[--wm-h:1rem] ${locale === "ar" ? "hidden sm:block" : "block"}`}
           />
           <span aria-hidden className="hidden h-4 w-px sm:block" style={{ background: "currentColor", opacity: 0.35 }} />
           <span
@@ -177,6 +213,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
               control of the three, so it is the one that moves. */}
           <Link
             href={swappedPath}
+            onClick={swapLocale}
             hrefLang={otherLocale}
             lang={otherLocale}
             className="u-eyebrow hidden items-center px-2 py-3 u-press lg:inline-flex"
@@ -266,6 +303,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             <li className="u-rule">
               <Link
                 href={swappedPath}
+                onClick={swapLocale}
                 hrefLang={otherLocale}
                 lang={otherLocale}
                 className="u-display-tight block py-5"

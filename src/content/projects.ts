@@ -92,15 +92,15 @@ export const projectCopy: Copy<{
   galleryTitleDelivered: string;
   galleryTitleRender: string;
   typologiesEyebrow: string;
-  typologiesTitle: string;
+  /** Built from the plans themselves, so a studio-only programme is never told it has bedrooms. */
+  typologiesTitle: (plans: { minBedrooms: number; maxBedrooms: number; studioOnly: boolean }) => string;
   typologiesLead: string;
   studio: string;
   bedroomsWord: (n: number) => string;
   surface: string;
   monthlyEst: string;
   composition: string;
-  available: (n: number, formatted: string) => string;
-  lastUnits: (n: number, formatted: string) => string;
+  priceOnRequest: string;
   askPlan: string;
   pricesNote: (years: string, rate: string, deposit: string) => string;
   toursBodyDelivered: string;
@@ -108,7 +108,7 @@ export const projectCopy: Copy<{
   amenitiesTitle: string;
   locationEyebrow: string;
   nearbyTitle: string;
-  minutes: (n: string) => string;
+  minutes: (n: number, formatted: string) => string;
   byCar: string;
   onFoot: string;
   noNearby: string;
@@ -121,6 +121,8 @@ export const projectCopy: Copy<{
   relatedEyebrow: string;
   relatedTitle: string;
   ctaTitle: (name: string) => string;
+  /** Land programmes: no building to "come and discover". */
+  ctaTitleLand: string;
   plotRange: (range: string) => string;
   plotMin: string;
   plotMax: string;
@@ -157,16 +159,22 @@ export const projectCopy: Copy<{
     galleryTitleDelivered: "Livré, photographié tel quel.",
     galleryTitleRender: "Le programme en images.",
     typologiesEyebrow: "Les plans",
-    typologiesTitle: "Chaque plan, avec son prix.",
+    typologiesTitle: ({ minBedrooms, maxBedrooms, studioOnly }) => {
+      if (studioOnly) return "Le plan du studio.";
+      const words = ["", "une", "deux", "trois", "quatre", "cinq"];
+      if (!(minBedrooms < maxBedrooms && maxBedrooms < words.length)) return "Les plans.";
+      return minBedrooms === 1
+        ? `Les plans, d'une à ${words[maxBedrooms]} chambres.`
+        : `Les plans, du ${words[minBedrooms]} au ${words[maxBedrooms]} chambres.`;
+    },
     typologiesLead:
-      "Pas seulement un prix d'appel : chaque typologie affiche sa surface, son prix et sa mensualité estimée.",
+      "Surfaces indicatives. Prix et disponibilités par plan : sur demande auprès d'un conseiller.",
     studio: "Studio",
     bedroomsWord: (n) => (n > 1 ? "chambres" : "chambre"),
     surface: "Surface",
     monthlyEst: "Mensualité estimée",
     composition: "Composition",
-    available: (n, f) => (n === 1 ? "1 disponible" : `${f} disponibles`),
-    lastUnits: (n, f) => (n === 1 ? "Dernière unité" : `${f} dernières unités`),
+    priceOnRequest: "Prix sur demande",
     askPlan: "Demander le plan",
     pricesNote: (years, rate, deposit) =>
       `Prix indiqués à partir de, hors frais de notaire et d'enregistrement, susceptibles d'évoluer. Mensualités estimées sur ${years} ans à ${rate} avec ${deposit} d'apport.`,
@@ -176,7 +184,7 @@ export const projectCopy: Copy<{
     amenitiesTitle: "À portée de main.",
     locationEyebrow: "L'emplacement",
     nearbyTitle: "À proximité",
-    minutes: (n) => `${n} min`,
+    minutes: (_n, f) => `${f} min`,
     byCar: "en voiture",
     onFoot: "à pied",
     noNearby:
@@ -192,6 +200,7 @@ export const projectCopy: Copy<{
     relatedEyebrow: "Autres programmes",
     relatedTitle: "À voir aussi.",
     ctaTitle: (name) => `Venez découvrir ${name}.`,
+    ctaTitleLand: "Parlons de votre terrain.",
     plotRange: (range) => `Lots de ${range}`,
     plotMin: "Le plus petit lot",
     plotMax: "Le plus grand lot",
@@ -219,7 +228,7 @@ export const projectCopy: Copy<{
     ficheSegment: "الفئة",
     ficheKinds: "العقارات المعروضة",
     ficheStatus: "الوضعية",
-    fichePrice: "ثمن الدخول",
+    fichePrice: "أدنى ثمن",
     previousPhase: "الشطر السابق",
     nextPhase: "الشطر الموالي",
     delivered: (year) => `سُلّم سنة ${year}`,
@@ -228,40 +237,47 @@ export const projectCopy: Copy<{
     galleryTitleDelivered: "سُلّم، وصُوّر كما هو.",
     galleryTitleRender: "البرنامج بالصور.",
     typologiesEyebrow: "المخططات",
-    typologiesTitle: "كل مخطط بثمنه.",
-    typologiesLead: "ليس مجرد ثمن انطلاق: كل نوع يعرض مساحته وثمنه وقسطه الشهري التقديري.",
+    typologiesTitle: ({ minBedrooms, maxBedrooms, studioOnly }) => {
+      if (studioOnly) return "مخطط الاستوديو.";
+      const rooms = ["", "غرفة واحدة", "غرفتين", "ثلاث غرف", "أربع غرف", "خمس غرف"];
+      return minBedrooms < maxBedrooms && maxBedrooms < rooms.length
+        ? `المخططات، من ${rooms[minBedrooms]} إلى ${rooms[maxBedrooms]}.`
+        : "المخططات.";
+    },
+    typologiesLead: "مساحات إرشادية. الأثمنة والتوفر حسب كل مخطط: عند الطلب لدى مستشارينا.",
     studio: "استوديو",
     bedroomsWord: (n) => (n === 1 ? "غرفة" : n === 2 ? "غرفتان" : "غرف"),
     surface: "المساحة",
     monthlyEst: "القسط الشهري التقديري",
     composition: "التركيبة",
-    available: (n, f) =>
-      n === 2 ? "وحدتان متاحتان" : n >= 3 && n <= 10 ? `${f} وحدات متاحة` : `${f} وحدة متاحة`,
-    lastUnits: (n, f) => (n === 1 ? "آخر وحدة" : n === 2 ? "آخر وحدتين" : `آخر ${f} وحدات`),
+    priceOnRequest: "الثمن عند الطلب",
     askPlan: "طلب المخطط",
     pricesNote: (years, rate, deposit) =>
-      `الأثمنة المعروضة ابتداءً من، دون احتساب مصاريف التوثيق والتسجيل، وقابلة للتغيير. الأقساط تقديرية على ${years} سنة بنسبة ${rate} مع مساهمة أولية بنسبة ${deposit}.`,
+      `الأثمنة المعروضة ابتداءً من، دون احتساب مصاريف التوثيق والتسجيل، وقابلة للتغيير. الأقساط تقديرية على ${years} سنة بنسبة ${rate} مع مساهمة شخصية بنسبة ${deposit}.`,
     toursBodyDelivered:
       "تجوّلوا بحرية داخل شقة مُسلَّمة، غرفة بغرفة: الأحجام والتشطيبات والإطلالات كما سُلّمت للمالكين.",
     amenitiesEyebrow: "في عين المكان وبالجوار",
     amenitiesTitle: "في متناول اليد.",
     locationEyebrow: "الموقع",
     nearbyTitle: "على مقربة",
-    minutes: (n) => `${n} دقيقة`,
+    // 1 and 2 take their own forms; 3–10 take the plural; 11+ the singular.
+    minutes: (n, f) =>
+      n === 1 ? "دقيقة واحدة" : n === 2 ? "دقيقتان" : n <= 10 ? `${f} دقائق` : `${f} دقيقة`,
     byCar: "بالسيارة",
     onFoot: "مشياً",
     noNearby: "يستقبلكم مستشارونا في عين المكان، ويدلّونكم على الطريق وينظّمون زيارة الموقع.",
     mapCaption: (city) => `${city} على خريطة المغرب.`,
     alsoIn: (city) => `أيضاً في ${city}`,
     simulatorEyebrow: "محاكي القرض",
-    simulatorTitle: (name) => `قسطكم الشهري لـ ${name}.`,
+    simulatorTitle: (name) => `قسطكم الشهري في ${name}.`,
     simulatorBody: (price) =>
-      `مملوء مسبقاً بثمن الدخول إلى البرنامج، ${price}. غيّروا المساهمة الأولية والمدة لتحصلوا على رقمكم.`,
+      `مملوء مسبقاً بأدنى ثمن في البرنامج، ${price}. غيّروا المساهمة الشخصية والمدة لتحصلوا على قسطكم.`,
     simulatorBodyLand: (price) =>
-      `مملوء مسبقاً بثمن أصغر بقعة، ${price}. غيّروا الثمن والمساهمة الأولية والمدة لتحصلوا على رقمكم.`,
+      `مملوء مسبقاً بثمن أصغر بقعة، ${price}. غيّروا الثمن والمساهمة الشخصية والمدة لتحصلوا على قسطكم.`,
     relatedEyebrow: "برامج أخرى",
     relatedTitle: "اكتشفوا أيضاً.",
     ctaTitle: (name) => `تعالوا لاكتشاف ${name}.`,
+    ctaTitleLand: "لنتحدث عن قطعتكم الأرضية.",
     plotRange: (range) => `بقع من ${range}`,
     plotMin: "أصغر بقعة",
     plotMax: "أكبر بقعة",
@@ -361,7 +377,7 @@ export const searchCopy: Copy<{
     budgetAny: "دون حد",
     perMonth: "درهم شهرياً",
     currency: "درهم",
-    deposit: "المساهمة الأولية",
+    deposit: "المساهمة الشخصية",
     ceiling: (amount) => `ميزانية تصل إلى حوالي ${amount}`,
     city: "المدينة",
     allCities: "جميع المدن",

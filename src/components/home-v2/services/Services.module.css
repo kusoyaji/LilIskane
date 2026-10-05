@@ -100,18 +100,66 @@
   background: var(--color-ink);
   color: var(--color-paper);
 }
-.tileWords {
+/* A worked example: the finder's opening state, computed, not typed. */
+.tileExample {
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.35;
+  text-wrap: balance;
+  color: color-mix(in oklab, var(--color-paper) 62%, transparent);
+}
+.tileFigures {
   display: grid;
-  gap: 0.15em;
-  font-family: var(--font-display);
-  font-size: clamp(2.6rem, 4.6vw, 4.5rem);
+  gap: clamp(0.9rem, 2vw, 1.6rem);
+}
+.tileMonthly {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.75rem;
+}
+.tileMonthlyFigure {
+  font-family: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  font-size: clamp(3rem, 6vw, 5.75rem);
   font-weight: 500;
   font-stretch: 112%;
-  line-height: 0.95;
-  letter-spacing: -0.035em;
+  line-height: 0.85;
+  letter-spacing: -0.045em;
+  color: var(--color-paper);
 }
-.tileWord { color: color-mix(in oklab, var(--color-paper) 42%, transparent); }
-.tileWord[data-accent] { color: var(--color-paper); }
+.tileMonthlyUnit {
+  font-size: var(--text-lead);
+  font-weight: 600;
+  color: var(--color-paper);
+}
+.tileCeiling {
+  display: grid;
+  gap: 0.35rem;
+  padding-block-start: clamp(0.75rem, 1.6vw, 1.1rem);
+  border-block-start: 1px solid color-mix(in oklab, var(--color-paper) 18%, transparent);
+}
+.tileCeilingLabel {
+  font-size: var(--text-small);
+  color: color-mix(in oklab, var(--color-paper) 70%, transparent);
+}
+.tileCeilingValue {
+  font-size: clamp(1.6rem, 2.6vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--color-ochre-bright);
+}
+.tileCeilingNumber {
+  font-family: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  font-stretch: 108%;
+  letter-spacing: -0.03em;
+}
+:global([lang="ar"]) .tileExample {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: var(--text-small);
+}
 .tileRail {
   position: relative;
   display: block;
@@ -123,14 +171,14 @@
   position: absolute;
   inset-block: 0;
   inset-inline-start: 0;
-  inline-size: 38%;
+  inline-size: var(--p, 38%);
   border-radius: 999px;
   background: var(--color-ochre);
 }
 .tileRailThumb {
   position: absolute;
   inset-block-start: 50%;
-  inset-inline-start: 38%;
+  inset-inline-start: var(--p, 38%);
   inline-size: 2.25rem;
   block-size: 2.25rem;
   margin-block-start: -1.125rem;
@@ -231,11 +279,23 @@
   border-block-end: 1px solid color-mix(in oklab, var(--color-ink) 14%, transparent);
 }
 .gItem:last-child { border-block-end: 0; }
+/* Mobile: numeral beside text. The numeral column is sized by its widest
+   content across all three rows ("10 سنوات" is wider than a fixed 7.5rem and
+   used to run into its description), and subgrid keeps the three
+   descriptions on one shared edge. */
 @media (max-width: 47.99rem) {
+  .gList {
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 1.25rem;
+  }
   .gItem {
-    grid-template-columns: 7.5rem minmax(0, 1fr);
-    gap: 1.25rem;
+    grid-column: 1 / -1;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 1.25rem;
     align-items: start;
+  }
+  @supports (grid-template-columns: subgrid) {
+    .gItem { grid-template-columns: subgrid; }
   }
 }
 @media (min-width: 48rem) {

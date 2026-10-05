@@ -9,6 +9,7 @@ import { ProofCompare } from "@/components/home-v2/ProofCompare";
 import { Services } from "@/components/home-v2/Services";
 import { Showcase } from "@/components/home-v2/Showcase";
 import { CtaBand } from "@/components/v2";
+import type { MediaRef } from "@/data/types";
 import { getDictionary } from "@/i18n";
 import { isLocale } from "@/i18n/config";
 
@@ -16,7 +17,16 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   if (!isLocale(locale)) return {};
   const t = getDictionary(locale);
-  return { title: { absolute: t.meta.homeTitle }, description: t.meta.homeDescription };
+  return {
+    title: { absolute: t.meta.homeTitle },
+    description: t.meta.homeDescription,
+    openGraph: {
+      title: t.meta.homeTitle,
+      description: t.meta.homeDescription,
+      locale: locale === "ar" ? "ar_MA" : "fr_MA",
+      type: "website",
+    },
+  };
 }
 
 /**
@@ -30,10 +40,21 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
  * budget answer and a visit.
  *
  * Sections declare the ground they sit on with `data-tone` and paint none of
- * it themselves — the Field blends between grounds as they pass (see
- * Field.tsx). The ramp below alternates dark and light so the page breathes
- * instead of cutting.
+ * it themselves — the wrapper paints it, feathered from the tone before it
+ * (see GROUNDS in globals.css). The ramp below alternates dark and light so the
+ * page breathes instead of cutting.
  */
+
+/** The close follows four Riad Garden I interiors, so it steps outside: the
+ *  delivered residence itself, pool and façades, instead of a fifth room. */
+const CLOSING_MEDIA: MediaRef = {
+  key: "rg1_DSC00924",
+  nature: "photograph",
+  alt: {
+    fr: "La piscine de Riad Garden I livrée, entourée de bâtiments ocre rose et de palmiers.",
+    ar: "مسبح رياض غاردن 1 بعد التسليم، تحيط به مبانٍ وردية مغرة ونخيل.",
+  },
+};
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
@@ -65,7 +86,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <Services locale={locale} />
       </div>
       <div data-tone="ink">
-        <CtaBand locale={locale} />
+        <CtaBand locale={locale} media={CLOSING_MEDIA} />
       </div>
     </>
   );

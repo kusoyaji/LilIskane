@@ -440,22 +440,45 @@
 }
 
 /* =============================================================================
-   THE FIELD — the page's continuous ground
+   GROUNDS — each toned wrapper paints its own tone, feathered at the top
 
-   Sections do not paint backgrounds. One fixed layer behind the whole document
-   does, and its colour is interpolated between the tone of the section holding
-   the viewport and the tone of the one arriving. That is the entire reason this
-   page reads as a single space rather than as a stack of blocks: a boundary you
-   cannot see is a boundary that does not exist.
+   This used to be one fixed layer (the Field) whose colour followed whichever
+   section held the middle of the viewport. One colour cannot serve two
+   sections at once: whenever a join sat on screen, the half of the viewport
+   belonging to the other section was painted the wrong tone, and the closing
+   lines of every section (guarantees, disclaimers, the map list) measured
+   1.00:1 against it. The header, which reads DOM boundaries, disagreed with it
+   too.
 
-   Stacking is explicit rather than negative. `z-index: -1` would put the field
-   behind the *canvas*, where the body background paints over it — the classic
-   way this technique silently does nothing. So the field sits at 0 and the
-   content above it at 1. The body keeps its paper background as the no-JS
-   fallback; the field simply covers it once mounted.
+   So the ground is spatial now, and scrolls with the content it belongs to. A
+   wrapper paints its own tone; when the wrapper before it has a different tone,
+   it starts on that tone and blends into its own across a band shorter than
+   the minimum section padding (DESIGN-V2: ≥ clamp(5rem, 12vh, 9rem)), so the
+   join stays soft and no line of type ever sits on the blend. The previous
+   tone is read from the sibling selector, so no page needs to declare it.
+
+   Painted once, never per scroll frame: there is nothing left to composite.
    ========================================================================== */
 
 @layer components {
+  [data-tone] {
+    --ground: var(--color-paper);
+    --ground-from: var(--ground);
+    --ground-feather: clamp(4rem, 10vh, 7rem);
+    background-color: var(--ground);
+    background-image: linear-gradient(to bottom, var(--ground-from), var(--ground) var(--ground-feather));
+    background-repeat: no-repeat;
+  }
+  [data-tone="ink"] { --ground: var(--color-ink); }
+  [data-tone="warm"] { --ground: var(--color-paper-warm); }
+  [data-tone="sand"] { --ground: var(--color-sand); }
+
+  [data-tone="paper"] + [data-tone] { --ground-from: var(--color-paper); }
+  [data-tone="ink"] + [data-tone] { --ground-from: var(--color-ink); }
+  [data-tone="warm"] + [data-tone] { --ground-from: var(--color-paper-warm); }
+  [data-tone="sand"] + [data-tone] { --ground-from: var(--color-sand); }
+
+  /* Kept for reference only — no longer mounted (see Field.tsx). */
   .field {
     position: fixed;
     inset: 0;
@@ -1647,7 +1670,11 @@
     --pos: calc(var(--p) * (var(--beats) - 1));
     --d: calc(var(--pos) - var(--i));
     --dist: max(var(--d), calc(-1 * var(--d)));
-    opacity: clamp(0, calc(1 - var(--dist)), 1);
+    /* Full within 0.35 of its beat, gone by 0.5 — so two captions never share
+       the cell. The visitor owns the playhead and can stop anywhere; a linear
+       crossfade left both lines at half opacity on top of each other. */
+    opacity: clamp(0, calc((0.5 - var(--dist)) * 6.67), 1);
+    transition: opacity 180ms var(--ease-ui, ease-out);
   }
 
   .cine-progress {
@@ -1947,4 +1974,32 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* =============================================================================
+   DEV BADGE
+   The Next.js dev indicator (the black "N" bottom-left) sat on every screen
+   and, on phones, over the film's render disclaimer. `devIndicators: false` in
+   next.config.ts is the proper switch but needs a dev-server restart; this
+   hides the portal host meanwhile. Dev-only element — production never renders
+   it. Note that it also hides the dev error overlay; check the console.
+   ========================================================================== */
+nextjs-portal {
+  display: none !important;
+}
+
+/* =============================================================================
+   HANDOFF, STOOD DOWN
+   Heritage and Flagship wrap their content in <Handoff>, which faded it out
+   while the fixed Field turned the ground under it — the words had to leave
+   before the colour changed. The ground no longer turns under a section (see
+   GROUNDS), so that fade now only emptied a section that was still on its own,
+   correct ground: the Heritage figures vanished on ink, the Flagship buttons
+   went ghostly on paper. Content stays put until it scrolls away. Inline
+   opacity is written by GSAP, hence !important. The selectors target the two
+   CSS-module classes Handoff is given (Next keeps `<File>_<local>__<hash>`).
+   ========================================================================== */
+[class*="Heritage_inner__"],
+[class*="Flagship_body__"] {
+  opacity: 1 !important;
 }

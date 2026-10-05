@@ -15,7 +15,7 @@ import { Typologies } from "@/components/project/Typologies";
 import { getCity, cityById } from "@/data/cities";
 import { toListItems } from "@/data/list";
 import { getProject, projects } from "@/data/projects";
-import type { MediaRef, Project } from "@/data/types";
+import type { Project } from "@/data/types";
 import { getDictionary } from "@/i18n";
 import { isLocale, LOCALES, type Locale } from "@/i18n/config";
 import { projectCopy, STATUS_LABELS } from "@/content/projects";
@@ -90,16 +90,6 @@ function relatedTo(project: Project, exclude: Set<string>): Project[] {
   }
   return picked;
 }
-
-/** Atmosphere for the closing band on land pages — stock, never captioned as a programme. */
-const LAND_CTA_MEDIA: MediaRef = {
-  key: "st_facade_beige",
-  nature: "photograph",
-  alt: {
-    fr: "Façade claire aux volumes en porte-à-faux sous un ciel bleu — image d'ambiance.",
-    ar: "واجهة فاتحة بأحجام بارزة تحت سماء زرقاء — صورة للأجواء.",
-  },
-};
 
 export default async function ProjectPage({
   params,
@@ -181,7 +171,12 @@ export default async function ProjectPage({
 
       {project.typologies.length > 0 && (
         <div data-tone="warm">
-          <Typologies locale={typedLocale} typologies={project.typologies} slug={project.slug} />
+          <Typologies
+            locale={typedLocale}
+            typologies={project.typologies}
+            slug={project.slug}
+            entryPrice={project.price.amount}
+          />
         </div>
       )}
 
@@ -224,10 +219,15 @@ export default async function ProjectPage({
       </div>
 
       <div data-tone="paper">
+        {/* Land programmes have no building to show, and a picture of one
+            under the programme's name would promise what a plot does not
+            deliver. They close on a generic line over the default band image
+            (a delivered Riad Garden I room, never a stock photograph). */}
         <CtaBand
           locale={typedLocale}
-          title={c.ctaTitle(project.name[typedLocale])}
-          media={project.segment === "terrain" ? LAND_CTA_MEDIA : undefined}
+          title={
+            project.segment === "terrain" ? c.ctaTitleLand : c.ctaTitle(project.name[typedLocale])
+          }
           href={`/${typedLocale}/contact?projet=${project.slug}`}
         />
       </div>

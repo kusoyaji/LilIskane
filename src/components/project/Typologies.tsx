@@ -9,27 +9,40 @@ import type { Typology } from "@/data/types";
 import s from "./Typologies.module.css";
 
 /**
- * The plans, each priced on its own.
+ * The plans: surface, composition, and a price only where Chaabi publishes one.
  *
- * "À partir de" is honest but incomplete — it tells you the cheapest unit
- * exists, not what the one you want costs. So every typology is a card with
- * its own surface, price and estimated monthly payment, set as large as the
- * headline price was, and availability only where it is a known fact.
+ * The client publishes a single figure per programme — its entry price. That
+ * figure appears on the plan it belongs to, with its estimated monthly
+ * payment; every other plan says "price on request" and leads to an adviser.
+ * Per-plan prices and stock counts are not shown: they are not published, and
+ * putting modelled figures on the page would commit the client to them.
  */
 export function Typologies({
   locale,
   typologies,
   slug,
+  entryPrice,
 }: {
   locale: Locale;
   typologies: Typology[];
   /** Programme slug, for the "ask for the plan" link. */
   slug?: string;
+  /**
+   * The programme's published entry price (`project.price.amount`). Only the
+   * plan carrying exactly this price shows a figure; omit it and none do.
+   */
+  entryPrice?: number;
 }) {
   if (typologies.length === 0) return null;
   const t = getDictionary(locale);
   const c = projectCopy[locale];
   const single = typologies.length === 1;
+  const bedrooms = typologies.map((typology) => typology.bedrooms);
+  const title = c.typologiesTitle({
+    minBedrooms: Math.min(...bedrooms),
+    maxBedrooms: Math.max(...bedrooms),
+    studioOnly: typologies.every((typology) => typology.kind === "studio"),
+  });
 
   return (
     <section className={`u-shell ${s.section}`} aria-labelledby="typologies-title">
@@ -38,15 +51,14 @@ export function Typologies({
           {c.typologiesEyebrow}
         </p>
         <h2 id="typologies-title" className={`u-display ${s.title}`} data-reveal="mask">
-          <span className="reveal-inner">{c.typologiesTitle}</span>
+          <span className="reveal-inner">{title}</span>
         </h2>
         <p className={`u-enter ${s.lead}`}>{c.typologiesLead}</p>
       </header>
 
       <ul className={s.grid} data-single={single || undefined}>
         {typologies.map((typology, index) => {
-          const units = typology.unitsAvailable;
-          const scarce = units !== null && units <= 4;
+          const published = entryPrice !== undefined && typology.price.amount === entryPrice;
           const rooms =
             typology.kind === "studio"
               ? c.studio
@@ -55,13 +67,6 @@ export function Typologies({
             <li key={typology.id} className={`u-enter ${s.card}`} data-step={String(Math.min(index + 1, 4))}>
               <div className={s.cardTop}>
                 <span className={`u-numeric ${s.index}`}>{isolateRun(String(index + 1).padStart(2, "0"), locale)}</span>
-                {units !== null && (
-                  <span className={`u-eyebrow ${s.units}`} data-scarce={scarce || undefined}>
-                    {scarce
-                      ? c.lastUnits(units, formatNumber(units, locale))
-                      : c.available(units, formatNumber(units, locale))}
-                  </span>
-                )}
               </div>
 
               <div className={s.cardMain}>
@@ -73,16 +78,22 @@ export function Typologies({
                 </p>
               </div>
 
-              <dl className={s.money}>
-                <div>
-                  <dt className={s.moneyLabel}>{c.fromPrice}</dt>
-                  <dd className={`u-numeric ${s.price}`}>{formatPrice(typology.price, locale)}</dd>
+              {published ? (
+                <dl className={s.money}>
+                  <div>
+                    <dt className={s.moneyLabel}>{c.fromPrice}</dt>
+                    <dd className={`u-numeric ${s.price}`}>{formatPrice(typology.price, locale)}</dd>
+                  </div>
+                  <div>
+                    <dt className={s.moneyLabel}>{c.monthlyEst}</dt>
+                    <dd className={`u-numeric ${s.monthly}`}>{formatMonthly(typology.price, locale)}</dd>
+                  </div>
+                </dl>
+              ) : (
+                <div className={s.money}>
+                  <p className={`${s.price} ${s.onRequest}`}>{c.priceOnRequest}</p>
                 </div>
-                <div>
-                  <dt className={s.moneyLabel}>{c.monthlyEst}</dt>
-                  <dd className={`u-numeric ${s.monthly}`}>{formatMonthly(typology.price, locale)}</dd>
-                </div>
-              </dl>
+              )}
 
               <div className={s.compo}>
                 <p className={s.moneyLabel}>{c.composition}</p>

@@ -535,3 +535,114 @@
     transform: none;
   }
 }
+
+/* ----------------------------------------------------------------- hero -- */
+/* The ink hero of the secondary pages, with the portfolio in its second
+   column: a delivered programme as photographed, then two renders, each
+   captioned. Layout only — ground, type and spacing come from PageHero's
+   own classes (v2.module.css). */
+.hero {
+  justify-content: center;
+}
+.heroGrid {
+  display: grid;
+  gap: clamp(2.5rem, 6vh, 3.5rem);
+}
+@media (min-width: 64rem) {
+  .heroGrid {
+    grid-template-columns: minmax(0, 13fr) minmax(0, 11fr);
+    column-gap: clamp(3rem, 5vw, 5.5rem);
+    align-items: center;
+  }
+}
+
+.heroStack {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: clamp(0.75rem, 1.2vw, 1.1rem);
+}
+.heroTile {
+  display: flex;
+  min-inline-size: 0;
+}
+.heroLink {
+  display: flex;
+  flex-direction: column;
+  inline-size: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+.heroMedia {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--color-paper) 6%, transparent);
+  aspect-ratio: 3 / 2;
+}
+.heroMedia img {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  transition: transform var(--dur-media) var(--ease-camera);
+}
+@media (hover: hover) {
+  .heroLink:hover .heroMedia img {
+    transform: scale(1.04);
+  }
+}
+.heroCaption {
+  display: grid;
+  gap: 0.2rem;
+  margin-block-start: 0.7rem;
+  font-size: var(--text-small);
+  line-height: 1.35;
+}
+.heroName {
+  color: var(--color-paper);
+}
+.heroCity {
+  color: color-mix(in oklab, var(--color-paper) 62%, transparent);
+}
+.heroNote {
+  font-size: 0.75rem;
+  color: color-mix(in oklab, var(--color-paper) 58%, transparent);
+}
+
+/* Phones: the delivered photograph alone, so the search stays close. */
+@media (max-width: 39.99rem) {
+  .heroTile:not(:first-child) {
+    display: none;
+  }
+}
+/* Tablets: the three side by side. */
+@media (min-width: 40rem) and (max-width: 63.99rem) {
+  .heroStack {
+    grid-template-columns: 1.4fr 1fr 1fr;
+    align-items: end;
+  }
+  .heroTile:not(:first-child) .heroMedia {
+    aspect-ratio: 4 / 5;
+  }
+}
+/* Desktop: the photograph tall on the start side, the renders stacked. */
+@media (min-width: 64rem) {
+  .heroStack {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    grid-template-rows: 1fr 1fr;
+  }
+  .heroTile:first-child {
+    grid-row: 1 / span 2;
+  }
+  .heroTile:first-child .heroMedia {
+    aspect-ratio: 4 / 5;
+  }
+  .heroTile:not(:first-child) .heroMedia {
+    aspect-ratio: auto;
+    flex: 1 1 auto;
+    min-block-size: 7rem;
+  }
+}

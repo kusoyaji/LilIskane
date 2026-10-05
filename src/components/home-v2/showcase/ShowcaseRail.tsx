@@ -70,17 +70,22 @@ export function ShowcaseRail({
         scrollTrigger: {
           trigger: section,
           start: "top top",
-          // A little less scroll than pan: fourteen programmes should not
-          // cost six screens of wheel.
-          end: () => `+=${Math.max(1, shift() * 0.8)}`,
+          // About half as much scroll as pan, capped at three screens:
+          // fourteen programmes are a rail to sweep along, not a walkthrough
+          // to sit in (≈2 700px of wheel at 1440×900, down from ≈4 150px).
+          end: () => `+=${Math.max(1, Math.round(Math.min(shift() * 0.52, window.innerHeight * 3)))}`,
           pin: stage,
           anticipatePin: 1,
+          // The only pin on the home page: it measures first, so every
+          // trigger below it sees the spacing it adds.
+          refreshPriority: 1,
           scrub: 0.8,
           invalidateOnRefresh: true,
           onUpdate: (self) => setProgress(self.progress),
         },
       });
       triggerRef.current = pan.scrollTrigger ?? null;
+      ScrollTrigger.sort();
       ScrollTrigger.refresh();
 
       return () => {
@@ -129,6 +134,7 @@ export function ShowcaseRail({
     const trigger = triggerRef.current;
     if (trigger) {
       const wasInside = window.scrollY > trigger.start;
+      ScrollTrigger.sort();
       ScrollTrigger.refresh();
       if (wasInside) window.scrollTo({ top: trigger.start, behavior: "instant" as ScrollBehavior });
     } else {

@@ -3,6 +3,7 @@ import { company } from "@/data/company";
 import type { MediaRef } from "@/data/types";
 import { isolateRun, type Locale } from "@/i18n/config";
 import { shared } from "@/content/shared";
+import { Lattice } from "./Lattice";
 import { LinkButton } from "./LinkButton";
 import s from "./v2.module.css";
 
@@ -20,6 +21,11 @@ const DEFAULT_MEDIA: MediaRef = {
  * The closing call to action shared by every page: book a visit, or call.
  * Same words and same destination everywhere, so the one thing the site exists
  * to produce is never more than one screen away.
+ *
+ * `media={null}` closes on the ink ground with the façade lattice instead of a
+ * photograph — for pages with nothing honest to show (land programmes: a room
+ * under the programme's name would promise what a plot does not deliver), or
+ * where the page has already shown enough interiors.
  */
 export function CtaBand({
   locale,
@@ -29,7 +35,7 @@ export function CtaBand({
   href,
 }: {
   locale: Locale;
-  media?: MediaRef;
+  media?: MediaRef | null;
   title?: string;
   body?: string;
   /** Booking destination; project pages pass /contact?projet=<slug> so the form arrives prefilled. */
@@ -37,15 +43,19 @@ export function CtaBand({
 }) {
   const t = shared[locale];
   return (
-    <section className={s.cta} data-nav-media>
-      <div style={{ position: "absolute", inset: "-8% 0", zIndex: -2 }} data-parallax="0.3">
-        <Figure ref_={media} locale={locale} sizes="100vw" className="h-full w-full object-cover" />
-      </div>
-      <div aria-hidden className={s.ctaScrim} />
+    <section className={`${s.cta} ${media ? "" : s.ctaLattice}`} data-nav-media>
+      {media ? (
+        <>
+          <div style={{ position: "absolute", inset: "-8% 0", zIndex: -2 }} data-parallax="0.3">
+            <Figure ref_={media} locale={locale} sizes="100vw" className="h-full w-full object-cover" />
+          </div>
+          <div aria-hidden className={s.ctaScrim} />
+        </>
+      ) : (
+        <Lattice />
+      )}
       <div className="u-shell w-full">
-        <p className="u-eyebrow u-enter" style={{ color: "var(--color-ochre-bright)", marginBlockEnd: "1.4rem" }}>
-          {t.ctaEyebrow}
-        </p>
+        <p className={`u-eyebrow u-enter ${s.ctaEyebrow}`}>{t.ctaEyebrow}</p>
         <h2 className="u-display" data-reveal="mask" style={{ fontSize: "var(--text-mega)", maxInlineSize: "14ch" }}>
           <span className="reveal-inner">{title ?? t.ctaTitle}</span>
         </h2>

@@ -14,6 +14,8 @@ export type MapDot = {
   /** Position as a percentage of the map box (geographic, so physical, never mirrored). */
   left: number;
   top: number;
+  /** Phone-width position, for the loupe points that would otherwise sit under one fingertip. */
+  phone?: { left: number; top: number };
   inLoupe: boolean;
   side: "n" | "s" | "e" | "w";
   labelled: boolean;
@@ -36,6 +38,18 @@ export type MapCity = MapDot & {
   countFigure: string;
   programmes: MapProgramme[];
 };
+
+/** Map position as custom properties; the stylesheet picks the phone pair below 48rem. */
+function at(dot: MapDot, i: number): React.CSSProperties {
+  const phone = dot.phone ?? dot;
+  return {
+    ["--x" as string]: `${dot.left}%`,
+    ["--y" as string]: `${dot.top}%`,
+    ["--px" as string]: `${phone.left}%`,
+    ["--py" as string]: `${phone.top}%`,
+    ["--i" as string]: i,
+  };
+}
 
 /**
  * The interactive half of the map: pins, the city index and the panel.
@@ -77,6 +91,26 @@ export function MapExplorer({
   const mapRef = useRef<HTMLDivElement>(null);
   const [activeId, setActiveId] = useState(defaultId);
   const active = cities.find((c) => c.id === activeId) ?? cities[0];
+
+  // A tap is given to the pin whose centre is nearest, not to whichever hit
+  // area happens to be painted on top: on a phone the 44px targets of
+  // neighbouring pins overlap, and the overlap must split down the middle.
+  // Keyboard activation (detail 0) carries no position and keeps its own pin.
+  const choose = (id: string, event: React.MouseEvent) => {
+    const map = mapRef.current;
+    if (!map || event.detail === 0) return setActiveId(id);
+    let best = id;
+    let bestD = Infinity;
+    map.querySelectorAll<HTMLElement>("[data-pin]").forEach((pin) => {
+      const r = pin.getBoundingClientRect();
+      const d = Math.hypot(event.clientX - (r.left + r.width / 2), event.clientY - (r.top + r.height / 2));
+      if (d < bestD) {
+        bestD = d;
+        best = pin.dataset.pin ?? id;
+      }
+    });
+    setActiveId(best);
+  };
 
   // Pins arrive when the map does. Armed only once JS is running, so without
   // it (or before hydration) every pin is simply there.
@@ -165,7 +199,7 @@ export function MapExplorer({
               aria-hidden
               className={s.dot}
               data-side={dot.side}
-              style={{ left: `${dot.left}%`, top: `${dot.top}%`, ["--i" as string]: i + cities.length }}
+              style={at(dot, i + cities.length)}
             >
               {dot.labelled && (
                 <span className={s.dotLabel} dir={dir}>
@@ -182,14 +216,15 @@ export function MapExplorer({
                 key={city.id}
                 type="button"
                 className={s.pin}
+                data-pin={city.id}
                 data-count={Math.min(city.count, 3)}
                 data-side={city.side}
                 data-active={on || undefined}
                 aria-pressed={on}
                 aria-controls={panelId}
                 aria-label={`${city.name}, ${city.countLabel}`}
-                style={{ left: `${city.left}%`, top: `${city.top}%`, ["--i" as string]: i }}
-                onClick={() => setActiveId(city.id)}
+                style={at(city, i)}
+                onClick={(e) => choose(city.id, e)}
                 onPointerEnter={(e) => e.pointerType === "mouse" && setActiveId(city.id)}
                 onFocus={() => setActiveId(city.id)}
               >

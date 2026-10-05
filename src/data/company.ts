@@ -146,7 +146,7 @@ export const values: Value[] = [
     title: { fr: "Innovation constante", ar: "الابتكار المستمر" },
     body: {
       fr: "Anticiper les usages et améliorer sans cesse l'offre, en gardant des prix très compétitifs.",
-      ar: "استباق الاستعمالات وتحسين العرض باستمرار مع الحفاظ على أسعار تنافسية.",
+      ar: "استباق احتياجات السكان وتحسين العرض باستمرار مع الحفاظ على أسعار تنافسية.",
     },
   },
   {
@@ -160,7 +160,7 @@ export const values: Value[] = [
     title: { fr: "Écoute et satisfaction client", ar: "الإنصات ورضا الزبون" },
     body: {
       fr: "Disponibles et réactifs, pour comprendre chaque attente et y répondre avec justesse.",
-      ar: "متاحون ومتجاوبون، لفهم كل انتظار والاستجابة له بدقة.",
+      ar: "متاحون ومتجاوبون، لفهم تطلعات كل زبون والاستجابة لها بدقة.",
     },
   },
 ];

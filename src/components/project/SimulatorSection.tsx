@@ -18,6 +18,10 @@ export function SimulatorSection({ locale, project }: { locale: Locale; project:
   const base = effectiveTotal(project.price);
   const price = `${formatNumber(base, locale)} ${t.common.currency}`;
   const land = project.price.unit === "per-sqm";
+  // Only plans whose price Chaabi publishes (the entry price) can preset the
+  // simulator; a chip per plan would otherwise reveal unpublished prices. One
+  // such plan is the default already, so it needs no picker.
+  const published = project.typologies.filter((typology) => typology.price.amount === project.price.amount);
 
   return (
     <div className={s.wrap} data-nav-media>
@@ -31,7 +35,7 @@ export function SimulatorSection({ locale, project }: { locale: Locale; project:
         <p className={`u-enter ${s.body}`}>{land ? c.simulatorBodyLand(price) : c.simulatorBody(price)}</p>
       </div>
       <div className={s.instrument}>
-        <CreditSimulator locale={locale} basePrice={base} typologies={project.typologies} intro={false} />
+        <CreditSimulator locale={locale} basePrice={base} typologies={published.length > 1 ? published : []} intro={false} />
       </div>
     </div>
   );

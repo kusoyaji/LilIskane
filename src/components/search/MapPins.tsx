@@ -45,13 +45,42 @@ export function MapPins({ locale, pins }: { locale: Locale; pins: Pin[] }) {
 
   const toggle = (id: string) => navigate(withScalar(query, "ville", active === id ? null : id));
 
+  const radius = (pin: Pin) => 7 + Math.sqrt(pin.total) * 3.5;
+
+  /**
+   * Two layers, in this order:
+   *
+   * 1. Every pin's invisible hit area (label box, ring around the dot).
+   * 2. Every pin's visible dot and label, which are clickable themselves.
+   *
+   * Painting each pin's hit area together with its own dot let a later pin's
+   * transparent shapes cover an earlier pin's dot in the Rabat–Casablanca
+   * cluster, so tapping Sala Al Jadida filtered Témara. With the visible marks
+   * on top, a dot or a label always answers for its own city; the hit areas
+   * only catch taps that land in the space around them. Leaders and halos are
+   * decoration and never take a pointer.
+   */
   return (
     <g>
+      <g aria-hidden>
+        {pins.map((pin) => {
+          const r = radius(pin);
+          // ~19 viewBox units per character at the label size, plus the count.
+          const labelWidth = pin.name.length * 19 + 8;
+          return (
+            <g key={pin.id} className={s.pin} data-city={pin.id} onClick={() => toggle(pin.id)}>
+              <rect x={pin.lx - labelWidth} y={pin.ly - 34} width={labelWidth + 40} height={46} fill="transparent" />
+              <circle cx={pin.x} cy={pin.y} r={r + 6} fill="transparent" />
+            </g>
+          );
+        })}
+      </g>
+
       {pins.map((pin) => {
         const on = active === pin.id;
         const lit = on || hovered === pin.id;
         const empty = pin.count === 0;
-        const r = 7 + Math.sqrt(pin.total) * 3.5;
+        const r = radius(pin);
         const elbowX = pin.lx + 12;
         return (
           <g
@@ -61,6 +90,7 @@ export function MapPins({ locale, pins }: { locale: Locale; pins: Pin[] }) {
             aria-pressed={on}
             aria-label={`${pin.name} — ${c.programmesIn(pin.count, String(pin.count))}`}
             className={s.pin}
+            data-city={pin.id}
             data-on={on || undefined}
             data-lit={lit || undefined}
             data-empty={empty || undefined}
@@ -75,11 +105,9 @@ export function MapPins({ locale, pins }: { locale: Locale; pins: Pin[] }) {
             <polyline
               points={`${elbowX},${pin.ly - 11} ${elbowX + 18},${pin.ly - 11} ${pin.x - r - 4},${pin.y}`}
               className={s.leader}
+              pointerEvents="none"
             />
-            {/* Generous invisible hit area over the label. */}
-            <rect x={pin.lx - 250} y={pin.ly - 38} width={280} height={54} fill="transparent" />
-            <circle cx={pin.x} cy={pin.y} r={r + 14} fill="transparent" />
-            <circle cx={pin.x} cy={pin.y} r={r + 9} className={s.pinHalo} />
+            <circle cx={pin.x} cy={pin.y} r={r + 9} className={s.pinHalo} pointerEvents="none" />
             <circle cx={pin.x} cy={pin.y} r={r} className={s.pinDot} />
             <text x={pin.lx} y={pin.ly} textAnchor="end" className={s.pinLabel}>
               <tspan>{pin.name}</tspan>

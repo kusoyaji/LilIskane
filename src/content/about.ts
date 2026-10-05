@@ -62,8 +62,8 @@ export const about: Copy<{
     eyebrow: string;
     title: string;
     lead: string;
-    year: string;
-    years: string;
+    /** Unit after the figure; Arabic needs the dual for 2 ("سنتان"). */
+    unit: (years: number) => string;
     scale: string;
     after: string;
     sav: string;
@@ -163,8 +163,7 @@ export const about: Copy<{
       eyebrow: "Garanties & durabilité",
       title: "Chaque logement est garanti, jusqu'à dix ans.",
       lead: "Acheter un logement est une étape majeure. Chaque bien est protégé par les garanties prévues par le cadre légal marocain, à compter de la réception des travaux.",
-      year: "an",
-      years: "ans",
+      unit: (n) => (n === 1 ? "an" : "ans"),
       scale: "Durée de couverture après réception",
       after: "après réception",
       sav: "En complément, un service après-vente structuré — réserves, interventions correctives, suivi — pour une prise en charge rapide et traçable.",
@@ -250,7 +249,7 @@ export const about: Copy<{
           mark: "الجائزة الأولى",
           meta: `القاهرة · ${ar.prize}`,
           title: "الجامعة العربية للإسكان",
-          body: `منحها مجلس وزراء الإسكان العرب عن البرنامج المبتكر للمدينة الجديدة الصويرة الجديدة: ${ar.units} وحدة سكنية.`,
+          body: `منحها مجلس وزراء الإسكان العرب عن البرنامج المبتكر لمدينة الصويرة الجديدة: ${ar.units} وحدة سكنية.`,
         },
         {
           mark: "HQE",
@@ -264,8 +263,7 @@ export const about: Copy<{
       eyebrow: "الضمانات والاستدامة",
       title: "كل مسكن مضمون، لمدة تصل إلى عشر سنوات.",
       lead: "اقتناء مسكن خطوة كبرى. لذلك يحظى كل عقار بالضمانات التي ينص عليها الإطار القانوني المغربي، ابتداءً من تسلّم الأشغال.",
-      year: "سنة",
-      years: "سنوات",
+      unit: (n) => (n === 1 ? "سنة" : n === 2 ? "سنتان" : "سنوات"),
       scale: "مدة الضمان بعد التسلّم",
       after: "بعد التسلّم",
       sav: "وإلى جانب هذه الضمانات، خدمة ما بعد البيع منظَّمة — تحفّظات، وتدخلات تصحيحية، وتتبّع — لتكفّل سريع وقابل للتتبع.",

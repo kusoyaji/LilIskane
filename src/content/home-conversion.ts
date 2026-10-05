@@ -138,7 +138,17 @@ export type ServicesCopy = {
   title: string;
   lead: string;
   guide: ServiceEntry;
-  simulator: ServiceEntry & { words: [string, string, string] };
+  /**
+   * The tile shows one worked example computed from the finder's defaults.
+   * `{deposit}` and `{years}` are filled at render time from `DEFAULT_DEPOSIT`
+   * and `CREDIT_DEFAULTS.years` — never typed in here.
+   */
+  simulator: ServiceEntry & {
+    example: string;
+    perMonth: string;
+    ceilingLabel: string;
+    currency: string;
+  };
   tours: ServiceEntry;
   visit: ServiceEntry;
   guaranteesEyebrow: string;
@@ -164,7 +174,10 @@ export const servicesCopy: Copy<ServicesCopy> = {
       title: "Simulateur de crédit",
       body: "Votre mensualité, votre apport, votre durée : le coût réel de votre crédit, poste par poste.",
       action: "Simuler",
-      words: ["Mensualité", "Apport", "Durée"],
+      example: "Exemple : {deposit} DH d'apport, {years} ans",
+      perMonth: "DH / mois",
+      ceilingLabel: "Prix accessible, jusqu'à",
+      currency: "DH",
     },
     tours: {
       title: "Visites virtuelles 360°",
@@ -197,7 +210,10 @@ export const servicesCopy: Copy<ServicesCopy> = {
       title: "محاكي القرض",
       body: "قسطكم الشهري ومساهمتكم ومدة القرض: الكلفة الحقيقية لقرضكم، بنداً بنداً.",
       action: "إجراء المحاكاة",
-      words: ["القسط", "المساهمة", "المدة"],
+      example: "مثال: مساهمة شخصية {deposit} درهم، {years} سنة",
+      perMonth: "درهم في الشهر",
+      ceilingLabel: "الثمن الممكن، حتى",
+      currency: "درهم",
     },
     tours: {
       title: "زيارات افتراضية 360°",

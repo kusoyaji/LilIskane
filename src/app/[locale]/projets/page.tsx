@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CtaBand, LinkButton, PageHero } from "@/components/v2";
+import { CtaBand, LinkButton } from "@/components/v2";
 import { ProjectCard } from "@/components/search/ProjectCard";
 import { MapPanel } from "@/components/search/MapPanel";
+import { SearchHero } from "@/components/search/SearchHero";
 import { SearchControls, type Facet } from "@/components/search/SearchControls";
 import { SearchMap, type MapCity } from "@/components/search/SearchMap";
 import { PendingRegion, SearchShell } from "@/components/search/SearchShell";
@@ -57,6 +58,19 @@ export default async function ProjectsPage({
   const query = toSearchParams(filters).toString();
   const items = toListItems(result.projects, typedLocale);
 
+  // The relaxation walks a fixed order and records every facet it stepped
+  // past, set or not. Only the ones the visitor actually chose were widened.
+  const active: Record<FacetKey, boolean> = {
+    amenities: filters.amenities.length > 0,
+    surfaceMin: filters.surfaceMin !== null,
+    bedrooms: filters.bedrooms !== null,
+    segments: filters.segments.length > 0,
+    statuses: filters.statuses.length > 0,
+    city: Boolean(filters.city),
+    budget: filters.budget !== null,
+  };
+  const widened = result.relaxed.filter((facet) => active[facet]);
+
   const count = (facet: FacetKey, predicate: Parameters<typeof facetCount>[2]) =>
     facetCount(filters, facet, predicate);
 
@@ -102,9 +116,8 @@ export default async function ProjectsPage({
   return (
     <>
       <div data-tone="paper">
-        <PageHero
+        <SearchHero
           locale={typedLocale}
-          variant="ink"
           eyebrow={c.heroEyebrow}
           title={c.heroTitle}
           lead={c.heroLead(formatNumber(projects.length, typedLocale), formatNumber(cityIds.length, typedLocale))}
@@ -145,10 +158,15 @@ export default async function ProjectsPage({
 
                   {/* Nothing matched exactly: say which constraint was widened
                       rather than showing an empty page. */}
-                  {result.relaxed.length > 0 && (
+                  {widened.length > 0 && (
                     <p role="status" className={s.relaxed}>
                       <strong>{c.noExact}</strong> {c.relaxedPrefix}{" "}
-                      <em>{result.relaxed.map((facet) => c.relaxed[facet]).join(", ")}</em> {c.relaxedSuffix}
+                      <em>
+                        {new Intl.ListFormat(typedLocale, { type: "conjunction" }).format(
+                          widened.map((facet) => c.relaxed[facet]),
+                        )}
+                      </em>{" "}
+                      {c.relaxedSuffix}
                     </p>
                   )}
 

@@ -7,9 +7,14 @@ import s from "./Film.module.css";
 type Props = {
   /** Dense-keyframe master (desktop). */
   src: string;
-  /** Smaller encode for phones — same keyframe density, so it still scrubs. */
+  /** Portrait encode for phones — same keyframe density, so it still scrubs. */
   srcSmall: string;
+  /** First frame of `src` (landscape). */
   poster: string;
+  /** First frame of `srcSmall` (portrait). */
+  posterSmall: string;
+  /** Media query that selects the phone encode and poster. */
+  phoneQuery: string;
   alt: string;
   /** The beats, chapter rail and cue — server-rendered, choreographed here. */
   children: React.ReactNode;
@@ -19,7 +24,13 @@ type Connection = { saveData?: boolean; effectiveType?: string };
 
 /** Where in the scroll each beat is fully on screen — used to bring a beat
  *  into view when keyboard focus lands inside it. */
-const BEAT_AT = [0, 0.47, 0.92];
+const BEAT_AT = [0, 0.47, 0.84];
+
+/** Where the stage hands over to the heritage panel: from here to the end of
+ *  the track the type, rail and caption leave, so that when the sticky stage
+ *  releases and scrolls away it carries the image only — never a CTA pair or a
+ *  chapter rail riding up over the next section and under the header. */
+const HANDOFF = 0.88;
 
 /**
  * The stage of the opening film, and the only part of it that needs script.
@@ -44,7 +55,7 @@ const BEAT_AT = [0, 0.47, 0.92];
  * Sticky is correct before hydration, needs no spacer, and the timeline maps
  * to exactly the same travel.
  */
-export function FilmScrub({ src, srcSmall, poster, alt, children }: Props) {
+export function FilmScrub({ src, srcSmall, poster, posterSmall, phoneQuery, alt, children }: Props) {
   const stageRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [mode, setMode] = useState<"pending" | "scrub" | "still">("pending");
@@ -58,9 +69,9 @@ export function FilmScrub({ src, srcSmall, poster, alt, children }: Props) {
       setMode("still");
       return;
     }
-    setSmall(window.matchMedia("(max-width: 47.99rem)").matches);
+    setSmall(window.matchMedia(phoneQuery).matches);
     setMode("scrub");
-  }, []);
+  }, [phoneQuery]);
 
   // This film *is* the first screen, so it buffers as soon as the page has
   // loaded (the poster — the LCP — is already in) rather than on approach.
@@ -113,6 +124,7 @@ export function FilmScrub({ src, srcSmall, poster, alt, children }: Props) {
       const cue = q("[data-cue]");
       const media = q("[data-media]");
       const floor = q("[data-floor]");
+      const overlay = q("[data-overlay]");
       if (beats.length < 3) return;
 
       const parts = (el: HTMLElement) => Array.from(el.children);
@@ -121,7 +133,7 @@ export function FilmScrub({ src, srcSmall, poster, alt, children }: Props) {
       const setActive = (p: number) => {
         beats[0].toggleAttribute("data-active", p < 0.2);
         beats[1].toggleAttribute("data-active", p >= 0.3 && p < 0.6);
-        beats[2].toggleAttribute("data-active", p >= 0.7);
+        beats[2].toggleAttribute("data-active", p >= 0.7 && p < 0.97);
       };
       setActive(0);
 
@@ -176,6 +188,11 @@ export function FilmScrub({ src, srcSmall, poster, alt, children }: Props) {
         .fromTo(fills[1], { scaleX: 0 }, { scaleX: 1, duration: 0.36 }, 0.29)
         .fromTo(fills[2], { scaleX: 0 }, { scaleX: 1, duration: 0.35 }, 0.65);
 
+      // Hand-over: everything typographic lifts away together over the last
+      // stretch of the track, so the stage reaches the heritage seam as image
+      // alone.
+      tl.to(overlay, { opacity: 0, yPercent: -2, duration: 1 - HANDOFF, ease: "power1.in" }, HANDOFF);
+
       // Playhead, eased toward the scroll target on GSAP's own ticker.
       let current = 0;
       const drive = () => {
@@ -216,24 +233,28 @@ export function FilmScrub({ src, srcSmall, poster, alt, children }: Props) {
   return (
     <div ref={stageRef} className={s.stage} data-mode={mode}>
       <div className={s.media} data-media>
-        {/* eslint-disable-next-line @next/next/no-img-element -- the film's
-            own first frame, served as-is from /public/video; it is the LCP
-            and must not wait on the image optimiser. */}
-        <img
-          src={poster}
-          alt={alt}
-          width={1280}
-          height={720}
-          className={s.poster}
-          fetchPriority="high"
-          decoding="async"
-        />
+        {/* The film's own first frame, served as-is from /public/video — it
+            is the LCP and must not wait on the image optimiser. Phones get
+            the portrait cut, matching the portrait encode. */}
+        <picture>
+          <source media={phoneQuery} srcSet={posterSmall} width={720} height={1280} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={poster}
+            alt={alt}
+            width={1920}
+            height={1080}
+            className={s.poster}
+            fetchPriority="high"
+            decoding="async"
+          />
+        </picture>
         {mode === "scrub" && (
           <video
             ref={videoRef}
             className={s.video}
             data-ready={ready}
-            poster={poster}
+            poster={small ? posterSmall : poster}
             muted
             playsInline
             preload={buffer ? "auto" : "metadata"}

@@ -364,8 +364,7 @@ export const projects: Project[] = [
       },
     ],
     nearby: [
-      { label: { fr: "Avenue Mohammed VI", ar: "شارع محمد السادس" }, minutes: 4, mode: "drive" },
-      { label: { fr: "Golf Al Maaden", ar: "غولف الماعدن" }, minutes: 10, mode: "drive" },
+      { label: { fr: "Golf Al Maaden", ar: "غولف المعدن" }, minutes: 10, mode: "drive" },
       { label: { fr: "Médina de Marrakech", ar: "مدينة مراكش العتيقة" }, minutes: 15, mode: "drive" },
       { label: { fr: "Aéroport Ménara", ar: "مطار المنارة" }, minutes: 18, mode: "drive" },
       { label: { fr: "École primaire", ar: "مدرسة ابتدائية" }, minutes: 6, mode: "walk" },
@@ -382,7 +381,7 @@ export const projects: Project[] = [
     lat: 31.6089,
     lng: -7.9925,
     segment: "haut-standing",
-    status: "livre",
+    status: "en-promotion",
     kinds: ["appartement"],
     price: { amount: 2450000, unit: "total" },
     surfaceMin: 96,
@@ -403,8 +402,8 @@ export const projects: Project[] = [
       "securite",
     ],
     summary: {
-      fr: "Première tranche, livrée en 2023 et entièrement occupée. Elle sert de référence à Riad Garden II : mêmes équipes, mêmes finitions, et un appartement visitable en 360°.",
-      ar: "الشطر الأول، سُلّم سنة 2023 ومسكون بالكامل. يُتّخذ مرجعاً لرياض غاردن 2: نفس الفرق، نفس التشطيبات، وشقة يمكن زيارتها بتقنية 360 درجة.",
+      fr: "Première tranche, livrée en 2023. Quelques appartements restent disponibles, à partir de 2 450 000 DH ; ils se visitent sur place ou en 360°.",
+      ar: "الشطر الأول، سُلّم سنة 2023. لا تزال بعض الشقق متاحة، ابتداءً من 2 450 000 درهم، ويمكن زيارتها في عين المكان أو بتقنية 360 درجة.",
     },
     hero: {
       key: "rg1_DSC00924",
@@ -510,7 +509,7 @@ export const projects: Project[] = [
     lat: 33.4692,
     lng: -7.4301,
     segment: "haut-standing",
-    status: "en-promotion",
+    status: "en-lancement",
     kinds: ["appartement", "villa"],
     price: { amount: 1962000, unit: "total" },
     surfaceMin: 78,
@@ -518,7 +517,7 @@ export const projects: Project[] = [
     bedroomsMin: 2,
     bedroomsMax: 4,
     floors: "R+2",
-    deliveryYear: 2026,
+    deliveryYear: null,
     deliveredYear: null,
     amenities: ["plage", "vue-mer", "piscine", "espaces-verts", "securite", "commerces"],
     summary: {
@@ -557,7 +556,7 @@ export const projects: Project[] = [
     bedroomsMin: 0,
     bedroomsMax: 0,
     floors: null,
-    deliveryYear: 2026,
+    deliveryYear: null,
     deliveredYear: null,
     amenities: ["plage", "vue-mer", "securite"],
     summary: {
@@ -866,7 +865,7 @@ export const projects: Project[] = [
     bedroomsMin: 2,
     bedroomsMax: 3,
     floors: "R+4",
-    deliveryYear: 2026,
+    deliveryYear: null,
     deliveredYear: null,
     amenities: ["vue-mer", "plage", "mosquee", "ecoles", "commerces", "ascenseur", "espaces-verts"],
     summary: {
@@ -922,7 +921,7 @@ export const projects: Project[] = [
     bedroomsMin: 0,
     bedroomsMax: 0,
     floors: null,
-    deliveryYear: 2026,
+    deliveryYear: null,
     deliveredYear: null,
     amenities: ["mosquee", "ecoles", "commerces", "securite"],
     summary: {
@@ -961,7 +960,7 @@ export const projects: Project[] = [
     bedroomsMin: 0,
     bedroomsMax: 0,
     floors: null,
-    deliveryYear: 2026,
+    deliveryYear: null,
     deliveredYear: null,
     amenities: ["mosquee", "ecoles", "commerces", "securite"],
     summary: {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { gsap, ScrollTrigger } from "@/components/motion/gsap";
 import { Figure } from "@/components/media/Figure";
 import { media } from "@/data/media.generated";
@@ -53,6 +54,7 @@ export function TourCards({ locale, tours, body, renderNote }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const openerRef = useRef<HTMLButtonElement | null>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   const trackRef = useRef<HTMLUListElement>(null);
   const [openId, setOpenId] = useState<string | null>(null);
@@ -90,8 +92,33 @@ export function TourCards({ locale, tours, body, renderNote }: Props) {
       const stage = section.querySelector<HTMLElement>(".tours__stage");
       if (!stage) return;
 
-      const shift = () => Math.max(0, track.scrollWidth - track.clientWidth);
+      /**
+       * On touch screens the track is also a native horizontal scroller
+       * (`overflow-x: auto`, see globals.css). An element's overflow clip moves
+       * with its own transform, so translating that same element slid its clip
+       * box off-screen with the cards and left an empty panel mid-pan. While the
+       * scroll-driven pan owns the track its overflow is released, and the
+       * stage — which already clips to the viewport — does the clipping.
+       */
+      const previousOverflow = track.style.overflow;
+      track.style.overflow = "visible";
+      track.scrollLeft = 0;
+
       const rtl = document.documentElement.dir === "rtl";
+      // Measured from the cards themselves plus the track's own padding, so the
+      // last card stops a gutter clear of the edge. `scrollWidth` leaves the
+      // end padding out once the track no longer scrolls natively. Both rects
+      // carry the same transform, so the span is the same mid-pan as at rest.
+      const shift = () => {
+        const slots = track.children;
+        if (slots.length === 0) return 0;
+        const first = slots[0].getBoundingClientRect();
+        const last = slots[slots.length - 1].getBoundingClientRect();
+        const span = rtl ? first.right - last.left : last.right - first.left;
+        const style = getComputedStyle(track);
+        const padding = parseFloat(style.paddingInlineStart) + parseFloat(style.paddingInlineEnd);
+        return Math.max(0, Math.ceil(span + padding - track.clientWidth));
+      };
 
       /**
        * ScrollTrigger owns the pin here, not CSS `sticky`.
@@ -148,6 +175,7 @@ export function TourCards({ locale, tours, body, renderNote }: Props) {
         window.clearTimeout(timer);
         pan.scrollTrigger?.kill();
         pan.kill();
+        track.style.overflow = previousOverflow;
       };
     });
 
@@ -221,8 +249,10 @@ export function TourCards({ locale, tours, body, renderNote }: Props) {
     setOpenId(null);
     setFrameReady(false);
     // Focus goes back to the card that opened it, or the section is left
-    // without a sensible focus position after the overlay unmounts.
-    openerRef.current?.focus();
+    // without a sensible focus position after the overlay unmounts. Deferred a
+    // frame: the page stays inert until the effect cleanup below has run, and
+    // an inert element cannot take focus.
+    window.requestAnimationFrame(() => openerRef.current?.focus({ preventScroll: true }));
   }, []);
 
   // Escape, focus trap, and scroll lock while a tour is open.
@@ -253,13 +283,31 @@ export function TourCards({ locale, tours, body, renderNote }: Props) {
     };
 
     document.addEventListener("keydown", onKeyDown);
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+
+    // The overlay is portalled to <body>, so everything else in <body> — the
+    // fixed header included — is a sibling of it. Making those siblings inert
+    // means no tap can fall through to the header's phone link, and assistive
+    // tech sees only the dialog. Anything already inert is left alone.
+    const overlay = overlayRef.current;
+    const madeInert: Element[] = [];
+    for (const child of Array.from(document.body.children)) {
+      if (child === overlay || child.hasAttribute("inert")) continue;
+      child.setAttribute("inert", "");
+      madeInert.push(child);
+    }
+
+    // Lock the page under the dialog. The overlay carries `data-lenis-prevent`,
+    // so the smooth-scroll driver ignores wheel input over it, and the root's
+    // overflow stops native (touch, keyboard) scrolling.
+    const root = document.documentElement;
+    const previousOverflow = root.style.overflow;
+    root.style.overflow = "hidden";
     closeRef.current?.focus();
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = previousOverflow;
+      for (const element of madeInert) element.removeAttribute("inert");
+      root.style.overflow = previousOverflow;
     };
   }, [openId, close]);
 
@@ -368,8 +416,17 @@ export function TourCards({ locale, tours, body, renderNote }: Props) {
 
       {/* Rendered only while open, so no iframe and no WebGL context exists
           until a tour is actually chosen. */}
-      {active && (
-        <div className="tours__overlay" role="presentation">
+      {/* Portalled to <body>: inside the page it inherited the stacking context
+          of an ancestor (position: relative; z-index: 1), so the fixed header
+          painted over it and swallowed taps on the close button. */}
+      {active &&
+        createPortal(
+        <div
+          ref={overlayRef}
+          className={`tours__overlay ${st.overlay}`}
+          role="presentation"
+          data-lenis-prevent=""
+        >
           <div
             ref={panelRef}
             className="tours__panel"
@@ -417,8 +474,9 @@ export function TourCards({ locale, tours, body, renderNote }: Props) {
               </svg>
             </button>
           </div>
-        </div>
-      )}
+        </div>,
+          document.body,
+        )}
     </section>
   );
 }

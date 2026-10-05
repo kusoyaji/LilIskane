@@ -8,6 +8,7 @@ import { flagshipCopy } from "@/content/home-opening";
 import { shared } from "@/content/shared";
 import { LinkButton } from "@/components/v2";
 import { Strip } from "./flagship/Strip";
+import { Handoff } from "./heritage/Handoff";
 import s from "./flagship/Flagship.module.css";
 
 /** Distance between the two phases, as the project data states it. */
@@ -80,143 +81,145 @@ export function Flagship({ locale }: { locale: Locale }) {
 
   return (
     <section className={s.flagship} aria-labelledby="flagship-title">
-      {/* ---- masthead ------------------------------------------------------- */}
-      <header className={`u-shell ${s.head}`}>
-        <div className={`u-enter ${s.kicker}`}>
-          <p className={`u-eyebrow ${s.eyebrow}`}>{t.eyebrow}</p>
-          <span className={s.status}>
-            <span aria-hidden className={s.statusDot} />
-            {statusLabel(project, locale)}
-          </span>
-        </div>
-        <h2 id="flagship-title" className={`u-display ${s.name}`} data-reveal="mask">
-          <span className="reveal-inner">{project.name[locale]}</span>
-        </h2>
-        <div className={s.headRow}>
-          <p className={`u-enter ${s.place}`}>
-            <span className={s.placeCity}>{city}</span>
-            <span className={s.placeHood}>{project.neighbourhood[locale]}</span>
-          </p>
-          <p className={`u-enter ${s.deck}`}>{t.deck}</p>
-        </div>
-      </header>
+      <Handoff className={s.body}>
+        {/* ---- masthead ------------------------------------------------------- */}
+        <header className={`u-shell ${s.head}`}>
+          <div className={`u-enter ${s.kicker}`}>
+            <p className={`u-eyebrow ${s.eyebrow}`}>{t.eyebrow}</p>
+            <span className={s.status}>
+              <span aria-hidden className={s.statusDot} />
+              {statusLabel(project, locale)}
+            </span>
+          </div>
+          <h2 id="flagship-title" className={`u-display ${s.name}`} data-reveal="mask">
+            <span className="reveal-inner">{project.name[locale]}</span>
+          </h2>
+          <div className={s.headRow}>
+            <p className={`u-enter ${s.place}`}>
+              <span className={s.placeCity}>{city}</span>
+              <span className={s.placeHood}>{project.neighbourhood[locale]}</span>
+            </p>
+            <p className={`u-enter ${s.deck}`}>{t.deck}</p>
+          </div>
+        </header>
 
-      {/* ---- two renders, two depths ---------------------------------------- */}
-      <div className={`u-shell ${s.layers}`}>
-        {pool && (
-          <figure className={`u-enter ${s.main}`} data-reveal="media">
-            <Figure
-              ref_={pool}
-              locale={locale}
-              sizes="(max-width: 768px) 100vw, 72vw"
-              className={s.img}
-            />
-            <figcaption className={s.note}>{t.renderNote}</figcaption>
-          </figure>
-        )}
-        {shops && (
-          <div className={s.insetDepth} data-parallax="1.1">
-            <figure className={`u-enter ${s.inset}`} data-reveal="media">
+        {/* ---- two renders, two depths ---------------------------------------- */}
+        <div className={`u-shell ${s.layers}`}>
+          {pool && (
+            <figure className={`u-enter ${s.main}`} data-reveal="media">
               <Figure
-                ref_={shops}
+                ref_={pool}
                 locale={locale}
-                sizes="(max-width: 768px) 70vw, 36vw"
+                sizes="(max-width: 768px) 100vw, 72vw"
                 className={s.img}
               />
-              <figcaption className={s.note}>
-                {t.rooms.commerces} · {t.renderNote}
-              </figcaption>
+              <figcaption className={s.note}>{t.renderNote}</figcaption>
             </figure>
-          </div>
-        )}
-      </div>
-
-      {/* ---- the figures ------------------------------------------------------ */}
-      <div className={`u-shell ${s.specsWrap}`}>
-        <dl className={s.specs}>
-          {specs.map((spec) => (
-            <div key={spec.label} className={`u-enter ${s.spec} ${spec.wide ? s.specWide : ""}`}>
-              <dt className={s.specLabel}>{spec.label}</dt>
-              <dd className={`u-numeric ${s.specValue}`}>{spec.value}</dd>
-            </div>
-          ))}
-        </dl>
-        <div className={`u-enter ${s.amenities}`}>
-          <p className={`u-eyebrow ${s.eyebrow}`}>{t.amenitiesLabel}</p>
-          <ul className={s.amenityList}>
-            {amenities.map((a) => (
-              <li key={a} className={s.amenity}>
-                <span aria-hidden className={s.amenityMark} />
-                {a}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* ---- the rooms, drifting past ---------------------------------------- */}
-      <div className={s.rooms}>
-        <div className={`u-shell ${s.roomsHead}`}>
-          <h3 className={`u-display ${s.roomsTitle}`} data-reveal="mask">
-            <span className="reveal-inner">{t.stripTitle}</span>
-          </h3>
-          <p className={`u-enter ${s.roomsLead}`}>{t.stripLead}</p>
-        </div>
-        <Strip label={t.stripTitle}>
-          {rooms.map((room) => (
-            <li key={room.key} className={`${s.card} ${room.shape === "tall" ? s.cardTall : s.cardWide}`}>
-              <figure className={s.cardFigure}>
-                <div className={s.cardFrame}>
-                  <Figure
-                    ref_={room.media}
-                    locale={locale}
-                    sizes={room.shape === "tall" ? "(max-width: 768px) 50vw, 24vw" : "(max-width: 768px) 80vw, 40vw"}
-                    className={s.img}
-                  />
-                </div>
-                <figcaption className={s.cardCaption}>
-                  <span className={s.cardName}>{t.rooms[room.key]}</span>
-                  <span className={s.cardNote}>{t.renderNote}</span>
+          )}
+          {shops && (
+            <div className={s.insetDepth} data-parallax="1.1">
+              <figure className={`u-enter ${s.inset}`} data-reveal="media">
+                <Figure
+                  ref_={shops}
+                  locale={locale}
+                  sizes="(max-width: 768px) 70vw, 36vw"
+                  className={s.img}
+                />
+                <figcaption className={s.note}>
+                  {t.rooms.commerces} · {t.renderNote}
                 </figcaption>
               </figure>
-            </li>
-          ))}
-        </Strip>
-      </div>
-
-      {/* ---- the phase already built ------------------------------------------ */}
-      <div className={`u-shell ${s.phase}`}>
-        {delivered && (
-          <figure className={`u-enter ${s.phaseFigure}`} data-reveal="media">
-            <Figure ref_={delivered} locale={locale} sizes="(max-width: 768px) 100vw, 50vw" className={s.img} />
-            {deliveredYear && (
-              <figcaption className={`${s.note} ${s.notePhoto}`}>
-                {t.photoNote(isolateRun(String(deliveredYear), locale))}
-              </figcaption>
-            )}
-          </figure>
-        )}
-        <div className={s.phaseText}>
-          {deliveredYear && (
-            <p className={`u-eyebrow u-enter ${s.delivered}`}>
-              <span aria-hidden className={s.deliveredDot} />
-              {t.phase1Eyebrow(isolateRun(String(deliveredYear), locale))}
-            </p>
+            </div>
           )}
-          <h3 className={`u-display ${s.phaseTitle}`} data-reveal="mask">
-            <span className="reveal-inner">{t.phase1Title(formatNumber(PHASE_DISTANCE_M, locale))}</span>
-          </h3>
-          <p className={`u-enter ${s.phaseBody}`}>{t.phase1Body}</p>
-          <div className={`u-enter ${s.actions}`}>
-            <LinkButton href={`/${locale}/projets/riad-garden-ii`} variant="primary">
-              {t.ctaProject}
-            </LinkButton>
-            <LinkButton href={`/${locale}/contact`} variant="outline">
-              {shared[locale].bookVisit}
-            </LinkButton>
+        </div>
+
+        {/* ---- the figures ------------------------------------------------------ */}
+        <div className={`u-shell ${s.specsWrap}`}>
+          <dl className={s.specs}>
+            {specs.map((spec) => (
+              <div key={spec.label} className={`u-enter ${s.spec} ${spec.wide ? s.specWide : ""}`}>
+                <dt className={s.specLabel}>{spec.label}</dt>
+                <dd className={`u-numeric ${s.specValue}`}>{spec.value}</dd>
+              </div>
+            ))}
+          </dl>
+          <div className={`u-enter ${s.amenities}`}>
+            <p className={`u-eyebrow ${s.eyebrow}`}>{t.amenitiesLabel}</p>
+            <ul className={s.amenityList}>
+              {amenities.map((a) => (
+                <li key={a} className={s.amenity}>
+                  <span aria-hidden className={s.amenityMark} />
+                  {a}
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
-      </div>
+
+        {/* ---- the rooms, drifting past ---------------------------------------- */}
+        <div className={s.rooms}>
+          <div className={`u-shell ${s.roomsHead}`}>
+            <h3 className={`u-display ${s.roomsTitle}`} data-reveal="mask">
+              <span className="reveal-inner">{t.stripTitle}</span>
+            </h3>
+            <p className={`u-enter ${s.roomsLead}`}>{t.stripLead}</p>
+          </div>
+          <Strip label={t.stripTitle}>
+            {rooms.map((room) => (
+              <li key={room.key} className={`${s.card} ${room.shape === "tall" ? s.cardTall : s.cardWide}`}>
+                <figure className={s.cardFigure}>
+                  <div className={s.cardFrame}>
+                    <Figure
+                      ref_={room.media}
+                      locale={locale}
+                      sizes={room.shape === "tall" ? "(max-width: 768px) 50vw, 24vw" : "(max-width: 768px) 80vw, 40vw"}
+                      className={s.img}
+                    />
+                  </div>
+                  <figcaption className={s.cardCaption}>
+                    <span className={s.cardName}>{t.rooms[room.key]}</span>
+                    <span className={s.cardNote}>{t.renderNote}</span>
+                  </figcaption>
+                </figure>
+              </li>
+            ))}
+          </Strip>
+        </div>
+
+        {/* ---- the phase already built ------------------------------------------ */}
+        <div className={`u-shell ${s.phase}`}>
+          {delivered && (
+            <figure className={`u-enter ${s.phaseFigure}`} data-reveal="media">
+              <Figure ref_={delivered} locale={locale} sizes="(max-width: 768px) 100vw, 50vw" className={s.img} />
+              {deliveredYear && (
+                <figcaption className={`${s.note} ${s.notePhoto}`}>
+                  {t.photoNote(isolateRun(String(deliveredYear), locale))}
+                </figcaption>
+              )}
+            </figure>
+          )}
+          <div className={s.phaseText}>
+            {deliveredYear && (
+              <p className={`u-eyebrow u-enter ${s.delivered}`}>
+                <span aria-hidden className={s.deliveredDot} />
+                {t.phase1Eyebrow(isolateRun(String(deliveredYear), locale))}
+              </p>
+            )}
+            <h3 className={`u-display ${s.phaseTitle}`} data-reveal="mask">
+              <span className="reveal-inner">{t.phase1Title(formatNumber(PHASE_DISTANCE_M, locale))}</span>
+            </h3>
+            <p className={`u-enter ${s.phaseBody}`}>{t.phase1Body}</p>
+            <div className={`u-enter ${s.actions}`}>
+              <LinkButton href={`/${locale}/projets/riad-garden-ii`} variant="primary">
+                {t.ctaProject}
+              </LinkButton>
+              <LinkButton href={`/${locale}/contact`} variant="outline">
+                {shared[locale].bookVisit}
+              </LinkButton>
+            </div>
+          </div>
+        </div>
+      </Handoff>
     </section>
   );
 }

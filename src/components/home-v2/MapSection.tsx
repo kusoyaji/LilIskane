@@ -50,21 +50,46 @@ const LABEL_SIDE: Record<string, MapDot["side"]> = {
   "had-soualem": "s",
 };
 
+/**
+ * Phones only: where the loupe's points sit when the map is ~350px wide.
+ *
+ * At that width the true magnified positions put Sala Al Jadida 12px from
+ * Témara and Mohammedia 18px from Sidi Rahal — closer than a fingertip, so a
+ * tap lands on the neighbour. These are the same points relaxed apart until
+ * every programme pin is at least ~90 units (≈31px at 350px) from every other,
+ * each kept on land inside the lens and as close as possible to where it
+ * truly is (the largest move is Témara's, south along the coast). The ring
+ * cities move with them so the neighbourhood still reads right. Loupe
+ * (viewBox) units; anything not listed keeps its place.
+ */
+const PHONE_LOUPE: Record<string, { x: number; y: number }> = {
+  "sala-al-jadida": { x: 401, y: 133 },
+  temara: { x: 339, y: 197 },
+  mohammedia: { x: 247, y: 204 },
+  "sidi-rahal": { x: 262, y: 293 },
+  rabat: { x: 369, y: 132 },
+  nouaceur: { x: 223, y: 286 },
+};
+
 /** Cities inside the loupe that would only crowd it if labelled. */
 const UNLABELLED_IN_LOUPE = new Set(["casablanca", "rabat", "nouaceur"]);
 
 const pct = (v: number, of: number) => Number(((v / of) * 100).toFixed(3));
 
-function place(lat: number, lng: number) {
+function place(id: string, lat: number, lng: number) {
   const p = projectMorocco(lat, lng);
   const dx = p.x - SOURCE.x;
   const dy = p.y - SOURCE.y;
   const inLoupe = Math.hypot(dx, dy) <= SOURCE_R * 0.92;
   const at = inLoupe ? { x: LOUPE.x + dx * ZOOM, y: LOUPE.y + dy * ZOOM } : p;
+  const phone = inLoupe ? PHONE_LOUPE[id] : undefined;
   return {
     inLoupe,
     left: pct(at.x, MOROCCO_VIEWBOX.width),
     top: pct(at.y, MOROCCO_VIEWBOX.height),
+    ...(phone && {
+      phone: { left: pct(phone.x, MOROCCO_VIEWBOX.width), top: pct(phone.y, MOROCCO_VIEWBOX.height) },
+    }),
   };
 }
 
@@ -123,7 +148,7 @@ export function MapSection({ locale }: { locale: Locale }) {
     .filter((c): c is { id: string; list: Project[]; city: NonNullable<typeof c.city> } => Boolean(c.city))
     .sort((a, b) => b.city.lat - a.city.lat)
     .map(({ id, list, city }) => {
-      const at = place(city.lat, city.lng);
+      const at = place(id, city.lat, city.lng);
       return {
         id,
         name: city.name[locale],
@@ -140,7 +165,7 @@ export function MapSection({ locale }: { locale: Locale }) {
   const footprint: MapDot[] = cities
     .filter((c) => !byCity.has(c.id))
     .map((c) => {
-      const at = place(c.lat, c.lng);
+      const at = place(c.id, c.lat, c.lng);
       return {
         id: c.id,
         name: c.name[locale],
