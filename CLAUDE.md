@@ -35,61 +35,75 @@ embeds, and how to verify motion without being fooled by a non-compositing viewp
   skip `src/app/[locale]/...`. Use `-LiteralPath` (PowerShell) or plain `cp -r` (Bash) for
   anything touching that tree.
 
-## What's built
+## What's built (v2 — the presentation build of 2026-10-06)
 
-**Foundation** — Next.js 15 App Router, TypeScript, Tailwind v4. FR/AR via `[locale]` routing,
-full RTL support (logical properties, bidi-isolated numbers/phone numbers — see
-`src/i18n/config.ts`), Archivo + IBM Plex Sans Arabic. Palette sampled programmatically from
-Chaabi's own renders, not chosen from a swatch — see `src/styles/tokens.css`.
+v1 is preserved as git tags `maquette-v1-deployed` / `maquette-v1-local`. The v2 contract is
+[`docs/DESIGN-V2.md`](docs/DESIGN-V2.md) (hard rules: facts only from `src/data/*`, brand spelling,
+one unified Morocco shape, renders always labelled, every link resolves, FR and AR complete).
+The demo script and the open questions for the client are in [`docs/DEMO.md`](docs/DEMO.md).
 
-**Home** — hero (static, LCP-first) → proof stage (scroll-wiped render/photograph comparison,
-the site's central "trust" device) → delivery record → budget qualifier (shares
-`src/lib/credit.ts` with the simulator) → **expanding frame** (Amali-style: a photograph grows
-from a tile to full-bleed on scroll, hinge into the portfolio section) → portfolio index
-(geographic, not a card grid) → price-range argument → footer.
+**Foundation** — Next.js 15 App Router, TypeScript, Tailwind v4, CSS Modules, GSAP + Lenis. FR/AR
+via `[locale]` routing, full RTL (logical properties, bidi-isolated numbers — `isolateRun` /
+`formatNumber` in `src/i18n/config.ts`), Archivo + IBM Plex Sans Arabic. Section grounds via
+`data-tone` on wrapper divs (`globals.css`; ink joins are hard cuts, light joins feather).
 
-**Project page** (`riad-garden-ii`, the only fully-built project) — hero → **cinematic
-sequence**: a scroll-scrubbed video (not autoplay — the playhead is driven by scroll position)
-using the AI-generated camera move, `public/video/sequence.mp4` (desktop scrub encode, dense
-keyframes) / `sequence-sm.mp4` (mobile loop) — → Matterport 360 tours, **preloaded on
-approach** (~700px before viewport, not click-gated, except on metered connections) → proof
-gallery (draggable compare slider) → typologies → location/amenities → credit simulator →
-booking form.
+**Data — all 23 programmes on liliskane.com** (`src/data/projects.ts`), each checked against the
+client's own fiche (address, surfaces, height, price, amenities, map pin). Status uses the client's
+vocabulary: `STATUSES` (`en-lancement`, `en-construction`, `en-promotion`, `livre`, `complet`) plus
+flags `readySoon` ("Livraison imminente"), `readyNow` ("Livraison immédiate") and `remisePct`
+("En promotion · Remise 6 %"). **Every badge goes through `statusText()`** in
+`src/content/projects.ts` — never print `STATUS_LABELS[status]` directly. No delivery years
+anywhere: none is published. Company facts only from `src/data/company.ts`.
 
-**Search** (`/projets`) — facet filters, SVG index-map (no tile-map library), URL-driven state,
-never-zero-results relaxation logic in `src/lib/filter.ts`.
+**Media pipeline** — `assets-src/` (gitignored originals) → `npm run media:prep` → `public/media`
++ two manifests: `media.generated.ts` (core; reaches client bundles via `Figure`, keep it small)
+and `media.gallery.generated.ts` (`g_*` keys; **server-only**, read only by `GalleryFigure`).
+Programme galleries are `src/data/galleries.ts`, generated from the curation of the client's
+images — regenerate with the scratch generator rather than hand-reordering (the page hero's
+picture is deliberately never a gallery's lead tile). `coreRef()` narrows a gallery image to one
+`Figure` can draw.
 
-**Motion system** — audited against Emil Kowalski's rules (`transform`/`opacity` only, ≤300ms
-UI timing, asymmetric press feedback, `(hover: hover)` gating, `prefers-reduced-motion`
-throughout). Route transitions via `template.tsx` (enter-only fade; App Router has no exit
-phase without a motion library). Full rationale and the two "tried it, it was wrong" histories
-(clip-path deadlocking its own IntersectionObserver; animated `mask-size` not compositing) are
-documented as comments directly in `src/styles/globals.css` — read those before changing
-`.u-enter` or `.expand-*`.
+**Home** (`src/components/home-v2`) — scroll-scrubbed opening film (`Film`/`FilmScrub`, the
+AI camera move through Riad Garden II) → Heritage (ink; founding year as architecture, figures,
+key dates, the client's institutional film) → Flagship (Riad Garden II) → ProofCompare (render vs
+photograph slider, the "trust" device) → Showcase (pinned horizontal rail of all programmes) →
+MapSection (Morocco map with loupes) → BudgetFinder (monthly payment → /projets, shares
+`src/lib/credit.ts`) → Services → closing band.
+
+**Project page** (`/projets/[slug]`, one template for all 23) — hero → cinematic sequence
+(Riad Garden II only) → overview + "En bref" → gallery (spread + `GalleryLightbox`, a native
+`<dialog>` viewer) → the programme's film → plans (RG2) → 360 tours (`TourCards`, Matterport,
+FLIP open, preconnect on approach) → proof gallery (RG2) → amenities → location → credit
+simulator → related → CTA band.
+
+**Films** — `src/data/films.ts`: the client's YouTube films, click-to-play via
+youtube-nocookie (`v2/YouTubeFilm` server poster + `YouTubePlayer` island). Posters are always
+ours: several of the client's thumbnails print prices that contradict its fiches.
+
+**Other pages** — `/projets` (facets incl. buyer-facing statuses `STATUS_FACETS` in
+`src/lib/filter.ts`, SVG map, URL state, never-zero-results relaxation), `/a-propos` (films,
+chronology, values, seals, guarantees), `/guide-achat` (steps + simulator), `/actualites`
+(only "En lancement" programmes are launches; channel films), `/contact` (appointment form,
+prefilled from `?projet=`), legal pages.
+
+**Motion** — Emil Kowalski's rules (`transform`/`opacity`, ≤300 ms UI, `(hover: hover)`,
+`prefers-reduced-motion`). Reveals via `ScrollChoreography` (`data-reveal="mask"` +
+`.reveal-inner`, `.u-enter`, `data-reveal="media"`, `data-parallax`). Route enter fade in
+`template.tsx`. Read the comments in `globals.css` before changing `.u-enter`.
 
 ## What's pending
 
-- **Video pipeline**: only clip 1 (arrival: street → facade → courtyard → terrace threshold) is
-  generated and live. Clips 2–3 (crossing the threshold, through the salon) still need
-  generation — full prompts and the frame-chaining technique are in `VIDEO-PROMPTS.md`.
-- **Amali interstitial**: the cloud-white atmospheric field with scattered depth images between
-  sections — not built. The expanding-frame hinge covers *scale*; it doesn't cover this.
-- **Persistent-headline hero**: Amali's "headline stays fixed, background media swaps beneath
-  it" pattern — not built. Would mean rebuilding the home hero, not just adding a section.
-- **Route exit animation**: only enter exists. Needs View Transitions API or a motion library to
-  do properly.
-- **Only Riad Garden II has full depth** (typologies, tours, proof pairs). The other 13 projects
-  in `src/data/projects.ts` have prices/summaries/filtering but no deep content — intentional,
-  per the brief's stress-test requirement, but worth knowing before assuming a project page
-  "should" look like Riad Garden II's.
-- **Amaïa has no usable imagery** — its six source files are PDF-page exports at 2116px with no
-  interiors. Flagged in `MEDIA-REQUESTS.md`.
-- **Never tested on a real device.** Everything verified via desktop Chromium + measurement.
-  No real mid-range Android, no real 4G, no real screen reader, no iOS Safari (matters for
-  `svh` units and the video-scrub `clip-path`/seek behaviour).
-- **Client bundle ships full portfolio data in both languages** — search/filter components
-  import the whole dataset rather than a server-projected, locale-scoped index. Flagged as the
-  largest remaining perf win in `REVIEW.md`.
+- **Client confirmations** listed in `docs/DEMO.md` (film thumbnails quote prices that differ from
+  the fiches; Jasmin exteriors may show Bougainvillier; Al Maamora lot sizes disagree within its
+  own fiche; shared map pins; hi-res façades needed for Massylia, Jnane Souss, Al Yassamine,
+  Assalam; no Amaïa interiors).
+- **Video pipeline**: only clip 1 of the camera move exists. Clips 2–3 — `VIDEO-PROMPTS.md`.
+- **Route exit animation**: only enter exists (needs View Transitions or a motion library).
+- **Only Riad Garden II has plans, a proof set and a camera move.** Every other programme has the
+  client's photographs, film and tour where they exist, and nothing invented beyond them.
+- **Never tested on a real device** (Android mid-range, iOS Safari `svh`/video seek, screen
+  readers). Everything was verified in desktop Chromium with emulation.
+- **Dead CSS**: `.expand-*` and `.depth*` in `globals.css` belong to deleted v1 components.
 
 ## Verify before claiming anything works
 
