@@ -19,7 +19,6 @@ export function NextChapter({ locale }: { locale: Locale }) {
   const project = getProject("riad-garden-ii");
   if (!project) return null;
   const media = project.gallery.find((m) => m.key === "rg2_Ext_Cam_c1_jardin_1") ?? project.hero;
-  const year = project.deliveryYear ? isolateRun(String(project.deliveryYear), locale) : "";
 
   return (
     <section className={`${s.band} ${s.bandNext}`} data-nav-media>
@@ -36,7 +35,7 @@ export function NextChapter({ locale }: { locale: Locale }) {
         <h2 className={`u-display ${s.nextTitle}`} data-reveal="mask">
           <span className="reveal-inner">{t.title}</span>
         </h2>
-        <p className={`u-enter ${s.nextBody}`}>{t.body(year)}</p>
+        <p className={`u-enter ${s.nextBody}`}>{t.body}</p>
         <div className="u-enter">
           <LinkButton href={`/${locale}/projets/${project.slug}`} variant="light">
             {t.cta}

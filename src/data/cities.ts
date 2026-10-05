@@ -19,7 +19,7 @@ export const cities: City[] = [
   { id: "nouaceur", name: { fr: "Nouaceur", ar: "النواصر" }, lat: 33.3667, lng: -7.5833 },
   { id: "rabat", name: { fr: "Rabat", ar: "الرباط" }, lat: 34.0209, lng: -6.8416 },
   { id: "sala-al-jadida", name: { fr: "Sala Al Jadida", ar: "سلا الجديدة" }, lat: 34.0, lng: -6.75 },
-  { id: "sidi-rahal", name: { fr: "Sidi Rahal", ar: "سيدي رحال" }, lat: 33.4667, lng: -7.4333 },
+  { id: "sidi-rahal", name: { fr: "Sidi Rahal", ar: "سيدي رحال" }, lat: 33.4716, lng: -7.957 },
   { id: "tanger", name: { fr: "Tanger", ar: "طنجة" }, lat: 35.7595, lng: -5.834 },
   { id: "temara", name: { fr: "Témara", ar: "تمارة" }, lat: 33.9287, lng: -6.9067 },
 ];

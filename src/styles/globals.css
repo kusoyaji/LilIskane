@@ -1976,30 +1976,3 @@
   }
 }
 
-/* =============================================================================
-   DEV BADGE
-   The Next.js dev indicator (the black "N" bottom-left) sat on every screen
-   and, on phones, over the film's render disclaimer. `devIndicators: false` in
-   next.config.ts is the proper switch but needs a dev-server restart; this
-   hides the portal host meanwhile. Dev-only element — production never renders
-   it. Note that it also hides the dev error overlay; check the console.
-   ========================================================================== */
-nextjs-portal {
-  display: none !important;
-}
-
-/* =============================================================================
-   HANDOFF, STOOD DOWN
-   Heritage and Flagship wrap their content in <Handoff>, which faded it out
-   while the fixed Field turned the ground under it — the words had to leave
-   before the colour changed. The ground no longer turns under a section (see
-   GROUNDS), so that fade now only emptied a section that was still on its own,
-   correct ground: the Heritage figures vanished on ink, the Flagship buttons
-   went ghostly on paper. Content stays put until it scrolls away. Inline
-   opacity is written by GSAP, hence !important. The selectors target the two
-   CSS-module classes Handoff is given (Next keeps `<File>_<local>__<hash>`).
-   ========================================================================== */
-[class*="Heritage_inner__"],
-[class*="Flagship_body__"] {
-  opacity: 1 !important;
-}

@@ -55,7 +55,7 @@ export const about: Copy<{
     jump: string;
     of: string;
   };
-  next: { eyebrow: string; title: string; body: (deliveryYear: string) => string; cta: string; renderNote: string };
+  next: { eyebrow: string; title: string; body: string; cta: string; renderNote: string };
   values: { eyebrow: string; title: string; lead: string; caption: string };
   seals: { eyebrow: string; title: string; lead: string; items: Seal[] };
   guarantees: {
@@ -78,7 +78,7 @@ export const about: Copy<{
       eyebrow: "Chaabi Lil Iskane · Groupe Ynna",
       title: `Bâtisseurs depuis ${fr.founded}.`,
       lead: "Plus de 75 ans de promotion immobilière au Maroc. Du logement économique au haut standing, d'une ville nouvelle à Essaouira aux résidences de Marrakech — avec la même exigence, de la conception à la livraison.",
-      caption: "Riad Garden I, Marrakech · piscine livrée en 2023",
+      caption: "Riad Garden I, Marrakech · la piscine, après livraison",
     },
     who: {
       eyebrow: "Qui sommes-nous",
@@ -95,7 +95,7 @@ export const about: Copy<{
       conception: "Concevoir",
       conceptionNote: "Maquette d'étude d'un programme Chaabi Lil Iskane",
       delivery: "Livrer",
-      deliveryNote: "Riad Garden I, Marrakech · façade livrée en 2023",
+      deliveryNote: "Riad Garden I, Marrakech · la façade, après livraison",
       stats: {
         founded: "Création de l'AFCA, structure fondatrice",
         years: "ans d'expérience",
@@ -124,7 +124,7 @@ export const about: Copy<{
     next: {
       eyebrow: "Aujourd'hui",
       title: "La suite s'écrit à Marrakech.",
-      body: (year) => `Riad Garden II, deuxième tranche de Riad Garden, à deux cents mètres de la première. En lancement — livraison prévue en ${year}.`,
+      body: "Riad Garden II, deuxième tranche de Riad Garden, à deux cents mètres de la première. En lancement.",
       cta: "Découvrir Riad Garden II",
       renderNote: "Rendu — image non contractuelle",
     },
@@ -178,7 +178,7 @@ export const about: Copy<{
       eyebrow: "الشعبي للإسكان · مجموعة ينا",
       title: `نبني منذ ${ar.founded}.`,
       lead: "أكثر من 75 سنة من الإنعاش العقاري بالمغرب. من السكن الاقتصادي إلى السكن الراقي، ومن مدينة جديدة بالصويرة إلى إقامات مراكش — بالصرامة نفسها، من التصميم إلى التسليم.",
-      caption: `رياض غاردن 1، مراكش · مسبح سُلّم سنة ${y(2023, "ar")}`,
+      caption: "رياض غاردن 1، مراكش · المسبح بعد التسليم",
     },
     who: {
       eyebrow: "من نحن",
@@ -195,7 +195,7 @@ export const about: Copy<{
       conception: "نصمّم",
       conceptionNote: "مجسّم دراسة لأحد مشاريع الشعبي للإسكان",
       delivery: "نسلّم",
-      deliveryNote: `رياض غاردن 1، مراكش · واجهة سُلّمت سنة ${y(2023, "ar")}`,
+      deliveryNote: "رياض غاردن 1، مراكش · الواجهة بعد التسليم",
       stats: {
         founded: "تأسيس الجمعية العقارية والتجارية الإفريقية، النواة الأولى",
         years: "سنة من الخبرة",
@@ -224,7 +224,7 @@ export const about: Copy<{
     next: {
       eyebrow: "اليوم",
       title: "والحكاية تتواصل في مراكش.",
-      body: (year) => `رياض غاردن 2، الشطر الثاني من رياض غاردن، على بعد مائتي متر من الأول. في طور الإطلاق — والتسليم مرتقب سنة ${year}.`,
+      body: "رياض غاردن 2، الشطر الثاني من رياض غاردن، على بعد مائتي متر من الأول. في طور الإطلاق.",
       cta: "اكتشفوا رياض غاردن 2",
       renderNote: "تصور — صورة غير تعاقدية",
     },

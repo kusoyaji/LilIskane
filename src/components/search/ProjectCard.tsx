@@ -37,8 +37,8 @@ export function ProjectCard({
     ...(item.bedroomsMax > 0
       ? [`${formatRange(item.bedroomsMin, item.bedroomsMax, locale)} ${c.bedroomsWord(item.bedroomsMax).toLowerCase()}`]
       : []),
-    item.deliveredYear
-      ? c.delivered(year(item.deliveredYear))
+    item.readyNow
+      ? c.readyNow
       : item.deliveryYear
         ? c.delivery(year(item.deliveryYear))
         : null,

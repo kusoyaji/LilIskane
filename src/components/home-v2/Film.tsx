@@ -44,10 +44,9 @@ const WIDE = "(min-width: 48rem)";
 
 export function Film({ locale }: { locale: Locale }) {
   const project = getProject("riad-garden-ii");
-  if (!project?.cinematic || !project.deliveryYear) return null;
+  if (!project?.cinematic) return null;
 
   const t = filmCopy[locale];
-  const year = isolateRun(String(project.deliveryYear), locale);
   const founded = isolateRun(String(company.founded), locale);
   const place = project.neighbourhood[locale];
 
@@ -90,7 +89,7 @@ export function Film({ locale }: { locale: Locale }) {
             <div className={s.beat} data-beat="2">
               <p className={`u-eyebrow ${s.eyebrow}`}>{t.beat3Eyebrow}</p>
               <h2 className={`u-display ${s.title}`}>{t.beat3Title}</h2>
-              <p className={s.lead}>{t.beat3Lead(year)}</p>
+              <p className={s.lead}>{t.beat3Lead}</p>
               <div className={s.actions}>
                 <LinkButton href={`/${locale}/projets/riad-garden-ii`} variant="light">
                   {t.ctaProject}
@@ -116,7 +115,7 @@ export function Film({ locale }: { locale: Locale }) {
                 </li>
               ))}
             </ol>
-            <p className={s.note}>{t.note(year)}</p>
+            <p className={s.note}>{t.note}</p>
           </div>
         </div>
 

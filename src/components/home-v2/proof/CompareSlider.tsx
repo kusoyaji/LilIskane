@@ -13,7 +13,7 @@ export type ComparePair = {
   render: ResolvedMediaRef;
   photograph: ResolvedMediaRef;
   source: string;
-  sourceYear: string;
+  sourceYear?: string;
 };
 
 type Copy = {
@@ -297,7 +297,7 @@ export function CompareSlider({
             <span className={`u-eyebrow ${s.tagKicker} ${s.tagKickerReal}`}>{copy.realTag}</span>
             <span className={s.tagName}>
               {pair.source}
-              <span className={s.tagMeta}> · {pair.sourceYear}</span>
+              {pair.sourceYear && <span className={s.tagMeta}> · {pair.sourceYear}</span>}
             </span>
             <span className={s.tagNote}>{copy.realNote}</span>
           </div>

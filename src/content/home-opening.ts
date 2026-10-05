@@ -23,12 +23,12 @@ export const filmCopy: Copy<{
   beat2Lead: (place: string) => string;
   beat3Eyebrow: string;
   beat3Title: string;
-  beat3Lead: (year: string) => string;
+  beat3Lead: string;
   ctaProject: string;
   scrollCue: string;
   chapters: [string, string, string];
-  /** Render disclaimer, with the delivery year passed in. */
-  note: (year: string) => string;
+  /** Render disclaimer. No delivery year: the client publishes none. */
+  note: string;
 }> = {
   fr: {
     label: "Entrer dans Riad Garden II",
@@ -44,15 +44,13 @@ export const filmCopy: Copy<{
       `${place}. Des immeubles en R+2 posés autour d'une piscine et de jardins plantés.`,
     beat3Eyebrow: "Appartements de 2 et 3 chambres",
     beat3Title: "Et enfin, chez vous.",
-    beat3Lead: (year) =>
-      `Un séjour ouvert sur la terrasse, la lumière de Marrakech jusqu'au fond de la pièce. Livraison ${year}.`,
+    beat3Lead: "Un séjour ouvert sur la terrasse, la lumière de Marrakech jusqu'au fond de la pièce.",
     ctaProject: "Découvrir Riad Garden II",
     scrollCue: "Faites défiler pour entrer",
     chapters: ["Depuis 1948", "Le lieu", "Chez vous"],
     /** The film is an AI-generated sequence made from the renders, not a render
      *  itself — worded as the legal notice describes it. */
-    note: (year) =>
-      `Séquence d'ambiance réalisée à partir des rendus de Riad Garden II — livraison ${year} — non contractuelle`,
+    note: "Séquence d'ambiance réalisée à partir des rendus de Riad Garden II — non contractuelle",
   },
   ar: {
     label: "الدخول إلى رياض غاردن 2",
@@ -67,11 +65,11 @@ export const filmCopy: Copy<{
     beat2Lead: (place) => `${place}. عمارات من طابق أرضي وطابقين حول مسبح وحدائق مغروسة.`,
     beat3Eyebrow: "شقق بغرفتين وثلاث غرف",
     beat3Title: "وأخيراً، في بيتكم.",
-    beat3Lead: (year) => `صالون مفتوح على الشرفة، وضوء مراكش يملأ المكان. التسليم سنة ${year}.`,
+    beat3Lead: "صالون مفتوح على الشرفة، وضوء مراكش يملأ المكان.",
     ctaProject: "اكتشفوا رياض غاردن 2",
     scrollCue: "مرّروا للدخول",
     chapters: ["منذ 1948", "المكان", "بيتكم"],
-    note: (year) => `مشهد إيحائي مُنجز انطلاقاً من تصوّرات رياض غاردن 2 — التسليم ${year} — غير تعاقدي`,
+    note: "مشهد إيحائي مُنجز انطلاقاً من تصوّرات رياض غاردن 2 — غير تعاقدي",
   },
 };
 
@@ -139,10 +137,10 @@ export const flagshipCopy: Copy<{
     sdb: string;
     commerces: string;
   };
-  phase1Eyebrow: (year: string) => string;
+  phase1Eyebrow: string;
   phase1Title: (metres: string) => string;
   phase1Body: string;
-  photoNote: (year: string) => string;
+  photoNote: string;
   amenitiesLabel: string;
   amenities: Partial<Record<Amenity, string>>;
   ctaProject: string;
@@ -167,11 +165,11 @@ export const flagshipCopy: Copy<{
       sdb: "La salle de bains",
       commerces: "Les commerces",
     },
-    phase1Eyebrow: (year) => `Riad Garden I · livré en ${year}`,
+    phase1Eyebrow: "Riad Garden I · livraison immédiate",
     phase1Title: (m) => `La première tranche est livrée, à ${m} mètres.`,
     phase1Body:
       "Mêmes équipes, mêmes finitions. Des familles y vivent déjà : venez la voir avant de vous engager sur Riad Garden II.",
-    photoNote: (year) => `Photographie — Riad Garden I, livré en ${year}`,
+    photoNote: "Photographie — Riad Garden I, livré",
     amenitiesLabel: "Sur place et à proximité",
     amenities: {
       piscine: "Piscine",
@@ -206,11 +204,11 @@ export const flagshipCopy: Copy<{
       sdb: "الحمام",
       commerces: "المحلات التجارية",
     },
-    phase1Eyebrow: (year) => `رياض غاردن 1 · سُلّم سنة ${year}`,
+    phase1Eyebrow: "رياض غاردن 1 · تسليم فوري",
     phase1Title: (m) => `الشطر الأول مُسلَّم، على بعد ${m} متر.`,
     phase1Body:
       "نفس الفرق، نفس التشطيبات. عائلات تسكنه اليوم: تعالوا لرؤيته قبل الالتزام برياض غاردن 2.",
-    photoNote: (year) => `صورة — رياض غاردن 1، سُلّم سنة ${year}`,
+    photoNote: "صورة — رياض غاردن 1 بعد التسليم",
     amenitiesLabel: "في عين المكان وبالقرب منه",
     amenities: {
       piscine: "مسبح",

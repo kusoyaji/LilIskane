@@ -57,7 +57,7 @@ export const news: Copy<{
   discover: string;
   renderNote: string;
   photoNote: string;
-  previousPhase: (name: string, year: number) => string;
+  previousPhase: (name: string) => string;
   seePrevious: (name: string) => string;
 
   listEyebrow: string;
@@ -99,7 +99,7 @@ export const news: Copy<{
     discover: "Découvrir le programme",
     renderNote: "Rendu — image non contractuelle",
     photoNote: "Photographie",
-    previousPhase: (name, y) => `${name}, la première tranche, a été livrée en ${y}.`,
+    previousPhase: (name) => `${name}, la première tranche, est déjà livrée.`,
     seePrevious: (name) => `Voir ${name}`,
 
     listEyebrow: "Le fil",
@@ -167,7 +167,7 @@ export const news: Copy<{
     discover: "اكتشفوا البرنامج",
     renderNote: "تصور — صورة غير تعاقدية",
     photoNote: "صورة فوتوغرافية",
-    previousPhase: (name, y) => `سُلّم ${name}، الشطر الأول، سنة ${y}.`,
+    previousPhase: (name) => `${name}، الشطر الأول، سُلّم بالفعل.`,
     seePrevious: (name) => `عرض ${name}`,
 
     listEyebrow: "آخر المستجدات",

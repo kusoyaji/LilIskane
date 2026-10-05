@@ -48,7 +48,7 @@ function railOrder(list: Project[]): Project[] {
 
 function yearLine(project: Project, locale: Locale): string | null {
   const t = showcaseCopy[locale];
-  if (project.deliveredYear) return `${t.deliveredIn} ${isolateRun(String(project.deliveredYear), locale)}`;
+  if (project.readyNow) return t.readyNow;
   if (project.deliveryYear) return `${t.deliveryIn} ${isolateRun(String(project.deliveryYear), locale)}`;
   return null;
 }

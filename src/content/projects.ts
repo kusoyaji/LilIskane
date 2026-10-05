@@ -74,7 +74,12 @@ export const projectCopy: Copy<{
   factFloors: string;
   factPlots: string;
   factDelivery: string;
-  factDelivered: string;
+  /** Value for the delivery fact when the client labels the stock "Livraison immédiate". */
+  immediate: string;
+  /** The client's own label for built stock. */
+  readyNow: string;
+  /** Caption for a photograph of a programme the client labels "Livraison immédiate". */
+  photoReady: string;
   bookVisit: string;
   overviewEyebrow: string;
   ficheTitle: string;
@@ -86,7 +91,6 @@ export const projectCopy: Copy<{
   fichePrice: string;
   previousPhase: string;
   nextPhase: string;
-  delivered: (year: string) => string;
   delivery: (year: string) => string;
   galleryEyebrow: string;
   galleryTitleDelivered: string;
@@ -141,7 +145,9 @@ export const projectCopy: Copy<{
     factFloors: "Hauteur",
     factPlots: "Lots",
     factDelivery: "Livraison",
-    factDelivered: "Livré en",
+    immediate: "Immédiate",
+    readyNow: "Livraison immédiate",
+    photoReady: "Photographie · livraison immédiate",
     bookVisit: "Prendre rendez-vous",
     overviewEyebrow: "Le programme",
     ficheTitle: "En bref",
@@ -153,7 +159,6 @@ export const projectCopy: Copy<{
     fichePrice: "Prix d'entrée",
     previousPhase: "La tranche précédente",
     nextPhase: "La tranche suivante",
-    delivered: (year) => `Livré en ${year}`,
     delivery: (year) => `Livraison ${year}`,
     galleryEyebrow: "En images",
     galleryTitleDelivered: "Livré, photographié tel quel.",
@@ -219,7 +224,9 @@ export const projectCopy: Copy<{
     factFloors: "الارتفاع",
     factPlots: "البقع",
     factDelivery: "التسليم",
-    factDelivered: "سُلّم سنة",
+    immediate: "فوري",
+    readyNow: "تسليم فوري",
+    photoReady: "صورة · تسليم فوري",
     bookVisit: "حجز موعد",
     overviewEyebrow: "البرنامج",
     ficheTitle: "باختصار",
@@ -231,7 +238,6 @@ export const projectCopy: Copy<{
     fichePrice: "أدنى ثمن",
     previousPhase: "الشطر السابق",
     nextPhase: "الشطر الموالي",
-    delivered: (year) => `سُلّم سنة ${year}`,
     delivery: (year) => `التسليم ${year}`,
     galleryEyebrow: "بالصور",
     galleryTitleDelivered: "سُلّم، وصُوّر كما هو.",

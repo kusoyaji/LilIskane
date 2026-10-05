@@ -37,16 +37,12 @@ export function ProofCompare({ locale }: { locale: Locale }) {
     render: resolve(pair.render, locale),
     photograph: resolve(pair.photograph, locale),
     source: pair.sourceProject[locale],
-    sourceYear: isolateRun(String(pair.sourceYear), locale),
   }));
 
   const first = project.proof[0]!;
-  const renderYear = project.deliveryYear ? isolateRun(String(project.deliveryYear), locale) : "";
   const lead = fill(t.lead, {
     render: project.name[locale],
-    year: renderYear,
     source: first.sourceProject[locale],
-    sourceYear: isolateRun(String(first.sourceYear), locale),
   });
 
   return (
@@ -77,7 +73,7 @@ export function ProofCompare({ locale }: { locale: Locale }) {
         pairs={pairs}
         initialId="piscine"
         renderName={project.name[locale]}
-        renderYear={renderYear}
+        renderYear={project.deliveryYear ? isolateRun(String(project.deliveryYear), locale) : ""}
         copy={{
           drag: t.drag,
           renderTag: t.renderTag,

@@ -40,8 +40,8 @@ export function SearchHero({
   const note = (project: Project) =>
     project.hero.nature === "render"
       ? c.renderNote
-      : project.deliveredYear
-        ? c.delivered(String(project.deliveredYear))
+      : project.readyNow
+        ? c.photoReady
         : null;
 
   return (

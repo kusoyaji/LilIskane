@@ -45,14 +45,14 @@ export function Featured({ locale, project, previous }: { locale: Locale; projec
             </span>
             {project.hero.nature === "render" && <span className={`${s.note} ${s.featNoteTop}`}>{t.renderNote}</span>}
           </div>
-          {previous && previous.deliveredYear && (
+          {previous && previous.readyNow && (
             <div className={`u-enter ${s.previous}`}>
               <div className={s.prevThumb}>
                 <Figure ref_={previous.hero} locale={locale} sizes="112px" className="h-full w-full object-cover" />
               </div>
               <div>
                 <span className={`u-eyebrow ${s.prevTag}`}>{t.photoNote}</span>
-                <p className={s.prevText}>{t.previousPhase(previous.name[locale], previous.deliveredYear)}</p>
+                <p className={s.prevText}>{t.previousPhase(previous.name[locale])}</p>
                 <Link href={`/${locale}/projets/${previous.slug}`} className={s.prevLink}>
                   <span>{t.seePrevious(previous.name[locale])}</span>
                   <Arrow />

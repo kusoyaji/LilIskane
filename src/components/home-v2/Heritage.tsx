@@ -3,7 +3,6 @@ import { formatNumber, isolateRun, type Locale } from "@/i18n/config";
 import { heritageCopy } from "@/content/home-opening";
 import { Lattice, LinkButton, Stat } from "@/components/v2";
 import { Drift } from "./heritage/Drift";
-import { Handoff } from "./heritage/Handoff";
 import s from "./heritage/Heritage.module.css";
 
 /** The four dates shown on the home strip; the full ten live on /a-propos. */
@@ -43,7 +42,7 @@ export function Heritage({ locale }: { locale: Locale }) {
       <div aria-hidden className={s.navZone} data-nav-media />
       <Lattice />
 
-      <Handoff className={`u-shell ${s.inner}`}>
+      <div className={`u-shell ${s.inner}`}>
         {/* ---- statement ---------------------------------------------------- */}
         <header className={s.head}>
           <div className={s.headMain}>
@@ -127,7 +126,7 @@ export function Heritage({ locale }: { locale: Locale }) {
             ))}
           </ol>
         </div>
-      </Handoff>
+      </div>
     </section>
   );
 }

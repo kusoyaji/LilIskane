@@ -122,8 +122,8 @@ export default async function ProjectPage({
     .map((p) => ({
       slug: p.slug,
       name: p.name[typedLocale],
-      status: p.deliveredYear
-        ? c.delivered(String(p.deliveredYear))
+      status: p.readyNow
+        ? c.readyNow
         : p.deliveryYear
           ? c.delivery(String(p.deliveryYear))
           : STATUS_LABELS[p.status][typedLocale],

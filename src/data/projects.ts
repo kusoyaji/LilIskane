@@ -12,7 +12,7 @@ import type { MediaRef, Project, ProofPair } from "./types";
  */
 
 /* -----------------------------------------------------------------------------
- * Riad Garden II — the flagship. Renders, off-plan, delivery 2027.
+ * Riad Garden II — the flagship. Renders, off-plan, en lancement.
  * -------------------------------------------------------------------------- */
 
 const rg2Gallery: MediaRef[] = [
@@ -92,7 +92,6 @@ const rg2Proof: ProofPair[] = [
     id: "facade",
     shortLabel: { fr: "Façade", ar: "الواجهة" },
     sourceProject: { fr: "Riad Garden I", ar: "رياض غاردن 1" },
-    sourceYear: 2023,
     caption: {
       fr: "La façade et ses claustras, en image de synthèse puis construite.",
       ar: "الواجهة ومشربياتها، في التصميم ثم بعد البناء.",
@@ -111,7 +110,6 @@ const rg2Proof: ProofPair[] = [
     id: "piscine",
     shortLabel: { fr: "Piscine", ar: "المسبح" },
     sourceProject: { fr: "Riad Garden I", ar: "رياض غاردن 1" },
-    sourceYear: 2023,
     caption: {
       fr: "La piscine et les bâtiments qui l'entourent.",
       ar: "المسبح والمباني المحيطة به.",
@@ -130,7 +128,6 @@ const rg2Proof: ProofPair[] = [
     id: "sejour",
     shortLabel: { fr: "Séjour", ar: "الصالون" },
     sourceProject: { fr: "Riad Garden I", ar: "رياض غاردن 1" },
-    sourceYear: 2023,
     caption: { fr: "Le séjour et sa hauteur sous plafond.", ar: "الصالون وارتفاع سقفه." },
     render: rg2Gallery[3],
     photograph: {
@@ -146,7 +143,6 @@ const rg2Proof: ProofPair[] = [
     id: "chambre",
     shortLabel: { fr: "Chambre parentale", ar: "غرفة النوم الرئيسية" },
     sourceProject: { fr: "Riad Garden I", ar: "رياض غاردن 1" },
-    sourceYear: 2023,
     caption: {
       fr: "La chambre parentale et son parquet chevron.",
       ar: "غرفة النوم الرئيسية وأرضيتها بنقشة السنبلة.",
@@ -165,7 +161,6 @@ const rg2Proof: ProofPair[] = [
     id: "chambre-enfants",
     shortLabel: { fr: "Chambre enfants", ar: "غرفة الأطفال" },
     sourceProject: { fr: "Riad Garden I", ar: "رياض غاردن 1" },
-    sourceYear: 2023,
     caption: { fr: "La seconde chambre.", ar: "الغرفة الثانية." },
     render: rg2Gallery[5],
     photograph: {
@@ -181,7 +176,6 @@ const rg2Proof: ProofPair[] = [
     id: "cuisine",
     shortLabel: { fr: "Cuisine", ar: "المطبخ" },
     sourceProject: { fr: "Riad Garden I", ar: "رياض غاردن 1" },
-    sourceYear: 2023,
     caption: { fr: "La cuisine équipée.", ar: "المطبخ المجهّز." },
     render: rg2Gallery[6],
     photograph: {
@@ -197,7 +191,6 @@ const rg2Proof: ProofPair[] = [
     id: "sdb",
     shortLabel: { fr: "Salle de bains", ar: "الحمام" },
     sourceProject: { fr: "Riad Garden I", ar: "رياض غاردن 1" },
-    sourceYear: 2023,
     caption: { fr: "La salle de bains.", ar: "الحمام." },
     render: rg2Gallery[7],
     photograph: {
@@ -242,7 +235,7 @@ export const projects: Project[] = [
     bedroomsMin: 2,
     bedroomsMax: 3,
     floors: "R+2",
-    deliveryYear: 2027,
+    deliveryYear: null,
     deliveredYear: null,
     previousPhaseSlug: "riad-garden-i",
     amenities: [
@@ -258,8 +251,8 @@ export const projects: Project[] = [
       "securite",
     ],
     summary: {
-      fr: "Deuxième tranche de Riad Garden, sur l'avenue Mohammed VI. Appartements de 2 et 3 chambres en R+2, avec parking en sous-sol, piscine et jardins plantés. La première tranche a été livrée en 2023, à deux cents mètres.",
-      ar: "الشطر الثاني من رياض غاردن، على شارع محمد السادس. شقق بغرفتين أو ثلاث غرف في بناية من طابقين، مع مرآب تحت أرضي ومسبح وحدائق مغروسة. سُلّم الشطر الأول سنة 2023 على بعد مائتي متر.",
+      fr: "Deuxième tranche de Riad Garden, sur l'avenue Mohammed VI. Appartements de 2 et 3 chambres en R+2, avec parking en sous-sol, piscine et jardins plantés. La première tranche, à deux cents mètres, est déjà livrée.",
+      ar: "الشطر الثاني من رياض غاردن، على شارع محمد السادس. شقق بغرفتين أو ثلاث غرف في بناية من طابقين، مع مرآب تحت أرضي ومسبح وحدائق مغروسة. أما الشطر الأول، على بعد مائتي متر، فقد سُلّم بالفعل.",
     },
     hero: rg2Gallery[0],
     gallery: rg2Gallery,
@@ -390,7 +383,9 @@ export const projects: Project[] = [
     bedroomsMax: 3,
     floors: "R+2",
     deliveryYear: null,
-    deliveredYear: 2023,
+    deliveredYear: null,
+    // Client's own label: "En promotion · Livraison immédiate".
+    readyNow: true,
     amenities: [
       "piscine",
       "mosquee",
@@ -402,8 +397,8 @@ export const projects: Project[] = [
       "securite",
     ],
     summary: {
-      fr: "Première tranche, livrée en 2023. Quelques appartements restent disponibles, à partir de 2 450 000 DH ; ils se visitent sur place ou en 360°.",
-      ar: "الشطر الأول، سُلّم سنة 2023. لا تزال بعض الشقق متاحة، ابتداءً من 2 450 000 درهم، ويمكن زيارتها في عين المكان أو بتقنية 360 درجة.",
+      fr: "Première tranche, livrée : livraison immédiate. Quelques appartements restent disponibles, à partir de 2 450 000 DH ; ils se visitent sur place ou en 360°.",
+      ar: "الشطر الأول، مُسلَّم والتسليم فوري. لا تزال بعض الشقق متاحة، ابتداءً من 2 450 000 درهم، ويمكن زيارتها في عين المكان أو بتقنية 360 درجة.",
     },
     hero: {
       key: "rg1_DSC00924",
@@ -466,7 +461,7 @@ export const projects: Project[] = [
     bedroomsMin: 2,
     bedroomsMax: 3,
     floors: "R+2",
-    deliveryYear: 2028,
+    deliveryYear: null,
     deliveredYear: null,
     amenities: [
       "piscine",
@@ -506,8 +501,10 @@ export const projects: Project[] = [
     name: { fr: "Océane", ar: "أوسيان" },
     cityId: "sidi-rahal",
     neighbourhood: { fr: "Front de mer", ar: "الواجهة البحرية" },
-    lat: 33.4692,
-    lng: -7.4301,
+    // Sidi Rahal Chatai, on the coast (OpenStreetMap). Was -7.43 — 48 km
+    // inland, which put a beachfront programme in the countryside.
+    lat: 33.4716,
+    lng: -7.957,
     segment: "haut-standing",
     status: "en-lancement",
     kinds: ["appartement", "villa"],
@@ -545,8 +542,8 @@ export const projects: Project[] = [
     name: { fr: "Océane R+1 — lots de terrain", ar: "أوسيان R+1 — بقع أرضية" },
     cityId: "sidi-rahal",
     neighbourhood: { fr: "Sidi Rahal Plage", ar: "شاطئ سيدي رحال" },
-    lat: 33.4671,
-    lng: -7.4348,
+    lat: 33.4716,
+    lng: -7.957,
     segment: "terrain",
     status: "en-lancement",
     kinds: ["lot"],
@@ -595,7 +592,7 @@ export const projects: Project[] = [
     bedroomsMin: 2,
     bedroomsMax: 3,
     floors: "R+5",
-    deliveryYear: 2027,
+    deliveryYear: null,
     deliveredYear: null,
     amenities: [
       "centre-commercial",
@@ -645,7 +642,7 @@ export const projects: Project[] = [
     bedroomsMin: 1,
     bedroomsMax: 1,
     floors: "R+5",
-    deliveryYear: 2027,
+    deliveryYear: null,
     deliveredYear: null,
     amenities: [
       "centre-commercial",
@@ -711,7 +708,9 @@ export const projects: Project[] = [
     bedroomsMax: 3,
     floors: "R+4",
     deliveryYear: null,
-    deliveredYear: 2021,
+    deliveredYear: null,
+    // Client's own label: "En promotion · Livraison immédiate".
+    readyNow: true,
     amenities: ["vue-mer", "piscine", "parking-sous-sol", "ascenseur", "espaces-verts", "securite"],
     summary: {
       fr: "Appartements livrés à Tanger, avec vue sur le détroit depuis les étages hauts et appartement témoin visitable.",
@@ -769,7 +768,9 @@ export const projects: Project[] = [
     bedroomsMax: 3,
     floors: "R+4",
     deliveryYear: null,
-    deliveredYear: 2022,
+    deliveredYear: null,
+    // Client's own label: "En promotion · Livraison immédiate".
+    readyNow: true,
     amenities: ["espaces-verts", "mosquee", "ecoles", "commerces", "aires-de-jeux", "ascenseur"],
     summary: {
       fr: "Appartements familiaux à Alia, livrés et disponibles immédiatement, à proximité des écoles et des commerces du quartier.",
@@ -824,7 +825,7 @@ export const projects: Project[] = [
     bedroomsMin: 2,
     bedroomsMax: 3,
     floors: "R+3",
-    deliveryYear: 2027,
+    deliveryYear: null,
     deliveredYear: null,
     amenities: ["mosquee", "ecoles", "commerces", "espaces-verts", "aires-de-jeux"],
     summary: {
@@ -1000,7 +1001,7 @@ export const projects: Project[] = [
     bedroomsMax: 0,
     floors: null,
     deliveryYear: null,
-    deliveredYear: 2024,
+    deliveredYear: null,
     amenities: ["mosquee", "ecoles", "commerces", "espaces-verts"],
     summary: {
       fr: "Lots viabilisés livrés à Sala Al Jadida, constructibles en R+1, disponibles immédiatement.",

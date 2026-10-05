@@ -69,7 +69,7 @@ export const fr = {
     heroRenderPrefix: "Rendu —",
     heroDelivery: "livraison",
     heroScroll: "Faire défiler",
-    heroPhotoLabel: "Photographie — Riad Garden I, livré 2023",
+    heroPhotoLabel: "Photographie — Riad Garden I, livré",
 
     recordEyebrow: "Notre bilan",
     recordTitle: "Quarante ans de livraisons",
@@ -156,7 +156,7 @@ export const fr = {
     proofEyebrow: "Le rendu et le réel",
     proofTitle: "Voici ce que nous avons livré la dernière fois.",
     proofBody:
-      "À gauche, l'image de synthèse de Riad Garden II. À droite, un espace comparable photographié à Riad Garden I, livré en 2023. Nous vous laissons comparer.",
+      "À gauche, l'image de synthèse de Riad Garden II. À droite, un espace comparable photographié à Riad Garden I, déjà livré. Nous vous laissons comparer.",
     proofRender: "Rendu",
     proofReal: "Livré",
     proofToggle: "Comparer rendu et livré",

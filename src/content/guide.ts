@@ -31,7 +31,7 @@ type GuideCopy = {
     title: string;
     stepsLabel: string;
     items: { title: string; body: string; steps: number[] }[];
-    caption: (year: string) => string;
+    caption: string;
   };
   index: { label: string; step: string; of: string; simulate: string };
   phases: [string, string, string];
@@ -110,7 +110,7 @@ export const guide: Copy<GuideCopy> = {
           steps: [2, 3, 8],
         },
       ],
-      caption: (year) => `Riad Garden I, Marrakech — photographié après sa livraison en ${year}.`,
+      caption: "Riad Garden I, Marrakech — photographié après sa livraison.",
     },
     index: { label: "Les huit étapes", step: "Étape", of: "sur", simulate: "Simuler mon crédit" },
     phases: ["Préparer", "Vérifier", "Signer et emménager"],
@@ -325,7 +325,7 @@ export const guide: Copy<GuideCopy> = {
           steps: [2, 3, 8],
         },
       ],
-      caption: (year) => `رياض غاردن 1، مراكش — صورة بعد تسليمه سنة ${year}.`,
+      caption: "رياض غاردن 1، مراكش — صورة بعد تسليمه.",
     },
     index: { label: "المراحل الثماني", step: "المرحلة", of: "من", simulate: "احسبوا قرضكم" },
     phases: ["التحضير", "التحقق", "التوقيع والسكن"],

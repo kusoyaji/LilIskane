@@ -37,8 +37,8 @@ export function ProjectHero({ locale, project }: { locale: Locale; project: Proj
       ? [{ label: c.factBedrooms, value: formatRange(project.bedroomsMin, project.bedroomsMax, locale) }]
       : []),
     ...(project.floors ? [{ label: c.factFloors, value: isolateRun(project.floors, locale) }] : []),
-    ...(project.deliveredYear
-      ? [{ label: c.factDelivered, value: year(project.deliveredYear) }]
+    ...(project.readyNow
+      ? [{ label: c.factDelivery, value: c.immediate }]
       : project.deliveryYear
         ? [{ label: c.factDelivery, value: year(project.deliveryYear) }]
         : []),

@@ -32,7 +32,7 @@ export const proofCopy: Copy<{
   eyebrow: string;
   titleA: string;
   titleB: string;
-  /** {render} = render project, {year} = its delivery year, {source} = delivered project, {sourceYear}. */
+  /** {render} = render project, {source} = delivered project. No years: the client publishes none. */
   lead: string;
   drag: string;
   renderTag: string;
@@ -51,7 +51,7 @@ export const proofCopy: Copy<{
     eyebrow: "Rendu et photographie",
     titleA: "Le rendu,",
     titleB: "puis le réel.",
-    lead: "À gauche, le rendu de {render}, livraison {year}. À droite, {source}, livré en {sourceYear} à deux cents mètres. Faites glisser pour comparer.",
+    lead: "À gauche, le rendu de {render}, en lancement. À droite, {source}, déjà livré, à deux cents mètres. Faites glisser pour comparer.",
     drag: "Glisser",
     renderTag: "Rendu",
     renderNote: "Image non contractuelle",
@@ -68,7 +68,7 @@ export const proofCopy: Copy<{
     eyebrow: "التصوّر والصورة الفوتوغرافية",
     titleA: "التصوّر،",
     titleB: "ثم الواقع.",
-    lead: "على اليمين، تصوّر {render}، التسليم {year}. وعلى اليسار، {source}، سُلّم سنة {sourceYear} على بعد مائتي متر. اسحبوا للمقارنة.",
+    lead: "على اليمين، تصوّر {render}، في طور الإطلاق. وعلى اليسار، {source} المُسلَّم، على بعد مائتي متر. اسحبوا للمقارنة.",
     drag: "اسحبوا",
     renderTag: "تصوّر",
     renderNote: "صورة غير تعاقدية",
@@ -98,7 +98,8 @@ export const showcaseCopy: Copy<{
   allTitle: string;
   allBody: string;
   scrollHint: string;
-  deliveredIn: string;
+  /** The client's own label for built stock. */
+  readyNow: string;
   deliveryIn: string;
 }> = {
   fr: {
@@ -114,7 +115,7 @@ export const showcaseCopy: Copy<{
     allTitle: "Tous nos programmes",
     allBody: "Filtrez par ville, budget, nombre de chambres et date de livraison.",
     scrollHint: "Faire défiler",
-    deliveredIn: "Livré en",
+    readyNow: "Livraison immédiate",
     deliveryIn: "Livraison",
   },
   ar: {
@@ -130,7 +131,7 @@ export const showcaseCopy: Copy<{
     allTitle: "جميع مشاريعنا",
     allBody: "صفّوا حسب المدينة والميزانية وعدد الغرف وتاريخ التسليم.",
     scrollHint: "مرّروا",
-    deliveredIn: "سُلّم سنة",
+    readyNow: "تسليم فوري",
     deliveryIn: "التسليم",
   },
 };

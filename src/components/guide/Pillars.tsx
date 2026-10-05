@@ -23,8 +23,8 @@ const FACADE: MediaRef = {
 export function Pillars({ locale }: { locale: Locale }) {
   const t = guide[locale];
   const pad = (n: number) => String(n).padStart(2, "0");
-  // Delivery year from the portfolio data rather than retyped.
-  const delivered = getProject("riad-garden-i")?.deliveredYear;
+  // Captioned as delivered only because the portfolio data says so.
+  const delivered = getProject("riad-garden-i")?.readyNow === true;
 
   return (
     <section className={`u-shell ${s.pillars}`} aria-labelledby="piliers-titre">
@@ -33,7 +33,7 @@ export function Pillars({ locale }: { locale: Locale }) {
         locale={locale}
         ratio="4 / 5"
         sizes="(min-width: 64rem) 42vw, 100vw"
-        caption={delivered ? t.pillars.caption(isolateRun(String(delivered), locale)) : undefined}
+        caption={delivered ? t.pillars.caption : undefined}
         className={s.pillarsMedia}
       />
       <div className={s.pillarsText}>

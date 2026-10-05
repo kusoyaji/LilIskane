@@ -31,8 +31,8 @@ export function ProjectOverview({
   const c = projectCopy[locale];
   const city = getCity(project.cityId);
 
-  const statusLine = project.deliveredYear
-    ? c.delivered(year(project.deliveredYear))
+  const statusLine = project.readyNow
+    ? `${STATUS_LABELS[project.status][locale]} · ${c.readyNow}`
     : project.deliveryYear
       ? `${STATUS_LABELS[project.status][locale]} · ${c.delivery(year(project.deliveryYear))}`
       : STATUS_LABELS[project.status][locale];
@@ -83,8 +83,8 @@ export function ProjectOverview({
                 </span>
                 <span className={`u-display-tight ${s.siblingName}`}>{sibling.project.name[locale]}</span>
                 <span className={s.siblingMeta}>
-                  {sibling.project.deliveredYear
-                    ? c.delivered(year(sibling.project.deliveredYear))
+                  {sibling.project.readyNow
+                    ? c.readyNow
                     : sibling.project.deliveryYear
                       ? c.delivery(year(sibling.project.deliveryYear))
                       : STATUS_LABELS[sibling.project.status][locale]}

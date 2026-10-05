@@ -8,7 +8,6 @@ import { flagshipCopy } from "@/content/home-opening";
 import { shared } from "@/content/shared";
 import { LinkButton } from "@/components/v2";
 import { Strip } from "./flagship/Strip";
-import { Handoff } from "./heritage/Handoff";
 import s from "./flagship/Flagship.module.css";
 
 /** Distance between the two phases, as the project data states it. */
@@ -62,7 +61,7 @@ export function Flagship({ locale }: { locale: Locale }) {
   ];
   const rooms: Room[] = roomPlan.flatMap((r) => (r.media ? [{ ...r, media: r.media }] : []));
 
-  const deliveredYear = previous?.deliveredYear ?? null;
+  const ready = previous?.readyNow === true;
   const delivered: MediaRef | undefined = previous?.hero;
 
   const specs = [
@@ -81,7 +80,7 @@ export function Flagship({ locale }: { locale: Locale }) {
 
   return (
     <section className={s.flagship} aria-labelledby="flagship-title">
-      <Handoff className={s.body}>
+      <div className={s.body}>
         {/* ---- masthead ------------------------------------------------------- */}
         <header className={`u-shell ${s.head}`}>
           <div className={`u-enter ${s.kicker}`}>
@@ -191,18 +190,18 @@ export function Flagship({ locale }: { locale: Locale }) {
           {delivered && (
             <figure className={`u-enter ${s.phaseFigure}`} data-reveal="media">
               <Figure ref_={delivered} locale={locale} sizes="(max-width: 768px) 100vw, 50vw" className={s.img} />
-              {deliveredYear && (
+              {ready && (
                 <figcaption className={`${s.note} ${s.notePhoto}`}>
-                  {t.photoNote(isolateRun(String(deliveredYear), locale))}
+                  {t.photoNote}
                 </figcaption>
               )}
             </figure>
           )}
           <div className={s.phaseText}>
-            {deliveredYear && (
+            {ready && (
               <p className={`u-eyebrow u-enter ${s.delivered}`}>
                 <span aria-hidden className={s.deliveredDot} />
-                {t.phase1Eyebrow(isolateRun(String(deliveredYear), locale))}
+                {t.phase1Eyebrow}
               </p>
             )}
             <h3 className={`u-display ${s.phaseTitle}`} data-reveal="mask">
@@ -219,7 +218,7 @@ export function Flagship({ locale }: { locale: Locale }) {
             </div>
           </div>
         </div>
-      </Handoff>
+      </div>
     </section>
   );
 }

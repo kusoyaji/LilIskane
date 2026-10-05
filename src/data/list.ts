@@ -37,6 +37,7 @@ export type ProjectListItem = {
   amenities: Amenity[];
   deliveryYear: number | null;
   deliveredYear: number | null;
+  readyNow: boolean;
   /** Alt already resolved: these are full sentences, and both languages is waste. */
   hero: ResolvedMediaRef;
 };
@@ -64,6 +65,7 @@ export function toListItem(project: Project, locale: Locale): ProjectListItem {
     amenities: project.amenities,
     deliveryYear: project.deliveryYear,
     deliveredYear: project.deliveredYear,
+    readyNow: project.readyNow === true,
     hero: { key: project.hero.key, nature: project.hero.nature, alt: project.hero.alt[locale] },
   };
 }

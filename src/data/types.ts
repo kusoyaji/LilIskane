@@ -106,7 +106,8 @@ export type ProofPair = {
   photograph: MediaRef;
   /** The finished programme the photograph was taken in. */
   sourceProject: Localized;
-  sourceYear: number;
+  /** Year the photograph's programme was delivered — only if sourced (it is not, today). */
+  sourceYear?: number | null;
   /** One or two words, for the picker. */
   shortLabel: Localized;
   /** A full sentence, shown beneath the comparison. */
@@ -172,8 +173,20 @@ export type Project = {
   bedroomsMax: number;
   /** e.g. "R+2". Null for land. */
   floors: string | null;
+  /**
+   * Delivery years — set ONLY from a client source. None of the client's
+   * published pages gives one, so every programme carries null. v1 had
+   * 2021–2028 here with no source; "Riad Garden I, livré en 2023" was
+   * contradicted by the client's own photographs of it (EXIF: pool Dec 2019,
+   * façade June 2022). Components render nothing when these are null.
+   */
   deliveryYear: number | null;
   deliveredYear: number | null;
+  /**
+   * The client's own label "Livraison immédiate": built, and units can be
+   * handed over now. This — not a year — is what marks delivered stock.
+   */
+  readyNow?: boolean;
   amenities: Amenity[];
   summary: Localized;
   hero: MediaRef;

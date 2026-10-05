@@ -46,8 +46,21 @@ const LABEL_SIDE: Record<string, MapDot["side"]> = {
   "sala-al-jadida": "e",
   temara: "w",
   mohammedia: "e",
-  "sidi-rahal": "e",
+  // Sidi Rahal Chatai is on the coast: its label sits above, over the ocean.
+  "sidi-rahal": "n",
   "had-soualem": "s",
+};
+
+/**
+ * Desktop: loupe points nudged apart where true positions collide.
+ *
+ * Sidi Rahal Chatai and Had Soualem are ~10 km apart, which even at 3.4× puts
+ * their programme pins on top of each other. Sidi Rahal keeps its true place on
+ * the coastline; Had Soualem moves a few kilometres further inland — the
+ * direction it actually lies from the coast. Loupe (viewBox) units.
+ */
+const DESK_LOUPE: Record<string, { x: number; y: number }> = {
+  "had-soualem": { x: 192, y: 296 },
 };
 
 /**
@@ -66,7 +79,10 @@ const PHONE_LOUPE: Record<string, { x: number; y: number }> = {
   "sala-al-jadida": { x: 401, y: 133 },
   temara: { x: 339, y: 197 },
   mohammedia: { x: 247, y: 204 },
-  "sidi-rahal": { x: 262, y: 293 },
+  // Coastal (Sidi Rahal Chatai); Had Soualem pushed inland so the two
+  // programme pins are a fingertip apart.
+  "sidi-rahal": { x: 140, y: 252 },
+  "had-soualem": { x: 206, y: 302 },
   rabat: { x: 369, y: 132 },
   nouaceur: { x: 223, y: 286 },
 };
@@ -81,7 +97,7 @@ function place(id: string, lat: number, lng: number) {
   const dx = p.x - SOURCE.x;
   const dy = p.y - SOURCE.y;
   const inLoupe = Math.hypot(dx, dy) <= SOURCE_R * 0.92;
-  const at = inLoupe ? { x: LOUPE.x + dx * ZOOM, y: LOUPE.y + dy * ZOOM } : p;
+  const at = inLoupe ? (DESK_LOUPE[id] ?? { x: LOUPE.x + dx * ZOOM, y: LOUPE.y + dy * ZOOM }) : p;
   const phone = inLoupe ? PHONE_LOUPE[id] : undefined;
   return {
     inLoupe,
