@@ -14,7 +14,17 @@ import s from "./news.module.css";
 /**
  * Editorial order for the grid. Launches and company news are interleaved so
  * the grid reads as a page of news rather than a catalogue with a few notes
- * at the end; land programmes close it as a group of three.
+ * at the end; Océane sits right above its sibling Océane R+1, and the land
+ * programmes close the grid as a group of three.
+ *
+ * Rows on the three-column grid (W = wide card, spans two columns):
+ *   Odyssée W · HQE  /  Amaïa · aide · Dyar Al Bahia 2  /  ISO · Izdihar W
+ *   Océane W · Odyssée Studios  /  Océane R+1 · Al Youssoufia R+2 · R+3
+ * Twelve cards + three wide = 15 slots, so every row is full; with the
+ * "Lancements" filter (company cards hidden) it is 9 + 3 = 12, still full.
+ * On the two-column grid Izdihar drops back to a single card, so the default
+ * view is 2 full-width + 10 singles: again no lone card at the end.
+ * Change ORDER and WIDE together, or the grid ends on a lone card again.
  *
  * Anything "en lancement" that is not named here is appended, so a programme
  * added to `projects.ts` still appears without touching this file.
@@ -24,16 +34,21 @@ const ORDER: string[] = [
   "company:hqe",
   "amaia",
   "company:aide",
-  "izdihar",
-  "company:iso",
   "dyar-al-bahia-2",
+  "company:iso",
+  "izdihar",
+  "oceane",
   "odyssee-studios",
   "oceane-r1",
   "al-youssoufia-r2",
   "al-youssoufia-r3",
 ];
-/** The one card that spans two columns: a 2560px render that earns the width. */
-const WIDE = "odyssee";
+/**
+ * Cards that span two columns — 2560px renders that earn the width. "desk":
+ * wide only on the three-column grid (see the row plan above).
+ */
+const WIDE: Record<string, Wide> = { odyssee: "all", oceane: "all", izdihar: "desk" };
+type Wide = "all" | "desk" | undefined;
 
 /**
  * `th_lots` is a clip-art signpost, not a photograph of the land, so land
@@ -84,7 +99,7 @@ export function NewsList({ locale, launches }: { locale: Locale; launches: Proje
               const company = companyById.get(key);
               if (company) return <CompanyCard key={key} locale={locale} item={company} />;
               const project = bySlug.get(key)!;
-              return <LaunchCard key={key} locale={locale} project={project} wide={key === WIDE} />;
+              return <LaunchCard key={key} locale={locale} project={project} wide={WIDE[key]} />;
             })}
           </NewsFilter>
         </div>
@@ -93,7 +108,7 @@ export function NewsList({ locale, launches }: { locale: Locale; launches: Proje
   );
 }
 
-function LaunchCard({ locale, project, wide }: { locale: Locale; project: Project; wide: boolean }) {
+function LaunchCard({ locale, project, wide }: { locale: Locale; project: Project; wide: Wide }) {
   const t = news[locale];
   const d = getDictionary(locale);
   const city = getCity(project.cityId).name[locale];
@@ -103,7 +118,11 @@ function LaunchCard({ locale, project, wide }: { locale: Locale; project: Projec
   const height = project.name.fr.match(/R\+\d/)?.[0];
 
   return (
-    <article className={[s.card, wide ? s.wide : ""].join(" ")} data-cat="launch" data-reveal="media">
+    <article
+      className={[s.card, wide === "all" ? s.wide : wide === "desk" ? s.wideDesk : ""].join(" ")}
+      data-cat="launch"
+      data-reveal="media"
+    >
       {image ? (
         <div className={s.cardMedia}>
           <div className={s.zoom}>
@@ -111,9 +130,11 @@ function LaunchCard({ locale, project, wide }: { locale: Locale; project: Projec
               ref_={project.hero}
               locale={locale}
               sizes={
-                wide
+                wide === "all"
                   ? "(min-width: 72rem) 60vw, (min-width: 48rem) 92vw, 100vw"
-                  : "(min-width: 72rem) 30vw, (min-width: 48rem) 46vw, 100vw"
+                  : wide === "desk"
+                    ? "(min-width: 72rem) 60vw, (min-width: 48rem) 46vw, 100vw"
+                    : "(min-width: 72rem) 30vw, (min-width: 48rem) 46vw, 100vw"
               }
               className="h-full w-full object-cover"
             />

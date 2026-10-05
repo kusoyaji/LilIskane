@@ -69,7 +69,9 @@ function validate(v: Values, t: FormCopy, today: string): Errors {
   const email = v.email.trim();
   if (!email) e.email = t.errors.email;
   else if (!EMAIL.test(email)) e.email = t.errors.emailFormat;
-  const phone = v.phone.trim().replace(/\s+/g, " ");
+  // "+212 (0)6 12 34 56 78" is how many people write a Moroccan number from
+  // abroad: drop the bracketed trunk zero before testing the patterns.
+  const phone = v.phone.trim().replace(/\s?\(0\)\s?/, " ").replace(/\s+/g, " ");
   if (!phone) e.phone = t.errors.phone;
   else if (!PHONE_MA.test(phone) && !PHONE_INTL.test(phone)) e.phone = t.errors.phoneFormat;
   if (!v.mode) e.mode = t.errors.mode;
@@ -673,8 +675,11 @@ export function AppointmentForm({
           </span>
           <span className={s.consentText}>
             {t.consentBefore}
-            <Link href={privacyHref} className={s.inlineLink}>
+            {/* Inside the consent <label>: following it in place would throw
+                away everything typed so far, so it opens in a new tab. */}
+            <Link href={privacyHref} className={s.inlineLink} target="_blank" rel="noopener">
               {t.consentLink}
+              <span className="u-visually-hidden">{t.newTab}</span>
             </Link>
             {t.consentAfter}
           </span>

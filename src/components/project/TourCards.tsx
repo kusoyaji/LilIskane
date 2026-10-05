@@ -462,6 +462,10 @@ export function TourCards({ locale, tours, body, renderNote }: Props) {
               type="button"
               onClick={close}
               className="u-eyebrow tours__close u-press"
+              // Matterport's own logo sits top-left and does not mirror, so in
+              // Arabic the pill stays on the physical right instead of
+              // following inline-end over it.
+              style={locale === "ar" ? { insetInlineEnd: "auto", right: "var(--gutter)" } : undefined}
             >
               {t.nav.close}
               <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden focusable="false">

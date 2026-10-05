@@ -33,7 +33,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
  * The eight steps are the spine. They run in two chapters around the credit
  * simulator, because financing is step 3 and the simulator is the one thing
  * on this page a buyer can *do*; it gets the full width rather than a column.
- * After the last step (handover) come the guarantees that start at handover,
+ * After the last step (handover) come the legal guarantees (which run from
+ * the réception des travaux, per the client's own text),
  * then the conventions, then the visit.
  *
  * Grounds alternate ink / paper / warm / sand so the long read has rhythm.

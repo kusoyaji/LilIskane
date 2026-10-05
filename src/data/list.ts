@@ -38,6 +38,10 @@ export type ProjectListItem = {
   deliveryYear: number | null;
   deliveredYear: number | null;
   readyNow: boolean;
+  /** Client label "Livraison imminente" — drawn on the card's status line. */
+  readySoon: boolean;
+  /** "Remise N %" beside "En promotion" on the card; null when none. */
+  remisePct: number | null;
   /** Alt already resolved: these are full sentences, and both languages is waste. */
   hero: ResolvedMediaRef;
 };
@@ -66,6 +70,8 @@ export function toListItem(project: Project, locale: Locale): ProjectListItem {
     deliveryYear: project.deliveryYear,
     deliveredYear: project.deliveredYear,
     readyNow: project.readyNow === true,
+    readySoon: project.readySoon === true,
+    remisePct: project.remisePct ?? null,
     hero: { key: project.hero.key, nature: project.hero.nature, alt: project.hero.alt[locale] },
   };
 }

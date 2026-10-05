@@ -47,6 +47,8 @@ export type FormCopy = {
   optional: string;
   consentBefore: string;
   consentLink: string;
+  /** Read after the privacy link by screen readers: it opens in a new tab. */
+  newTab: string;
   consentAfter: string;
   marketing: string;
   submit: string;
@@ -219,6 +221,7 @@ export const contact: Copy<ContactCopy> = {
       optional: "facultatif",
       consentBefore: "J'accepte que mes informations soient utilisées pour traiter ma demande, conformément à la loi n° 09-08. ",
       consentLink: "Données personnelles",
+      newTab: " (nouvel onglet)",
       consentAfter: "",
       marketing: "J'accepte de recevoir des informations sur les programmes de Chaabi Lil Iskane (facultatif).",
       submit: "Demander mon rendez-vous",
@@ -350,6 +353,7 @@ export const contact: Copy<ContactCopy> = {
       optional: "اختياري",
       consentBefore: `أوافق على استعمال معلوماتي لمعالجة طلبي، طبقاً للقانون رقم ${L("09-08")}. `,
       consentLink: "المعطيات الشخصية",
+      newTab: " (نافذة جديدة)",
       consentAfter: "",
       marketing: "أوافق على تلقي معلومات حول مشاريع الشعبي للإسكان (اختياري).",
       submit: "اطلبوا موعدكم",

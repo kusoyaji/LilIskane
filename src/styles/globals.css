@@ -478,6 +478,23 @@
   [data-tone="warm"] + [data-tone] { --ground-from: var(--color-paper-warm); }
   [data-tone="sand"] + [data-tone] { --ground-from: var(--color-sand); }
 
+  /* Light ↔ light joins keep the feather, interpolated in oklab so it stays
+     warm rather than greying through sRGB. (Browsers without gradient
+     interpolation syntax keep the sRGB declaration above.) */
+  [data-tone] {
+    background-image: linear-gradient(to bottom in oklab, var(--ground-from), var(--ground) var(--ground-feather));
+  }
+
+  /* Any join that involves ink is cut, never feathered. Between ink and paper
+     even an oklab ramp passes through a neutral grey ~100px tall that reads as
+     a dirty shadow — on À propos it sat between the "Livrer" photograph and
+     the chronology like a layout bug. The hard cut matches the joins that were
+     already hard (proof gallery → showcase, guarantees → CTA). */
+  [data-tone="ink"] + [data-tone]:not([data-tone="ink"]),
+  [data-tone]:not([data-tone="ink"]) + [data-tone="ink"] {
+    background-image: none;
+  }
+
   /* Kept for reference only — no longer mounted (see Field.tsx). */
   .field {
     position: fixed;

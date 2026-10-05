@@ -6,6 +6,16 @@ import s from "./search.module.css";
 
 /** Right edge of the label column, in viewBox units — open Atlantic at these latitudes. */
 const LABEL_X = 392;
+/**
+ * Pins drawn slightly off their true position so two dots never sit on top of
+ * each other. Had Soualem and Sidi Rahal Chatai are ~8 units apart at this
+ * scale with radii of ~12, so Had Soualem moves a little inland — the same
+ * nudge the home map loupe makes. Labels and filtering are unaffected.
+ */
+const NUDGE: Record<string, { dx: number; dy: number }> = {
+  "had-soualem": { dx: 16, dy: 10 },
+};
+
 /** Minimum vertical distance between two labels. */
 const LABEL_GAP = 58;
 
@@ -42,7 +52,11 @@ export type MapCity = { id: string; name: string; lat: number; lng: number; coun
 export function SearchMap({ locale, cities }: { locale: Locale; cities: MapCity[] }) {
   const c = searchCopy[locale];
   const placed = cities
-    .map((city) => ({ city, ...projectMorocco(city.lat, city.lng) }))
+    .map((city) => {
+      const at = projectMorocco(city.lat, city.lng);
+      const nudge = NUDGE[city.id];
+      return { city, x: at.x + (nudge?.dx ?? 0), y: at.y + (nudge?.dy ?? 0) };
+    })
     .sort((a, b) => a.y - b.y);
   const labelYs = spread(placed.map((p) => p.y + 11));
 

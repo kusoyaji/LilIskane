@@ -190,40 +190,6 @@
   line-height: 1.5;
 }
 
-/* The study model, laid on the delivered façade like a print on a desk. */
-.modelCard {
-  grid-column: 9 / -1;
-  grid-row: 1;
-  justify-self: end;
-  inline-size: 100%;
-  max-inline-size: 26rem;
-  padding: 0.75rem 0.75rem 1.1rem;
-  background: var(--color-paper);
-  color: var(--color-ink);
-  box-shadow: 0 2.5rem 4rem -1.5rem rgb(28 30 20 / 0.55);
-}
-
-.modelFrame {
-  overflow: hidden;
-  background: var(--color-sand);
-}
-
-.modelCaption {
-  display: grid;
-  gap: 0.4rem;
-  padding: 1rem 0.35rem 0;
-}
-
-.modelWord {
-  font-size: clamp(1.75rem, 2.6vw, 2.5rem);
-}
-
-.modelNote {
-  font-size: var(--text-small);
-  line-height: 1.45;
-  color: var(--color-ink-mute);
-}
-
 .bandNext {
   min-block-size: 96svh;
 }
@@ -584,24 +550,9 @@
     row-gap: 2rem;
   }
 
-  .bandText,
-  .modelCard {
+  .bandText {
     grid-column: 1;
     grid-row: auto;
-  }
-
-  .modelCard {
-    justify-self: start;
-    max-inline-size: 15rem;
-    padding: 0.5rem 0.5rem 0.75rem;
-  }
-
-  .modelCaption {
-    padding-block-start: 0.65rem;
-  }
-
-  .modelWord {
-    font-size: 1.5rem;
   }
 
   .band {

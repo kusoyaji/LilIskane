@@ -232,7 +232,7 @@ export function Showcase({ locale }: { locale: Locale }) {
                   <p className={s.price}>
                     <span className={s.priceFrom}>{shared[locale].from}</span>{" "}
                     <span className="u-numeric">{formatPrice(project.price, locale)}</span>
-                    {year && <span className={s.priceYear}> · {year}</span>}
+                    {year && <span className={s.priceYear}> {year}</span>}
                   </p>
                 </div>
                 <span className={s.go} aria-hidden>

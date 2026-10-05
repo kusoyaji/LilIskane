@@ -8,14 +8,15 @@ import s from "./about.module.css";
 /**
  * Qui sommes-nous: the statement, the client's own two paragraphs, the four
  * trades as an index, the four figures that are the company's record — and
- * then the whole job in one image: a study model (conceive) pinned like a
- * print over the façade as it was handed over (deliver), full-bleed.
+ * then the end of the job in one image: the façade as it was handed over
+ * (deliver), full-bleed.
  *
  * The full-bleed band is also the hinge into the dark chronology: the page
  * ground changes colour behind a photograph, never behind a line of text.
  *
- * The model photograph is a 515px source, so its frame is held at or under
- * 30rem and cropped 16:9 to drop the letterbox bars baked into the file.
+ * The study-model inset ("Concevoir") was removed: its only source is a 515px
+ * frame grabbed from a social video, with a burned-in hashtag, logo bug and
+ * letterbox. It comes back when an original photograph of the model exists.
  */
 export function Who({ locale }: { locale: Locale }) {
   const t = about[locale].who;
@@ -113,29 +114,6 @@ export function Who({ locale }: { locale: Locale }) {
         <div aria-hidden className={s.bandScrim} />
 
         <div className={`u-shell ${s.bandInner}`}>
-          <figure className={s.modelCard} data-reveal="media">
-            <div className={s.modelFrame}>
-              <Figure
-                ref_={{
-                  key: "maquette_model",
-                  nature: "photograph",
-                  alt: {
-                    fr: "Maquette d'étude d'un programme Chaabi Lil Iskane : îlots de bâtiments ocre rose autour de jardins et d'allées plantées.",
-                    ar: "مجسّم دراسة لأحد مشاريع الشعبي للإسكان: مجموعات من المباني الوردية حول حدائق وممرات مشجّرة.",
-                  },
-                }}
-                locale={locale}
-                ratio="16 / 9"
-                sizes="(min-width: 64em) 26rem, 88vw"
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <figcaption className={s.modelCaption}>
-              <span className={`u-display ${s.modelWord}`}>{t.conception}</span>
-              <span className={s.modelNote}>{t.conceptionNote}</span>
-            </figcaption>
-          </figure>
-
           <div className={s.bandText}>
             <p className={`u-display ${s.bandWord}`} data-reveal="mask">
               <span className="reveal-inner">{t.delivery}</span>

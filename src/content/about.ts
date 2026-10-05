@@ -41,8 +41,6 @@ export const about: Copy<{
     p2: string;
     trades: Item[];
     tradesLabel: string;
-    conception: string;
-    conceptionNote: string;
     delivery: string;
     deliveryNote: string;
     stats: { founded: string; years: string; cities: string; units: string };
@@ -92,8 +90,6 @@ export const about: Copy<{
         { title: "Haut standing", note: `La marque Chaabi Lil Iskane GOLD, depuis ${fr.gold}` },
         { title: "Immobilier d'entreprise", note: "Bureaux, commerces, équipements, hôtellerie, sites industriels" },
       ],
-      conception: "Concevoir",
-      conceptionNote: "Maquette d'étude d'un programme Chaabi Lil Iskane",
       delivery: "Livrer",
       deliveryNote: "Riad Garden I, Marrakech · la façade, après livraison",
       stats: {
@@ -192,8 +188,6 @@ export const about: Copy<{
         { title: "السكن الراقي", note: `علامة الشعبي للإسكان GOLD منذ ${ar.gold}` },
         { title: "عقار المقاولات", note: "مكاتب، محلات تجارية، تجهيزات، فنادق، مواقع صناعية" },
       ],
-      conception: "نصمّم",
-      conceptionNote: "مجسّم دراسة لأحد مشاريع الشعبي للإسكان",
       delivery: "نسلّم",
       deliveryNote: "رياض غاردن 1، مراكش · الواجهة بعد التسليم",
       stats: {

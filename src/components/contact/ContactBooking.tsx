@@ -48,8 +48,7 @@ export function ContactBooking({
   const [street, city] = company.hq[locale].split(/[,،]\s*/);
 
   return (
-    <section className={s.booking} data-tone="ink" aria-labelledby="contact-title">
-      <span className={s.navMarkTop} data-nav-media aria-hidden />
+    <section className={s.booking} data-tone="ink" data-nav-media aria-labelledby="contact-title">
       <div className={s.backdrop}>
         <Figure ref_={BACKDROP} locale={locale} sizes="100vw" priority className={s.backdropImg} />
       </div>
@@ -58,10 +57,6 @@ export function ContactBooking({
       <div className="u-shell">
         <div className={s.grid}>
           <div className={s.aside}>
-            {/* Mobile only: the statement column is dark, so the header goes
-                light over it. On desktop the paper card sits beside it under
-                the header strip, so only the top band (navMarkTop) counts. */}
-            <span className={s.navMarkAside} data-nav-media aria-hidden />
             <div className={s.asideInner}>
               <nav aria-label={locale === "ar" ? "مسار التصفح" : "Fil d'Ariane"} className={`u-eyebrow u-enter ${s.crumbs}`}>
                 <Link href={`/${locale}`}>{shared[locale].home}</Link>

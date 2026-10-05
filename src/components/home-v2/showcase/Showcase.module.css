@@ -302,7 +302,8 @@
   line-height: 1.35;
 }
 .priceFrom { font-size: var(--text-small); font-weight: 400; opacity: 0.75; }
-.priceYear { font-size: var(--text-small); font-weight: 400; opacity: 0.75; }
+/* Own line, never broken: "Livraison immédiate" used to wrap so "immédiate" sat alone. */
+.priceYear { display: block; white-space: nowrap; font-size: var(--text-small); font-weight: 400; opacity: 0.75; }
 .year { font-size: var(--text-small); opacity: 0.75; }
 
 .go {

@@ -148,13 +148,13 @@ export const fr = {
     tourLoading: "Ouverture de la visite",
     tour2br: "Témoin 2 chambres",
     tour3br: "Témoin 3 chambres",
-    tourDelivered: "Appartement livré — Riad Garden I",
+    tourDelivered: "Appartement témoin — Riad Garden I, livré",
     tourDataWarning:
       "La visite charge environ 15 Mo. En 4G, préférez le Wi-Fi si vous le pouvez.",
     tourExit: "Quitter la visite",
 
     proofEyebrow: "Le rendu et le réel",
-    proofTitle: "Voici ce que nous avons livré la dernière fois.",
+    proofTitle: "Voici ce que nous avons déjà livré, sur la même avenue.",
     proofBody:
       "À gauche, l'image de synthèse de Riad Garden II. À droite, un espace comparable photographié à Riad Garden I, déjà livré. Nous vous laissons comparer.",
     proofRender: "Rendu",
@@ -163,7 +163,7 @@ export const fr = {
     proofShowing: "Affichage :",
 
     typologiesEyebrow: "Les appartements",
-    typologiesTitle: "Quatre plans, deux orientations.",
+    typologiesTitle: "Les plans.",
     typologySurface: "Surface",
     typologyRooms: "Chambres",
     typologyPrice: "À partir de",
@@ -172,7 +172,7 @@ export const fr = {
     typologyLast: "dernières unités",
 
     locationEyebrow: "L'emplacement",
-    locationTitle: "Sur la route d'Amezmiz, à Chrifia.",
+    locationTitle: "Sur l'avenue Mohammed VI, à l'Agdal.",
     locationDrive: "en voiture",
     locationWalk: "à pied",
 

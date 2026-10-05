@@ -127,8 +127,27 @@ export function FilmScrub({ src, srcSmall, poster, posterSmall, phoneQuery, alt,
       const overlay = q("[data-overlay]");
       if (beats.length < 3) return;
 
-      const parts = (el: HTMLElement) => Array.from(el.children);
+      const parts = (el: HTMLElement) => Array.from(el.children) as HTMLElement[];
       let target = 0;
+
+      // Beat one's CSS load-in (`film-rise`) must hand over to the timeline
+      // as soon as the scroll is anywhere but the very top — e.g. when Back
+      // restores a deep scroll position. Two reasons: a running CSS animation
+      // outranks GSAP's inline values, and GSAP snapshots an element's
+      // computed state when its tween first renders and reverts to that
+      // snapshot when the playhead rewinds past the tween. Taken mid load-in,
+      // that snapshot is "opacity ≈ 0", and the headline would never come
+      // back at the top. So the animation is switched off inline *before*
+      // any tween touches beat one; at the top it is left to finish.
+      let loadInReleased = false;
+      const releaseLoadIn = (p: number) => {
+        if (loadInReleased || p <= 0.01) return;
+        loadInReleased = true;
+        parts(beats[0]).forEach((el) => {
+          el.style.animation = "none";
+        });
+      };
+      if (section.getBoundingClientRect().top < -1) releaseLoadIn(1);
 
       const setActive = (p: number) => {
         beats[0].toggleAttribute("data-active", p < 0.2);
@@ -148,6 +167,7 @@ export function FilmScrub({ src, srcSmall, poster, posterSmall, phoneQuery, alt,
           onUpdate: (self) => {
             target = self.progress;
             setActive(self.progress);
+            releaseLoadIn(self.progress);
           },
         },
       });
@@ -156,14 +176,24 @@ export function FilmScrub({ src, srcSmall, poster, posterSmall, phoneQuery, alt,
       // reads directly as a fraction of the scroll.
       tl.to({}, { duration: 1 }, 0);
 
-      tl.to(cue, { opacity: 0, y: 24, duration: 0.05 }, 0.005);
+      // Every exit below is a fromTo with explicit start values and no
+      // immediate render: a plain .to() samples computed style when the
+      // timeline is built, and if that happens mid load-in (Back restores
+      // the scroll deep in the track) it records opacity ≈ 0 as the "start",
+      // so scrolling back to the top would never bring the headline back.
+      tl.fromTo(cue, { opacity: 1, y: 0 }, { opacity: 0, y: 24, duration: 0.05, immediateRender: false }, 0.005);
 
       // The frame settles as the camera starts walking: a slow push from
       // slightly over-scale, so the first scroll already feels like depth.
       tl.fromTo(media, { scale: 1.07 }, { scale: 1, duration: 0.6, ease: "power1.out" }, 0);
 
       // Beat 1 leaves as the camera reaches the façade.
-      tl.to(parts(beats[0]), { opacity: 0, y: -56, stagger: 0.012, duration: 0.08, ease: "power1.in" }, 0.17);
+      tl.fromTo(
+        parts(beats[0]),
+        { opacity: 1, y: 0 },
+        { opacity: 0, y: -56, stagger: 0.012, duration: 0.08, ease: "power1.in", immediateRender: false },
+        0.17,
+      );
 
       // Beat 2 holds through the courtyard.
       tl.fromTo(
@@ -172,7 +202,12 @@ export function FilmScrub({ src, srcSmall, poster, posterSmall, phoneQuery, alt,
         { opacity: 1, y: 0, stagger: 0.014, duration: 0.09, ease: "power2.out" },
         0.3,
       );
-      tl.to(parts(beats[1]), { opacity: 0, y: -56, stagger: 0.012, duration: 0.08, ease: "power1.in" }, 0.56);
+      tl.fromTo(
+        parts(beats[1]),
+        { opacity: 1, y: 0 },
+        { opacity: 0, y: -56, stagger: 0.012, duration: 0.08, ease: "power1.in", immediateRender: false },
+        0.56,
+      );
 
       // Beat 3 lands at the threshold of the salon and stays.
       tl.fromTo(
@@ -191,7 +226,12 @@ export function FilmScrub({ src, srcSmall, poster, posterSmall, phoneQuery, alt,
       // Hand-over: everything typographic lifts away together over the last
       // stretch of the track, so the stage reaches the heritage seam as image
       // alone.
-      tl.to(overlay, { opacity: 0, yPercent: -2, duration: 1 - HANDOFF, ease: "power1.in" }, HANDOFF);
+      tl.fromTo(
+        overlay,
+        { opacity: 1, yPercent: 0 },
+        { opacity: 0, yPercent: -2, duration: 1 - HANDOFF, ease: "power1.in", immediateRender: false },
+        HANDOFF,
+      );
 
       // Playhead, eased toward the scroll target on GSAP's own ticker.
       let current = 0;

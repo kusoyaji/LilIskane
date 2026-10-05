@@ -48,6 +48,29 @@ export function MapPins({ locale, pins }: { locale: Locale; pins: Pin[] }) {
   const radius = (pin: Pin) => 7 + Math.sqrt(pin.total) * 3.5;
 
   /**
+   * A tap on a dot or its ring answers for the pin whose centre is nearest the
+   * tap, not for whichever circle happens to paint on top. In the
+   * Rabat–Casablanca and Casablanca-south clusters the rings overlap, and
+   * paint order alone sent taps on one city to its neighbour.
+   */
+  const pickNearest = (event: React.MouseEvent<SVGCircleElement>, fallback: string) => {
+    event.stopPropagation();
+    const ctm = event.currentTarget.getScreenCTM();
+    if (!ctm) return toggle(fallback);
+    const at = new DOMPoint(event.clientX, event.clientY).matrixTransform(ctm.inverse());
+    let best = fallback;
+    let bestDistance = Infinity;
+    for (const pin of pins) {
+      const distance = Math.hypot(pin.x - at.x, pin.y - at.y);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = pin.id;
+      }
+    }
+    toggle(best);
+  };
+
+  /**
    * Two layers, in this order:
    *
    * 1. Every pin's invisible hit area (label box, ring around the dot).
@@ -70,7 +93,13 @@ export function MapPins({ locale, pins }: { locale: Locale; pins: Pin[] }) {
           return (
             <g key={pin.id} className={s.pin} data-city={pin.id} onClick={() => toggle(pin.id)}>
               <rect x={pin.lx - labelWidth} y={pin.ly - 34} width={labelWidth + 40} height={46} fill="transparent" />
-              <circle cx={pin.x} cy={pin.y} r={r + 6} fill="transparent" />
+              <circle
+                cx={pin.x}
+                cy={pin.y}
+                r={r + 6}
+                fill="transparent"
+                onClick={(event) => pickNearest(event, pin.id)}
+              />
             </g>
           );
         })}
@@ -108,7 +137,13 @@ export function MapPins({ locale, pins }: { locale: Locale; pins: Pin[] }) {
               pointerEvents="none"
             />
             <circle cx={pin.x} cy={pin.y} r={r + 9} className={s.pinHalo} pointerEvents="none" />
-            <circle cx={pin.x} cy={pin.y} r={r} className={s.pinDot} />
+            <circle
+              cx={pin.x}
+              cy={pin.y}
+              r={r}
+              className={s.pinDot}
+              onClick={(event) => pickNearest(event, pin.id)}
+            />
             <text x={pin.lx} y={pin.ly} textAnchor="end" className={s.pinLabel}>
               <tspan>{pin.name}</tspan>
               <tspan dx={12} className={s.pinCount}>

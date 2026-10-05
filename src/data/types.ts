@@ -187,6 +187,16 @@ export type Project = {
    * handed over now. This — not a year — is what marks delivered stock.
    */
   readyNow?: boolean;
+  /**
+   * The client's own label "Livraison imminente" (Al Youssoufia R+2/R+3,
+   * Océane R+1). Rendered in place of the status label where present.
+   */
+  readySoon?: boolean;
+  /**
+   * The discount the client attaches to its "En promotion" label ("Remise 6%"
+   * on Riad Garden I and Assalam TG, "Remise 3%" on Bougainvillier).
+   */
+  remisePct?: number;
   amenities: Amenity[];
   summary: Localized;
   hero: MediaRef;

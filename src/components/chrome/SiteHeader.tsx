@@ -71,10 +71,15 @@ export function SiteHeader({ locale }: { locale: Locale }) {
 
       // Focus trap. Without it, tabbing out of an open full-screen menu lands
       // on links behind the overlay that a sighted user cannot see.
-      const focusables = panelRef.current?.querySelectorAll<HTMLElement>(
+      // The toggle sits in the bar, outside the panel, but it is the only way
+      // to close the menu without Escape — so it belongs in the cycle, first.
+      const inPanel = panelRef.current?.querySelectorAll<HTMLElement>(
         'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
       );
-      if (!focusables?.length) return;
+      const focusables = [toggleRef.current, ...(inPanel ? Array.from(inPanel) : [])].filter(
+        (el): el is HTMLElement => !!el,
+      );
+      if (!focusables.length) return;
       const first = focusables[0];
       const last = focusables[focusables.length - 1];
 
@@ -90,11 +95,16 @@ export function SiteHeader({ locale }: { locale: Locale }) {
     document.addEventListener("keydown", onKeyDown);
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    // Lenis drives the wheel itself, so overflow:hidden alone would still let
+    // the page glide underneath the open menu.
+    const lenis = (window as Window & { __lenis?: { stop(): void; start(): void } }).__lenis;
+    lenis?.stop();
     panelRef.current?.querySelector<HTMLElement>("a[href]")?.focus();
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previousOverflow;
+      lenis?.start();
     };
   }, [menuOpen]);
 
@@ -148,7 +158,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
 
       <nav
         aria-label={t.nav.menu}
-        className={`relative flex h-full items-center justify-between gap-6 ${light ? "on-media" : ""}`}
+        className={`relative flex h-full items-center justify-between gap-3 sm:gap-6 ${light ? "on-media" : ""}`}
         style={{ paddingInline: "var(--gutter)" }}
       >
         {/* A bilingual lockup: the company's name in both of its scripts, the way
@@ -156,7 +166,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             fits beside the call button, so the other script steps out. */}
         <Link
           href={`/${locale}`}
-          className={`flex h-11 shrink-0 items-center gap-3 ${locale === "ar" ? "flex-row-reverse" : ""}`}
+          className={`flex h-11 min-w-0 shrink items-center gap-3 ${locale === "ar" ? "flex-row-reverse" : ""}`}
           aria-label={t.footer.company}
           style={{ lineHeight: 0, color: light ? "var(--color-paper)" : "var(--color-ink)" }}
         >
@@ -175,7 +185,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
           </span>
         </Link>
 
-        <ul className="hidden items-center gap-8 lg:flex" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+        <ul className="hidden items-center gap-8 xl:flex" style={{ listStyle: "none", margin: 0, padding: 0 }}>
           {links.map((link) => {
             const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
             return (
@@ -183,7 +193,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
                 <Link
                   href={link.href}
                   aria-current={active ? "page" : undefined}
-                  className="u-eyebrow relative py-2 u-press"
+                  className="u-eyebrow relative whitespace-nowrap py-2 u-press"
                   style={{ color: light ? "var(--color-paper)" : "var(--color-ink)" }}
                 >
                   {link.label}
@@ -204,8 +214,10 @@ export function SiteHeader({ locale }: { locale: Locale }) {
           })}
         </ul>
 
-        <div className="flex items-center gap-1.5 sm:gap-4">
-          {/* Hidden below `lg`, where it moves into the menu panel.
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-4">
+          {/* Hidden below `xl`, where it moves into the menu panel. (The
+              inline nav needs ~1280px in French: between 1024 and 1279 its
+              labels wrapped onto three lines and spilled out of the bar.)
               At 390px the bar was overflowing by 41px and pushing the menu
               button entirely off-screen — measured 402–431px in a 390px
               viewport, i.e. untappable. The phone number stays visible because
@@ -216,18 +228,21 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             onClick={swapLocale}
             hrefLang={otherLocale}
             lang={otherLocale}
-            className="u-eyebrow hidden items-center px-2 py-3 u-press lg:inline-flex"
+            className="u-eyebrow hidden items-center whitespace-nowrap px-2 py-3 u-press xl:inline-flex"
             style={{ color: light ? "var(--color-paper)" : "var(--color-ink)" }}
           >
             <span className="u-visually-hidden">{t.nav.language}: </span>
             {t.nav.switchTo}
           </Link>
 
-          {/* The phone number is the conversion, so it is a real number the
-              whole time — never an icon that hides it, and never a popup. */}
+          {/* The phone number is the conversion: from 640px it is the real
+              number. Below that the pill says "Nous appeler", and under 420px
+              — most Android phones in Morocco are 360 — it becomes a 44px
+              round call button, because the tracked label pushed the menu
+              button off-screen. The label stays for screen readers. */}
           <a
             href={t.nav.phoneHref}
-            className="u-eyebrow u-numeric flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2.5 u-press"
+            className="u-eyebrow u-numeric flex h-11 w-11 items-center justify-center gap-2 whitespace-nowrap rounded-full px-0 u-press min-[420px]:h-auto min-[420px]:w-auto min-[420px]:px-4 min-[420px]:py-2.5"
             style={{
               background: light ? "color-mix(in oklab, var(--color-paper) 92%, transparent)" : "var(--color-ink)",
               color: light ? "var(--color-ink)" : "var(--color-paper)",
@@ -237,7 +252,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
               <path d="M6.6 10.8a15.1 15.1 0 006.6 6.6l2.2-2.2a1 1 0 011-.24 11.4 11.4 0 003.6.58 1 1 0 011 1V20a1 1 0 01-1 1A17 17 0 013 4a1 1 0 011-1h3.5a1 1 0 011 1 11.4 11.4 0 00.58 3.6 1 1 0 01-.25 1z" />
             </svg>
             <span className="hidden sm:inline">{t.nav.phone}</span>
-            <span className="sm:hidden">{t.nav.callUs}</span>
+            <span className="sr-only min-[420px]:not-sr-only sm:hidden">{t.nav.callUs}</span>
           </a>
 
           <button
@@ -247,7 +262,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             aria-expanded={menuOpen}
             aria-controls={menuId}
             /* 44px is the minimum comfortable touch target; this was 40×29. */
-            className="-me-1 flex h-11 w-11 shrink-0 items-center justify-center lg:hidden"
+            className="flex h-11 w-11 shrink-0 items-center justify-center xl:hidden"
             style={{ color: light ? "var(--color-paper)" : "var(--color-ink)" }}
           >
             <span className="u-visually-hidden">{menuOpen ? t.nav.closeMenu : t.nav.openMenu}</span>
@@ -279,7 +294,8 @@ export function SiteHeader({ locale }: { locale: Locale }) {
         <div
           id={menuId}
           ref={panelRef}
-          className="fixed inset-0 top-[var(--nav-h)] lg:hidden"
+          className="fixed inset-0 top-[var(--nav-h)] xl:hidden"
+          data-lenis-prevent
           style={{ background: "var(--color-paper)" }}
         >
           <ul
@@ -290,6 +306,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
               <li key={link.href} className="u-rule first:border-0">
                 <Link
                   href={link.href}
+                  onClick={() => setMenuOpen(false)}
                   className="u-display-tight block py-5"
                   style={{ fontSize: "var(--text-title)", color: "var(--color-ink)" }}
                 >
@@ -303,7 +320,10 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             <li className="u-rule">
               <Link
                 href={swappedPath}
-                onClick={swapLocale}
+                onClick={(event) => {
+                  setMenuOpen(false);
+                  swapLocale(event);
+                }}
                 hrefLang={otherLocale}
                 lang={otherLocale}
                 className="u-display-tight block py-5"

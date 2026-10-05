@@ -109,7 +109,9 @@ export function ProofGallery({ locale, pairs }: Props) {
           value={position}
           onChange={(event) => setPosition(Number(event.target.value))}
           className="compare__range absolute inset-0 h-full w-full"
-          aria-valuetext={`${position}% ${t.project.proofReal}`}
+          // The photograph is clipped from inline-start by `position`, so the
+          // delivered share actually on screen is the remainder.
+          aria-valuetext={`${100 - position}${locale === "ar" ? "٪" : " %"} ${t.project.proofReal}`}
         />
 
         <span className={`u-eyebrow ${st.chip} ${st.chipRender}`}>{t.project.proofRender}</span>

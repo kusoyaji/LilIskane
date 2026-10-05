@@ -69,6 +69,10 @@ export function SmoothScroll() {
 
     lenis.on("scroll", ScrollTrigger.update);
 
+    // Exposed so overlays (the mobile menu) can freeze the page beneath them:
+    // body overflow:hidden alone does not stop Lenis' own wheel handling.
+    (window as Window & { __lenis?: Lenis }).__lenis = lenis;
+
     const raf = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
@@ -82,6 +86,8 @@ export function SmoothScroll() {
       gsap.ticker.remove(raf);
       lenis.off("scroll", ScrollTrigger.update);
       lenis.destroy();
+      const w = window as Window & { __lenis?: Lenis };
+      if (w.__lenis === lenis) delete w.__lenis;
     };
   }, []);
 

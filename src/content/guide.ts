@@ -270,7 +270,7 @@ export const guide: Copy<GuideCopy> = {
     guarantees: {
       eyebrow: "Garanties",
       title: "Après la remise des clés, vous restez couvert.",
-      lead: "Les garanties applicables courent à partir de la livraison, avec un service après-vente structuré pour le suivi.",
+      lead: "Les garanties légales courent à compter de la réception des travaux ; un service après-vente structuré assure le suivi.",
       unit: (years) => (years > 1 ? "ans" : "an"),
     },
     conventions: {
@@ -481,7 +481,7 @@ export const guide: Copy<GuideCopy> = {
     guarantees: {
       eyebrow: "الضمانات",
       title: "بعد تسلّم المفاتيح، تظلّون محميين.",
-      lead: "تسري الضمانات المعمول بها ابتداءً من التسليم، مع خدمة ما بعد البيع المنظّمة للمتابعة.",
+      lead: "تسري الضمانات القانونية ابتداءً من تسلّم الأشغال، مع خدمة ما بعد البيع منظَّمة للمتابعة.",
       unit: (years) => (years === 1 ? "سنة" : years === 2 ? "سنتان" : "سنوات"),
     },
     conventions: {

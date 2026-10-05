@@ -48,7 +48,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
             <div className="flex items-center gap-5">
               <Image
                 src="/brand/logo.png"
-                alt={`${t.footer.company} — الشعبي للإسكان`}
+                alt={locale === "ar" ? "شعار الشعبي للإسكان" : "Logo Chaabi Lil Iskane — الشعبي للإسكان"}
                 width={150}
                 height={196}
                 className="h-[4.5rem] w-auto rounded-[6px]"
@@ -78,7 +78,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
               {t.nav.phone}
             </a>
             {/* The client's own published profiles (linked from liliskane.com). */}
-            <ul className="mt-6 flex gap-2" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+            <ul className="flex gap-2" style={{ listStyle: "none", margin: 0, marginBlockStart: "1.5rem", padding: 0 }}>
               {SOCIAL.map((n) => (
                 <li key={n.name}>
                   <a
@@ -102,7 +102,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
             <h2 className="u-eyebrow" style={{ color: "var(--color-ochre-bright)" }}>
               {t.nav.projects}
             </h2>
-            <ul className="mt-5 flex flex-col gap-2.5" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+            <ul className="flex flex-col gap-2.5" style={{ listStyle: "none", margin: 0, marginBlockStart: "1rem", padding: 0 }}>
               {activeCities.map((city) => (
                 <li key={city.id}>
                   <Link
@@ -121,7 +121,7 @@ export function SiteFooter({ locale }: { locale: Locale }) {
             <h2 className="u-eyebrow" style={{ color: "var(--color-ochre-bright)" }}>
               {t.footer.company}
             </h2>
-            <ul className="mt-5 flex flex-col gap-2.5" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+            <ul className="flex flex-col gap-2.5" style={{ listStyle: "none", margin: 0, marginBlockStart: "1rem", padding: 0 }}>
               {[
                 { href: `/${locale}/a-propos`, label: t.nav.about },
                 { href: `/${locale}/guide-achat`, label: t.nav.guide },

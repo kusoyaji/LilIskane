@@ -63,21 +63,7 @@
   .aside { align-self: stretch; }
 }
 
-/* Header colour markers. The header turns light only while one of these is
-   under it: the top band before the card rises into the header strip, and —
-   on narrow screens only — the dark statement column. */
-.navMarkTop {
-  position: absolute;
-  inset-inline: 0;
-  inset-block-start: 0;
-  block-size: calc(var(--nav-h) + clamp(2rem, 6vh, 4.5rem));
-  pointer-events: none;
-}
 .aside { position: relative; }
-.navMarkAside { position: absolute; inset: 0; pointer-events: none; }
-@media (min-width: 64rem) {
-  .navMarkAside { display: none; }
-}
 
 .crumbs {
   display: flex;

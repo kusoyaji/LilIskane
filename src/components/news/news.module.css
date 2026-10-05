@@ -369,6 +369,9 @@
   .grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+  .wideDesk {
+    grid-column: span 2;
+  }
 }
 .grid[data-filter="launch"] > [data-cat="company"],
 .grid[data-filter="company"] > [data-cat="launch"] {
@@ -450,6 +453,11 @@
 }
 .wide .cardTitle {
   font-size: clamp(1.75rem, 3vw, 2.6rem);
+}
+@media (min-width: 72rem) {
+  .wideDesk .cardTitle {
+    font-size: clamp(1.75rem, 3vw, 2.6rem);
+  }
 }
 .cardTitle a {
   color: inherit;

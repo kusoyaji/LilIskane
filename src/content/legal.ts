@@ -421,7 +421,7 @@ export const privacy: Copy<LegalDoc> = {
           },
           {
             kind: "p",
-            text: "Les champs signalés comme obligatoires sont nécessaires au traitement de votre demande ; les autres sont facultatifs.",
+            text: "Les champs non signalés « facultatif » sont nécessaires au traitement de votre demande.",
           },
           {
             kind: "note",
@@ -439,7 +439,7 @@ export const privacy: Copy<LegalDoc> = {
           },
           {
             kind: "p",
-            text: "Comme l'indiquent nos formulaires, elles peuvent également être utilisées par Chaabi Lil Iskane pour vous informer de ses programmes. Vous pouvez vous y opposer à tout moment (voir « Vos droits »).",
+            text: "Si vous l'avez accepté en cochant la case prévue à cet effet, elles peuvent également être utilisées par Chaabi Lil Iskane pour vous informer de ses programmes. Vous pouvez retirer cet accord à tout moment (voir « Vos droits »).",
           },
           {
             kind: "p",
@@ -467,7 +467,8 @@ export const privacy: Copy<LegalDoc> = {
             items: [
               "d'un droit d'accès aux informations qui vous concernent ;",
               "d'un droit de rectification, si elles sont inexactes ou incomplètes ;",
-              "d'un droit d'opposition, pour des motifs légitimes, à leur traitement.",
+              "d'un droit d'opposition, pour des motifs légitimes, à leur traitement ;",
+              "du droit de retirer à tout moment, sans frais, l'accord donné pour recevoir des informations sur nos programmes.",
             ],
           },
           {
@@ -567,7 +568,7 @@ export const privacy: Copy<LegalDoc> = {
           },
           {
             kind: "p",
-            text: "الخانات المشار إليها بأنها إلزامية ضرورية لمعالجة طلبكم؛ أما الباقي فاختياري.",
+            text: "الحقول غير المشار إليها بعبارة «اختياري» ضرورية لمعالجة طلبكم.",
           },
           {
             kind: "note",
@@ -585,7 +586,7 @@ export const privacy: Copy<LegalDoc> = {
           },
           {
             kind: "p",
-            text: "وكما تشير إليه استماراتنا، يمكن أن يستعملها الشعبي للإسكان أيضاً لإخباركم ببرامجه. ويحق لكم الاعتراض على ذلك في أي وقت (انظر «حقوقكم»).",
+            text: "إذا وافقتم على ذلك بتأشير الخانة المخصّصة، يمكن أيضاً استعمالها من طرف الشعبي للإسكان لإخباركم ببرامجه. ويمكنكم سحب هذه الموافقة في أي وقت (انظر «حقوقكم»).",
           },
           {
             kind: "p",
@@ -613,7 +614,8 @@ export const privacy: Copy<LegalDoc> = {
             items: [
               "بحق الولوج إلى المعلومات المتعلقة بكم؛",
               "بحق تصحيحها إن كانت غير دقيقة أو غير مكتملة؛",
-              "بحق التعرض، لأسباب مشروعة، على معالجتها.",
+              "بحق التعرض، لأسباب مشروعة، على معالجتها؛",
+              "بحق سحب موافقتكم على تلقي معلومات حول برامجنا، في أي وقت ودون أي مصاريف.",
             ],
           },
           {

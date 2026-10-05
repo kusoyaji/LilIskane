@@ -84,7 +84,7 @@ const rg2Gallery: MediaRef[] = [
 
 /**
  * The seven pairings. Each render is matched to a photograph of the equivalent
- * space in Riad Garden I, the finished phase 200 m away — same architect, same
+ * space in Riad Garden I, the finished phase on the same avenue — same architect, same
  * contractor, same specification. This is the argument the site is built on.
  */
 const rg2Proof: ProofPair[] = [
@@ -248,11 +248,10 @@ export const projects: Project[] = [
       "ascenseur",
       "espaces-verts",
       "vue-montagne",
-      "securite",
     ],
     summary: {
-      fr: "Deuxième tranche de Riad Garden, sur l'avenue Mohammed VI. Appartements de 2 et 3 chambres en R+2, avec parking en sous-sol, piscine et jardins plantés. La première tranche, à deux cents mètres, est déjà livrée.",
-      ar: "الشطر الثاني من رياض غاردن، على شارع محمد السادس. شقق بغرفتين أو ثلاث غرف في بناية من طابقين، مع مرآب تحت أرضي ومسبح وحدائق مغروسة. أما الشطر الأول، على بعد مائتي متر، فقد سُلّم بالفعل.",
+      fr: "Deuxième tranche de Riad Garden, sur l'avenue Mohammed VI. Appartements de 2 et 3 chambres en R+2, avec parking en sous-sol, piscine et jardins plantés. La première tranche, sur la même avenue, est déjà livrée.",
+      ar: "الشطر الثاني من رياض غاردن، على شارع محمد السادس. شقق بغرفتين أو ثلاث غرف في عمارات من طابق أرضي وطابقين، مع مرآب تحت أرضي ومسبح وحدائق مغروسة. أما الشطر الأول، على الشارع نفسه، فقد سُلّم بالفعل.",
     },
     hero: rg2Gallery[0],
     gallery: rg2Gallery,
@@ -281,88 +280,64 @@ export const projects: Project[] = [
         ofDelivered: false,
       },
       {
-        id: "livre-rg1",
+        id: "temoin-rg1",
+        // The client labels this Matterport "Visite Témoin 2 Chambres, Salon":
+        // a furnished show flat in the delivered phase, not an owner's home.
         label: {
-          fr: "Appartement livré — Riad Garden I",
-          ar: "شقة مُسلَّمة — رياض غاردن 1",
+          fr: "Appartement témoin — Riad Garden I, livré",
+          ar: "شقة نموذجية — رياض غاردن 1، مُسلَّم",
         },
         matterportId: "aRgKUGQrgkF",
         poster: {
           key: "rg1_DSC08548",
           nature: "photograph",
           alt: {
-            fr: "Séjour d'un appartement livré de Riad Garden I, meublé et occupé, pouf terracotta et téléviseur mural.",
-            ar: "صالون شقة مُسلَّمة برياض غاردن 1، مؤثثة ومسكونة، مقعد طيني اللون وتلفاز مثبّت على الجدار.",
+            fr: "Séjour de l'appartement témoin de Riad Garden I, meublé, pouf terracotta et téléviseur mural.",
+            ar: "صالون الشقة النموذجية برياض غاردن 1، مؤثثة، مقعد طيني اللون وتلفاز مثبّت على الجدار.",
           },
         },
         ofDelivered: true,
       },
     ],
+    // The client publishes one composition ("Salon - 2 Chambres - Cuisine
+    // équipée - 2 SDB - Balcons et Terrasses"), one surface range (84–116 m²)
+    // and two show flats, "Visite Témoin 2 Chambres" and "3 Chambres". v1's
+    // Types A–D, their per-type surfaces, prices and stock were invented.
+    // The 3-bedroom plan carries no published price: amount 0 never equals the
+    // entry price, so the plan card reads "Prix sur demande".
     typologies: [
       {
-        id: "t2-a",
-        label: { fr: "Type A — 2 chambres", ar: "النوع أ — غرفتان" },
+        id: "2ch",
+        label: { fr: "Salon et 2 chambres", ar: "صالون وغرفتان" },
         kind: "appartement",
         surfaceMin: 84,
-        surfaceMax: 92,
+        surfaceMax: 116,
         bedrooms: 2,
         price: { amount: 1830000, unit: "total" },
         composition: {
-          fr: "Séjour, 2 chambres, cuisine équipée, 2 salles de bains, balcon",
-          ar: "صالون، غرفتان، مطبخ مجهّز، حمامان، شرفة",
+          fr: "Salon, 2 chambres, cuisine équipée, 2 salles de bains, balcons et terrasses",
+          ar: "صالون، غرفتان، مطبخ مجهّز، حمّامان، شرفات وتراسات",
         },
-        unitsAvailable: 14,
+        unitsAvailable: null,
       },
       {
-        id: "t2-b",
-        label: { fr: "Type B — 2 chambres, terrasse", ar: "النوع ب — غرفتان مع شرفة" },
+        id: "3ch",
+        label: { fr: "Salon et 3 chambres", ar: "صالون وثلاث غرف" },
         kind: "appartement",
-        surfaceMin: 92,
-        surfaceMax: 98,
-        bedrooms: 2,
-        price: { amount: 1985000, unit: "total" },
-        composition: {
-          fr: "Séjour, 2 chambres, cuisine équipée, 2 salles de bains, terrasse plantée",
-          ar: "صالون، غرفتان، مطبخ مجهّز، حمامان، شرفة مغروسة",
-        },
-        unitsAvailable: 6,
-      },
-      {
-        id: "t3-c",
-        label: { fr: "Type C — 3 chambres", ar: "النوع ج — ثلاث غرف" },
-        kind: "appartement",
-        surfaceMin: 104,
-        surfaceMax: 110,
-        bedrooms: 3,
-        price: { amount: 2240000, unit: "total" },
-        composition: {
-          fr: "Séjour, 3 chambres, cuisine équipée, 2 salles de bains, 2 balcons",
-          ar: "صالون، ثلاث غرف، مطبخ مجهّز، حمامان، شرفتان",
-        },
-        unitsAvailable: 9,
-      },
-      {
-        id: "t3-d",
-        label: { fr: "Type D — 3 chambres, angle", ar: "النوع د — ثلاث غرف، زاوية" },
-        kind: "appartement",
-        surfaceMin: 110,
+        surfaceMin: 84,
         surfaceMax: 116,
         bedrooms: 3,
-        price: { amount: 2390000, unit: "total" },
+        price: { amount: 0, unit: "total" },
         composition: {
-          fr: "Séjour double orientation, 3 chambres, cuisine équipée, 3 salles de bains, terrasse d'angle",
-          ar: "صالون بواجهتين، ثلاث غرف، مطبخ مجهّز، ثلاثة حمامات، شرفة زاوية",
+          fr: "Appartement témoin visitable en 360°",
+          ar: "شقة نموذجية قابلة للزيارة بتقنية 360°",
         },
-        unitsAvailable: 3,
+        unitsAvailable: null,
       },
     ],
-    nearby: [
-      { label: { fr: "Golf Al Maaden", ar: "غولف المعدن" }, minutes: 10, mode: "drive" },
-      { label: { fr: "Médina de Marrakech", ar: "مدينة مراكش العتيقة" }, minutes: 15, mode: "drive" },
-      { label: { fr: "Aéroport Ménara", ar: "مطار المنارة" }, minutes: 18, mode: "drive" },
-      { label: { fr: "École primaire", ar: "مدرسة ابتدائية" }, minutes: 6, mode: "walk" },
-      { label: { fr: "Mosquée", ar: "مسجد" }, minutes: 3, mode: "walk" },
-    ],
+    // The client gives no walking or driving times; its only proximity claim
+    // is "à côté du plus grand mall d'Afrique", carried by the location copy.
+    nearby: [],
   },
 
   {
@@ -377,8 +352,8 @@ export const projects: Project[] = [
     status: "en-promotion",
     kinds: ["appartement"],
     price: { amount: 2450000, unit: "total" },
-    surfaceMin: 96,
-    surfaceMax: 148,
+    surfaceMin: 101,
+    surfaceMax: 190,
     bedroomsMin: 2,
     bedroomsMax: 3,
     floors: "R+2",
@@ -386,19 +361,20 @@ export const projects: Project[] = [
     deliveredYear: null,
     // Client's own label: "En promotion · Livraison immédiate".
     readyNow: true,
+    // Client: "En promotion · Remise 6%".
+    remisePct: 6,
     amenities: [
       "piscine",
-      "mosquee",
-      "commerces",
-      "parking-sous-sol",
-      "ascenseur",
       "espaces-verts",
+      "commerces",
+      "centre-commercial",
+      "spa",
+      "parking-sous-sol",
       "vue-montagne",
-      "securite",
     ],
     summary: {
-      fr: "Première tranche, livrée : livraison immédiate. Quelques appartements restent disponibles, à partir de 2 450 000 DH ; ils se visitent sur place ou en 360°.",
-      ar: "الشطر الأول، مُسلَّم والتسليم فوري. لا تزال بعض الشقق متاحة، ابتداءً من 2 450 000 درهم، ويمكن زيارتها في عين المكان أو بتقنية 360 درجة.",
+      fr: "Première tranche, livrée. Des appartements sont disponibles en livraison immédiate, à partir de 2 450 000 DH ; ils se visitent sur place ou en 360°.",
+      ar: "الشطر الأول، مُسلَّم. شقق متاحة بتسليم فوري، ابتداءً من 2 450 000 درهم، يمكن زيارتها في عين المكان أو بتقنية 360 درجة.",
     },
     hero: {
       key: "rg1_DSC00924",
@@ -412,29 +388,31 @@ export const projects: Project[] = [
     proof: [],
     tours: [
       {
-        id: "livre",
-        label: { fr: "Appartement livré", ar: "شقة مُسلَّمة" },
+        id: "temoin-2ch",
+        // Client: "Visite Témoin 2 Chambres, Salon".
+        label: { fr: "Appartement témoin — 2 chambres", ar: "شقة نموذجية — غرفتان" },
         matterportId: "aRgKUGQrgkF",
         poster: {
           key: "rg1_DSC08548",
           nature: "photograph",
           alt: {
-            fr: "Séjour d'un appartement livré de Riad Garden I, meublé et occupé.",
-            ar: "صالون شقة مُسلَّمة برياض غاردن 1، مؤثثة ومسكونة.",
+            fr: "Séjour de l'appartement témoin de Riad Garden I, meublé.",
+            ar: "صالون الشقة النموذجية برياض غاردن 1، مؤثثة.",
           },
         },
         ofDelivered: true,
       },
       {
-        id: "livre-2",
-        label: { fr: "Second appartement livré", ar: "شقة مُسلَّمة ثانية" },
+        id: "temoin-3ch",
+        // Client: "Visite Témoin 3 Chambres, Salon".
+        label: { fr: "Appartement témoin — 3 chambres", ar: "شقة نموذجية — ثلاث غرف" },
         matterportId: "LdA3dxyG6dA",
         poster: {
           key: "rg1_DSC08601",
           nature: "photograph",
           alt: {
-            fr: "Chambre et salle d'eau attenante d'un appartement livré de Riad Garden I.",
-            ar: "غرفة نوم وحمام ملحق بها في شقة مُسلَّمة برياض غاردن 1.",
+            fr: "Chambre et salle d'eau attenante de l'appartement témoin de Riad Garden I.",
+            ar: "غرفة نوم وحمام ملحق بها في الشقة النموذجية برياض غاردن 1.",
           },
         },
         ofDelivered: true,
@@ -454,7 +432,7 @@ export const projects: Project[] = [
     lng: -8.0714,
     segment: "haut-standing",
     status: "en-lancement",
-    kinds: ["appartement", "local-commercial"],
+    kinds: ["appartement"],
     price: { amount: 1130000, unit: "total" },
     surfaceMin: 72,
     surfaceMax: 110,
@@ -467,15 +445,16 @@ export const projects: Project[] = [
       "piscine",
       "espaces-verts",
       "mosquee",
-      "ecoles",
       "commerces",
+      "centre-commercial",
       "parking-sous-sol",
+      "ascenseur",
       "aires-de-jeux",
       "vue-montagne",
     ],
     summary: {
       fr: "Sur la route d'Amezmiz, à dix minutes de l'avenue Mohammed VI. Appartements de 2 et 3 chambres en R+2, piscines et jardins paysagers.",
-      ar: "على طريق أمزميز، على بعد عشر دقائق من شارع محمد السادس. شقق بغرفتين أو ثلاث غرف في بناية من طابقين، مسابح وحدائق مهيّأة.",
+      ar: "على طريق أمزميز، على بعد عشر دقائق من شارع محمد السادس. شقق بغرفتين أو ثلاث غرف في عمارات من طابق أرضي وطابقين، مسابح وحدائق مهيّأة.",
     },
     hero: {
       key: "th_amaia",
@@ -491,7 +470,6 @@ export const projects: Project[] = [
     typologies: [],
     nearby: [
       { label: { fr: "Avenue Mohammed VI", ar: "شارع محمد السادس" }, minutes: 10, mode: "drive" },
-      { label: { fr: "Centre de Marrakech", ar: "وسط مراكش" }, minutes: 20, mode: "drive" },
     ],
   },
 
@@ -500,40 +478,51 @@ export const projects: Project[] = [
     slug: "oceane",
     name: { fr: "Océane", ar: "أوسيان" },
     cityId: "sidi-rahal",
-    neighbourhood: { fr: "Front de mer", ar: "الواجهة البحرية" },
+    neighbourhood: { fr: "Route d'Azemmour", ar: "طريق أزمور" },
     // Sidi Rahal Chatai, on the coast (OpenStreetMap). Was -7.43 — 48 km
     // inland, which put a beachfront programme in the countryside.
     lat: 33.4716,
     lng: -7.957,
     segment: "haut-standing",
     status: "en-lancement",
-    kinds: ["appartement", "villa"],
+    // Client fiche: "Type de logement : Villa", pavillons of 158 m² (min = max)
+    // in R+1, salon, séjour, 2 chambres with terraces.
+    kinds: ["villa"],
     price: { amount: 1962000, unit: "total" },
-    surfaceMin: 78,
-    surfaceMax: 165,
+    surfaceMin: 158,
+    surfaceMax: 158,
     bedroomsMin: 2,
-    bedroomsMax: 4,
-    floors: "R+2",
+    bedroomsMax: 2,
+    floors: "R+1",
     deliveryYear: null,
     deliveredYear: null,
-    amenities: ["plage", "vue-mer", "piscine", "espaces-verts", "securite", "commerces"],
+    amenities: [
+      "plage",
+      "vue-mer",
+      "piscine",
+      "espaces-verts",
+      "spa",
+      "centre-commercial",
+      "aires-de-jeux",
+      "terrains-de-sport",
+    ],
     summary: {
-      fr: "Bungalows et appartements en front de mer à Sidi Rahal, avec accès direct à la plage et piscine collective.",
-      ar: "بنغالوهات وشقق على الواجهة البحرية بسيدي رحال، مع ولوج مباشر إلى الشاطئ ومسبح جماعي.",
+      fr: "À 5 minutes du centre de Sidi Rahal, en bordure immédiate de la mer : des pavillons de 158 m² en R+1, avec un salon lumineux ouvert sur la piscine ou le jardin et deux chambres prolongées de terrasses.",
+      ar: "على بعد 5 دقائق من وسط سيدي رحال، على حافة البحر مباشرة: فيلات من 158 م² بطابق أرضي وطابق علوي، بصالون مضيء ينفتح على المسبح أو الحديقة، وغرفتين تمتدّ كل منهما إلى تراس.",
     },
     hero: {
       key: "th_oceane",
       nature: "render",
       alt: {
-        fr: "Bungalows d'Océane à Sidi Rahal, toitures basses et terrasses ouvertes sur la pinède, à quelques pas de la plage.",
-        ar: "بنغالوهات أوسيان بسيدي رحال، أسقف منخفضة وشرفات مفتوحة على غابة الصنوبر، على بعد خطوات من الشاطئ.",
+        fr: "Pavillons d'Océane à Sidi Rahal, toitures basses et terrasses ouvertes, près de la mer.",
+        ar: "فيلات أوسيان بسيدي رحال، أسقف منخفضة وتراسات مفتوحة، قرب البحر.",
       },
     },
     gallery: [],
     proof: [],
     tours: [],
     typologies: [],
-    nearby: [{ label: { fr: "Plage", ar: "الشاطئ" }, minutes: 3, mode: "walk" }],
+    nearby: [{ label: { fr: "Centre de Sidi Rahal", ar: "وسط سيدي رحال" }, minutes: 5, mode: "drive" }],
   },
 
   {
@@ -541,24 +530,26 @@ export const projects: Project[] = [
     slug: "oceane-r1",
     name: { fr: "Océane R+1 — lots de terrain", ar: "أوسيان R+1 — بقع أرضية" },
     cityId: "sidi-rahal",
-    neighbourhood: { fr: "Sidi Rahal Plage", ar: "شاطئ سيدي رحال" },
+    neighbourhood: { fr: "Route d'Azemmour", ar: "طريق أزمور" },
     lat: 33.4716,
     lng: -7.957,
     segment: "terrain",
     status: "en-lancement",
     kinds: ["lot"],
-    price: { amount: 4500, unit: "per-sqm", minimumLotSqm: 120 },
-    surfaceMin: 120,
-    surfaceMax: 320,
+    price: { amount: 4500, unit: "per-sqm", minimumLotSqm: 168 },
+    surfaceMin: 168,
+    surfaceMax: 379,
     bedroomsMin: 0,
     bedroomsMax: 0,
     floors: null,
     deliveryYear: null,
     deliveredYear: null,
-    amenities: ["plage", "vue-mer", "securite"],
+    // Client label: "Livraison imminente".
+    readySoon: true,
+    amenities: ["plage", "piscine", "espaces-verts", "centre-commercial", "aires-de-jeux", "terrains-de-sport"],
     summary: {
-      fr: "Lots viabilisés constructibles en R+1, à proximité immédiate de la plage de Sidi Rahal.",
-      ar: "بقع أرضية مجهّزة قابلة للبناء في طابق واحد فوق الأرضي، على مقربة مباشرة من شاطئ سيدي رحال.",
+      fr: "Lots pour villas isolées ou jumelées, de 168 à 379 m², à bâtir en R+1, à 5 minutes du centre de Sidi Rahal, en bordure de mer. Livraison imminente.",
+      ar: "بقع لفيلات مستقلة أو متلاصقة، من 168 إلى 379 م²، للبناء بطابق أرضي وطابق علوي، على بعد 5 دقائق من وسط سيدي رحال، على حافة البحر. تسليم وشيك.",
     },
     hero: {
       key: "th_lots",
@@ -572,7 +563,7 @@ export const projects: Project[] = [
     proof: [],
     tours: [],
     typologies: [],
-    nearby: [],
+    nearby: [{ label: { fr: "Centre de Sidi Rahal", ar: "وسط سيدي رحال" }, minutes: 5, mode: "drive" }],
   },
 
   {
@@ -585,10 +576,10 @@ export const projects: Project[] = [
     lng: -7.3862,
     segment: "haut-standing",
     status: "en-lancement",
-    kinds: ["appartement", "local-commercial", "plateau-bureau"],
+    kinds: ["appartement", "local-commercial"],
     price: { amount: 1010000, unit: "total" },
-    surfaceMin: 62,
-    surfaceMax: 118,
+    surfaceMin: 73,
+    surfaceMax: 111,
     bedroomsMin: 2,
     bedroomsMax: 3,
     floors: "R+5",
@@ -607,8 +598,8 @@ export const projects: Project[] = [
       "spa",
     ],
     summary: {
-      fr: "Programme mixte sur l'avenue Hassan II : logements, plateaux de bureaux et commerces en rez-de-chaussée, avec centre commercial intégré.",
-      ar: "برنامج مختلط على شارع الحسن الثاني: سكن، طوابق مكاتب، ومحلات تجارية بالطابق الأرضي، مع مركز تجاري مدمج.",
+      fr: "Sur l'avenue Hassan II, une résidence haut standing en R+5 avec ascenseurs, piscine, allées piétonnes et parking en sous-sol : appartements de 2 à 3 chambres, de 73 à 111 m², avec 2 salles de bains et buanderie, commerces en rez-de-chaussée.",
+      ar: "على شارع الحسن الثاني، إقامة راقية من طابق أرضي وخمسة طوابق بمصاعد ومسبح وممرات للراجلين ومرآب تحت أرضي: شقق من غرفتين إلى ثلاث، من 73 إلى 111 م²، بحمّامين وغرفة غسيل، ومحلات تجارية بالطابق الأرضي.",
     },
     hero: {
       key: "th_odyssee",
@@ -695,26 +686,28 @@ export const projects: Project[] = [
     slug: "assalam-tg",
     name: { fr: "Assalam TG", ar: "السلام طنجة" },
     cityId: "tanger",
-    neighbourhood: { fr: "Route de Rabat", ar: "طريق الرباط" },
+    neighbourhood: { fr: "Avenue Moulay Ismaïl", ar: "شارع مولاي إسماعيل" },
     lat: 35.7412,
     lng: -5.8203,
     segment: "moyen-standing",
     status: "en-promotion",
     kinds: ["appartement"],
     price: { amount: 1760000, unit: "total" },
-    surfaceMin: 88,
-    surfaceMax: 142,
+    surfaceMin: 182,
+    surfaceMax: 213,
     bedroomsMin: 2,
     bedroomsMax: 3,
-    floors: "R+4",
+    floors: "R+8",
     deliveryYear: null,
     deliveredYear: null,
     // Client's own label: "En promotion · Livraison immédiate".
     readyNow: true,
-    amenities: ["vue-mer", "piscine", "parking-sous-sol", "ascenseur", "espaces-verts", "securite"],
+    // Client: "En promotion · Remise 6%".
+    remisePct: 6,
+    amenities: ["parking-sous-sol", "spa", "commerces", "centre-commercial"],
     summary: {
-      fr: "Appartements livrés à Tanger, avec vue sur le détroit depuis les étages hauts et appartement témoin visitable.",
-      ar: "شقق مُسلَّمة بطنجة، بإطلالة على المضيق من الطوابق العليا وشقة نموذجية قابلة للزيارة.",
+      fr: "Au cœur de Tanger, avenue Moulay Ismaïl, près de la place Jamia Al Arabia : appartements et duplex de 182 à 213 m² dans un complexe mixte avec centres d'affaires et centre commercial, parking sur deux niveaux en sous-sol. Livraison immédiate.",
+      ar: "في قلب طنجة، بشارع مولاي إسماعيل قرب ساحة الجامعة العربية: شقق ودوبلكس من 182 إلى 213 م² ضمن مركّب مختلط يضم مركزَي أعمال ومركزاً تجارياً، مع مرآب من مستويين تحت الأرض. تسليم فوري.",
     },
     hero: {
       key: "th_assalam_tg",
@@ -729,7 +722,8 @@ export const projects: Project[] = [
     tours: [
       {
         id: "temoin",
-        label: { fr: "Appartement témoin", ar: "شقة نموذجية" },
+        // Client: "Visite Immersive Témoin 150m²".
+        label: { fr: "Appartement témoin — 150 m²", ar: "شقة نموذجية — 150 م²" },
         matterportId: "9oWTZCGuoXG",
         poster: {
           key: "th_assalam_tg",
@@ -755,26 +749,39 @@ export const projects: Project[] = [
     slug: "bougainvillier",
     name: { fr: "Bougainvillier", ar: "بوغانفيلي" },
     cityId: "mohammedia",
-    neighbourhood: { fr: "Alia", ar: "العالية" },
+    neighbourhood: { fr: "Entrée sud, route côtière", ar: "المدخل الجنوبي، الطريق الساحلية" },
     lat: 33.6944,
     lng: -7.3627,
     segment: "moyen-standing",
     status: "en-promotion",
     kinds: ["appartement"],
     price: { amount: 700000, unit: "total" },
-    surfaceMin: 58,
-    surfaceMax: 96,
+    surfaceMin: 70,
+    surfaceMax: 155,
     bedroomsMin: 2,
     bedroomsMax: 3,
-    floors: "R+4",
+    floors: "R+5",
     deliveryYear: null,
     deliveredYear: null,
     // Client's own label: "En promotion · Livraison immédiate".
     readyNow: true,
-    amenities: ["espaces-verts", "mosquee", "ecoles", "commerces", "aires-de-jeux", "ascenseur"],
+    // Client: "En promotion · Remise 3%".
+    remisePct: 3,
+    amenities: [
+      "piscine",
+      "parking-sous-sol",
+      "spa",
+      "espaces-verts",
+      "mosquee",
+      "ecoles",
+      "centre-commercial",
+      "terrains-de-sport",
+      "commerces",
+      "ascenseur",
+    ],
     summary: {
-      fr: "Appartements familiaux à Alia, livrés et disponibles immédiatement, à proximité des écoles et des commerces du quartier.",
-      ar: "شقق عائلية بالعالية، مُسلَّمة ومتاحة فوراً، بالقرب من مدارس الحي ومحلاته التجارية.",
+      fr: "À l'entrée sud de Mohammedia, à quelques minutes des plages et de la gare, à 15 minutes de Casablanca : appartements de 2 à 3 chambres avec balcons, autour d'une grande piscine. Livraison immédiate.",
+      ar: "عند المدخل الجنوبي للمحمدية، على بعد دقائق من الشواطئ والمحطة و15 دقيقة من الدار البيضاء: شقق من غرفتين إلى ثلاث بشرفات، حول مسبح كبير. تسليم فوري.",
     },
     hero: {
       key: "th_bougainvillier",
@@ -789,7 +796,8 @@ export const projects: Project[] = [
     tours: [
       {
         id: "temoin",
-        label: { fr: "Appartement témoin", ar: "شقة نموذجية" },
+        // Client: "Visite Immersive Témoin 80m²".
+        label: { fr: "Appartement témoin — 80 m²", ar: "شقة نموذجية — 80 م²" },
         matterportId: "B5HfsowjF9b",
         poster: {
           key: "th_bougainvillier",
@@ -805,7 +813,7 @@ export const projects: Project[] = [
       },
     ],
     typologies: [],
-    nearby: [],
+    nearby: [{ label: { fr: "Casablanca", ar: "الدار البيضاء" }, minutes: 15, mode: "drive" }],
   },
 
   {
@@ -813,24 +821,24 @@ export const projects: Project[] = [
     slug: "izdihar",
     name: { fr: "Izdihar", ar: "الازدهار" },
     cityId: "essaouira",
-    neighbourhood: { fr: "Quartier Al Massira", ar: "حي المسيرة" },
+    neighbourhood: { fr: "Al Ghazoua, route d'Agadir", ar: "الغزوة، طريق أكادير" },
     lat: 31.5152,
     lng: -9.7492,
     segment: "moyen-standing",
     status: "en-lancement",
     kinds: ["appartement"],
     price: { amount: 485000, unit: "total" },
-    surfaceMin: 52,
-    surfaceMax: 78,
+    surfaceMin: 54,
+    surfaceMax: 92,
     bedroomsMin: 2,
-    bedroomsMax: 3,
-    floors: "R+3",
+    bedroomsMax: 2,
+    floors: "R+2",
     deliveryYear: null,
     deliveredYear: null,
-    amenities: ["mosquee", "ecoles", "commerces", "espaces-verts", "aires-de-jeux"],
+    amenities: ["mosquee", "ecoles", "commerces", "espaces-verts"],
     summary: {
-      fr: "Le programme le plus accessible du portefeuille, à Essaouira. Appartements de 2 et 3 chambres, à quinze minutes de la médina et du port.",
-      ar: "أكثر برامج المحفظة في المتناول، بالصويرة. شقق بغرفتين أو ثلاث غرف، على بعد خمس عشرة دقيقة من المدينة العتيقة والميناء.",
+      fr: "À Al Ghazoua, à 10 minutes du centre d'Essaouira, entre océan et nature : appartements de 2 chambres, de 54 à 92 m², en R+2. Projet éligible au programme d'aide directe au logement.",
+      ar: "بالغزوة، على بعد 10 دقائق من وسط الصويرة، بين المحيط والطبيعة: شقق بغرفتين من 54 إلى 92 م²، في عمارات من طابق أرضي وطابقين. مشروع مؤهَّل لبرنامج الدعم المباشر للسكن.",
     },
     hero: {
       key: "th_izdihar",
@@ -845,7 +853,7 @@ export const projects: Project[] = [
     tours: [],
     typologies: [],
     nearby: [
-      { label: { fr: "Médina d'Essaouira", ar: "مدينة الصويرة العتيقة" }, minutes: 15, mode: "drive" },
+      { label: { fr: "Centre d'Essaouira", ar: "وسط الصويرة" }, minutes: 10, mode: "drive" },
     ],
   },
 
@@ -854,31 +862,33 @@ export const projects: Project[] = [
     slug: "dyar-al-bahia-2",
     name: { fr: "Dyar Al Bahia 2", ar: "ديار البهية 2" },
     cityId: "temara",
-    neighbourhood: { fr: "Harhoura", ar: "الهرهورة" },
-    lat: 33.9169,
-    lng: -6.9312,
+    neighbourhood: { fr: "Al Massira II, avenue Lalla Meriem", ar: "المسيرة 2، شارع للا مريم" },
+    // Client: "au cœur de la ville de Temara" — the Témara centroid, not
+    // Harhoura on the coast.
+    lat: 33.9287,
+    lng: -6.9067,
     segment: "moyen-standing",
     status: "en-lancement",
     kinds: ["appartement"],
     price: { amount: 830000, unit: "total" },
-    surfaceMin: 64,
-    surfaceMax: 104,
+    surfaceMin: 70,
+    surfaceMax: 94,
     bedroomsMin: 2,
     bedroomsMax: 3,
     floors: "R+4",
     deliveryYear: null,
     deliveredYear: null,
-    amenities: ["vue-mer", "plage", "mosquee", "ecoles", "commerces", "ascenseur", "espaces-verts"],
+    amenities: ["parking-sous-sol", "commerces", "mosquee", "centre-commercial", "ascenseur", "espaces-verts"],
     summary: {
-      fr: "Deuxième tranche à Harhoura, entre Rabat et Témara, à quelques minutes de la côte.",
-      ar: "الشطر الثاني بالهرهورة، بين الرباط وتمارة، على بعد دقائق من الساحل.",
+      fr: "Au cœur de Témara, à 5 minutes de Rabat : appartements de 2 à 3 chambres, de 70 à 94 m², avec balcon et terrasse, ouverts sur des patios plantés. Immeubles en R+4 avec ascenseur et parking en sous-sol.",
+      ar: "في قلب تمارة، على بعد 5 دقائق من الرباط: شقق من غرفتين إلى ثلاث، من 70 إلى 94 م²، بشرفة وتراس، تطلّ على فناءات خضراء. عمارات من طابق أرضي وأربعة طوابق بمصعد ومرآب تحت أرضي.",
     },
     hero: {
       key: "th_dyar_al_bahia",
       nature: "render",
       alt: {
-        fr: "Immeubles de Dyar Al Bahia 2 à Harhoura, façades blanches et balcons orientés vers l'océan.",
-        ar: "عمارات ديار البهية 2 بالهرهورة، واجهات بيضاء وشرفات موجّهة نحو المحيط.",
+        fr: "Immeubles de Dyar Al Bahia 2 à Témara, façades blanches et balcons.",
+        ar: "عمارات ديار البهية 2 بتمارة، واجهات بيضاء وشرفات.",
       },
     },
     gallery: [],
@@ -886,14 +896,15 @@ export const projects: Project[] = [
     tours: [
       {
         id: "temoin",
-        label: { fr: "Appartement témoin", ar: "شقة نموذجية" },
+        // Client: "Visite Immersive Témoin 77m²".
+        label: { fr: "Appartement témoin — 77 m²", ar: "شقة نموذجية — 77 م²" },
         matterportId: "hiNnb5TZFkM",
         poster: {
           key: "th_dyar_al_bahia",
           nature: "render",
           alt: {
-            fr: "Immeubles de Dyar Al Bahia 2 à Harhoura, façades blanches et balcons orientés vers l'océan.",
-            ar: "عمارات ديار البهية 2 بالهرهورة، واجهات بيضاء وشرفات موجّهة نحو المحيط.",
+            fr: "Immeubles de Dyar Al Bahia 2 à Témara, façades blanches et balcons.",
+            ar: "عمارات ديار البهية 2 بتمارة، واجهات بيضاء وشرفات.",
           },
         },
         // Still en lancement: nothing in this programme is delivered, so the
@@ -902,7 +913,7 @@ export const projects: Project[] = [
       },
     ],
     typologies: [],
-    nearby: [],
+    nearby: [{ label: { fr: "Rabat", ar: "الرباط" }, minutes: 5, mode: "drive" }],
   },
 
   {
@@ -910,24 +921,26 @@ export const projects: Project[] = [
     slug: "al-youssoufia-r2",
     name: { fr: "Al Youssoufia R+2", ar: "اليوسفية R+2" },
     cityId: "had-soualem",
-    neighbourhood: { fr: "Al Youssoufia", ar: "اليوسفية" },
+    neighbourhood: { fr: "Boulevard Mohammed VI", ar: "شارع محمد السادس" },
     lat: 33.4201,
     lng: -7.8446,
     segment: "terrain",
     status: "en-lancement",
     kinds: ["lot"],
-    price: { amount: 3450, unit: "per-sqm", minimumLotSqm: 90 },
-    surfaceMin: 90,
-    surfaceMax: 240,
+    price: { amount: 3450, unit: "per-sqm", minimumLotSqm: 120 },
+    surfaceMin: 120,
+    surfaceMax: 140,
     bedroomsMin: 0,
     bedroomsMax: 0,
     floors: null,
     deliveryYear: null,
     deliveredYear: null,
-    amenities: ["mosquee", "ecoles", "commerces", "securite"],
+    // Client label: "Livraison imminente".
+    readySoon: true,
+    amenities: ["mosquee", "commerces", "centre-commercial", "aires-de-jeux"],
     summary: {
-      fr: "Lots de terrain viabilisés constructibles en R+2 à Had Soualem, sur l'axe Casablanca — El Jadida.",
-      ar: "بقع أرضية مجهّزة قابلة للبناء في طابقين فوق الأرضي بحد السوالم، على محور الدار البيضاء — الجديدة.",
+      fr: "Lots de terrain viabilisés de 120 à 140 m², d'une ou deux façades, pour maisons individuelles en sous-sol + RDC + 2 étages, sur le boulevard Mohammed VI à Had Soualem. Livraison imminente.",
+      ar: "بقع أرضية مجهّزة من 120 إلى 140 م²، بواجهة أو واجهتين، لبناء منازل فردية (طابق تحت أرضي وطابق أرضي وطابقان)، على شارع محمد السادس بحد السوالم. تسليم وشيك.",
     },
     hero: {
       key: "th_lots",
@@ -949,31 +962,33 @@ export const projects: Project[] = [
     slug: "al-youssoufia-r3",
     name: { fr: "Al Youssoufia R+3", ar: "اليوسفية R+3" },
     cityId: "had-soualem",
-    neighbourhood: { fr: "Al Youssoufia", ar: "اليوسفية" },
+    neighbourhood: { fr: "Boulevard Mohammed VI", ar: "شارع محمد السادس" },
     lat: 33.4188,
     lng: -7.8479,
     segment: "terrain",
     status: "en-lancement",
     kinds: ["lot", "local-commercial"],
-    price: { amount: 4950, unit: "per-sqm", minimumLotSqm: 110 },
-    surfaceMin: 110,
-    surfaceMax: 300,
+    price: { amount: 4950, unit: "per-sqm", minimumLotSqm: 147 },
+    surfaceMin: 147,
+    surfaceMax: 173,
     bedroomsMin: 0,
     bedroomsMax: 0,
     floors: null,
     deliveryYear: null,
     deliveredYear: null,
-    amenities: ["mosquee", "ecoles", "commerces", "securite"],
+    // Client label: "Livraison imminente".
+    readySoon: true,
+    amenities: ["mosquee", "commerces", "centre-commercial", "aires-de-jeux"],
     summary: {
-      fr: "Lots constructibles en R+3 avec commerce autorisé en rez-de-chaussée, sur les axes principaux du lotissement.",
-      ar: "بقع قابلة للبناء في ثلاثة طوابق مع ترخيص للتجارة بالطابق الأرضي، على المحاور الرئيسية للتجزئة.",
+      fr: "Lots de terrain viabilisés de 147 à 173 m², pour immeubles en sous-sol + RDC commercial ou résidentiel + 3 étages, sur le boulevard Mohammed VI à Had Soualem. Livraison imminente.",
+      ar: "بقع أرضية مجهّزة من 147 إلى 173 م²، لبناء عمارات (طابق تحت أرضي وطابق أرضي تجاري أو سكني وثلاثة طوابق)، على شارع محمد السادس بحد السوالم. تسليم وشيك.",
     },
     hero: {
       key: "th_lots",
       nature: "photograph",
       alt: {
-        fr: "Lots d'angle du lotissement Al Youssoufia, en bordure d'axe principal.",
-        ar: "بقع زاويّة بتجزئة اليوسفية، على حافة محور رئيسي.",
+        fr: "Lots du lotissement Al Youssoufia à Had Soualem, voirie tracée et lots bornés.",
+        ar: "بقع تجزئة اليوسفية بحد السوالم، طرق مهيأة وبقع محدّدة.",
       },
     },
     gallery: [],
@@ -988,24 +1003,28 @@ export const projects: Project[] = [
     slug: "al-maamora-r1",
     name: { fr: "Al Maamora R+1", ar: "المعمورة R+1" },
     cityId: "sala-al-jadida",
-    neighbourhood: { fr: "Al Maamora", ar: "المعمورة" },
+    neighbourhood: { fr: "Avenue Lalla Meryem, zone villas", ar: "شارع للا مريم، منطقة الفيلات" },
     lat: 34.0043,
     lng: -6.7412,
     segment: "terrain",
-    status: "en-promotion",
+    // Client: "Livraison immédiate", no promotion. Lots of 330 to 550 m² per
+    // the client's description (its spec line says 474–618 m²: to confirm
+    // with the client; the description's range is used until then).
+    status: "livre",
+    readyNow: true,
     kinds: ["lot"],
-    price: { amount: 4600, unit: "per-sqm", minimumLotSqm: 100 },
-    surfaceMin: 100,
-    surfaceMax: 260,
+    price: { amount: 4600, unit: "per-sqm", minimumLotSqm: 330 },
+    surfaceMin: 330,
+    surfaceMax: 550,
     bedroomsMin: 0,
     bedroomsMax: 0,
     floors: null,
     deliveryYear: null,
     deliveredYear: null,
-    amenities: ["mosquee", "ecoles", "commerces", "espaces-verts"],
+    amenities: ["mosquee", "ecoles", "commerces", "espaces-verts", "piscine", "centre-commercial"],
     summary: {
-      fr: "Lots viabilisés livrés à Sala Al Jadida, constructibles en R+1, disponibles immédiatement.",
-      ar: "بقع مجهّزة مُسلَّمة بسلا الجديدة، قابلة للبناء في طابق فوق الأرضي، متاحة فوراً.",
+      fr: "Lots de villas viabilisés et équipés, de 330 à 550 m², en bande ou isolés, à bâtir en R+1 avec sous-sol, face à la mosquée Mohammed VI. Livraison immédiate.",
+      ar: "بقع فيلات مجهّزة من 330 إلى 550 م²، متلاصقة أو مستقلة، للبناء بطابق أرضي وطابق علوي مع طابق تحت أرضي، قبالة مسجد محمد السادس. تسليم فوري.",
     },
     hero: {
       key: "th_maamora",

@@ -54,7 +54,10 @@ const PRELOAD_MARGIN = "0px 0px -12% 0px";
  * - `static` — reduced motion, and the server render. Poster frame with every
  *              caption listed at once. No video is fetched at all.
  */
-export function CinematicSequence({ cinematic, eyebrow, title, captions, altText, note }: Props) {
+export function CinematicSequence({ locale, cinematic, eyebrow, title, captions, altText, note }: Props) {
+  // The heading block sits at inline-start, so the side shade follows it: on
+  // the left in French, on the right in Arabic, where beats 1–2 are open sky.
+  const textSide = locale === "ar" ? "left" : "right";
   const sectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [mode, setMode] = useState<Mode>("static");
@@ -217,7 +220,9 @@ export function CinematicSequence({ cinematic, eyebrow, title, captions, altText
             className="cine-scrim"
             style={{
               background:
-                "linear-gradient(to top, color-mix(in oklab, var(--color-ink) 80%, transparent) 0%, color-mix(in oklab, var(--color-ink) 20%, transparent) 34%, transparent 60%), linear-gradient(to bottom, color-mix(in oklab, var(--color-ink) 60%, transparent) 0%, transparent 28%)",
+                "linear-gradient(to top, color-mix(in oklab, var(--color-ink) 80%, transparent) 0%, color-mix(in oklab, var(--color-ink) 20%, transparent) 34%, transparent 60%), " +
+                "linear-gradient(to bottom, color-mix(in oklab, var(--color-ink) 72%, transparent) 0%, color-mix(in oklab, var(--color-ink) 40%, transparent) 30%, transparent 52%), " +
+                `linear-gradient(to ${textSide}, color-mix(in oklab, var(--color-ink) 55%, transparent) 0%, transparent 55%)`,
             }}
           />
         </div>
@@ -226,20 +231,30 @@ export function CinematicSequence({ cinematic, eyebrow, title, captions, altText
           className="on-media cine-head"
           style={{ padding: "calc(var(--nav-h) + 1.75rem) var(--gutter) 0" }}
         >
-          <p className="u-eyebrow" style={{ color: "var(--color-ochre-bright)" }}>
+          <p className="u-eyebrow" style={{ color: "var(--color-ochre-bright)", textShadow: "0 1px 2px rgb(0 0 0 / 0.45)" }}>
             {eyebrow}
           </p>
           <h2
             id="cine-title"
             className="u-display mt-4"
-            style={{ fontSize: "var(--text-display)", color: "var(--color-paper)", maxInlineSize: "14ch" }}
+            style={{
+              fontSize: "var(--text-display)",
+              color: "var(--color-paper)",
+              maxInlineSize: "14ch",
+              textShadow: "0 1px 18px rgb(0 0 0 / 0.28)",
+            }}
           >
             {title}
           </h2>
           {note && (
             <p
               className="mt-4"
-              style={{ fontSize: "var(--text-label)", color: "color-mix(in oklab, var(--color-paper) 70%, transparent)" }}
+              style={{
+                fontSize: "var(--text-label)",
+                fontWeight: 500,
+                color: "color-mix(in oklab, var(--color-paper) 84%, transparent)",
+                textShadow: "0 1px 2px rgb(0 0 0 / 0.45)",
+              }}
             >
               {note}
             </p>

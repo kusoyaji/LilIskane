@@ -182,7 +182,9 @@ export function CreditSimulator({ locale, basePrice, typologies, intro }: Props)
                         border: `1px solid ${selected ? "var(--color-ochre-bright)" : "color-mix(in oklab, var(--color-paper) 26%, transparent)"}`,
                       }}
                     >
-                      {formatNumber(duration, locale)} {t.simulator.years}
+                      {formatNumber(duration, locale)}{" "}
+                      {/* Arabic counts 3–10 take the plural (10 سنوات); 11 and up the singular (15 سنة). */}
+                      {locale === "ar" ? (duration <= 10 ? "سنوات" : "سنة") : t.simulator.years}
                     </button>
                   );
                 })}
