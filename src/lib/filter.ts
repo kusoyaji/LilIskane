@@ -1,7 +1,7 @@
 import { maxAffordablePrice } from "./credit";
 import { effectiveTotal } from "./format";
 import { projects } from "@/data/projects";
-import type { Amenity, Project, Segment, Status } from "@/data/types";
+import type { Amenity, Project, Segment } from "@/data/types";
 
 /**
  * Search state, and the only place it is turned into and out of a URL.
@@ -18,9 +18,33 @@ export type Filters = {
   segments: Segment[];
   bedrooms: number | null;
   surfaceMin: number | null;
-  statuses: Status[];
+  statuses: StatusFacet[];
   amenities: Amenity[];
 };
+
+/**
+ * Status as the buyer reads it on the card, which is not always the stored
+ * status: "Livraison imminente" stands in for the status it replaces, and
+ * "Livraison immédiate" (built, can be handed over now) cuts across "En
+ * promotion" and "Livré" — it is what someone who needs keys this year filters
+ * on, so it is offered as its own value. Values combine with OR.
+ */
+export const STATUS_FACETS = [
+  "en-lancement",
+  "en-construction",
+  "imminente",
+  "immediate",
+  "en-promotion",
+  "livre",
+  "complet",
+] as const;
+export type StatusFacet = (typeof STATUS_FACETS)[number];
+
+export function hasStatusFacet(project: Project, facet: StatusFacet): boolean {
+  if (facet === "immediate") return project.readyNow === true;
+  if (facet === "imminente") return project.readySoon === true;
+  return !project.readySoon && project.status === facet;
+}
 
 export const DEFAULT_DEPOSIT = 150_000;
 
@@ -73,7 +97,7 @@ export function fromSearchParams(params: URLSearchParams | Record<string, string
     segments: list<Segment>("standing"),
     bedrooms: num("chambres"),
     surfaceMin: num("surface"),
-    statuses: list<Status>("statut"),
+    statuses: list<StatusFacet>("statut").filter((v) => (STATUS_FACETS as readonly string[]).includes(v)),
     amenities: list<Amenity>("equipements"),
   };
 }
@@ -90,7 +114,7 @@ function matches(project: Project, filters: Filters, ignore: Set<FacetKey>): boo
   if (!ignore.has("segments") && filters.segments.length && !filters.segments.includes(project.segment)) {
     return false;
   }
-  if (!ignore.has("statuses") && filters.statuses.length && !filters.statuses.includes(project.status)) {
+  if (!ignore.has("statuses") && filters.statuses.length && !filters.statuses.some((f) => hasStatusFacet(project, f))) {
     return false;
   }
   if (!ignore.has("bedrooms") && filters.bedrooms && project.bedroomsMax < filters.bedrooms) return false;

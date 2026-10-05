@@ -2,6 +2,7 @@ import { formatNumber, isolateRun, type Locale } from "@/i18n/config";
 import { getDictionary } from "@/i18n";
 import { indicativeMonthly, roundMonthly } from "./credit";
 import type { Price, Project } from "@/data/types";
+import { statusText } from "@/content/projects";
 
 /**
  * Renders a price with its unit made explicit.
@@ -56,17 +57,7 @@ export function formatSurfaceRange(project: Project, locale: Locale): string {
 }
 
 export function statusLabel(project: Project, locale: Locale): string {
-  const t = getDictionary(locale);
-  switch (project.status) {
-    case "livre":
-      return t.common.delivered;
-    case "en-promotion":
-      return t.common.promotion;
-    case "complet":
-      return t.common.soldOut;
-    default:
-      return t.common.launching;
-  }
+  return statusText(project, locale);
 }
 
 /**

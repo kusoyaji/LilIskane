@@ -14,16 +14,19 @@ import s from "./news.module.css";
 /**
  * Editorial order for the grid. Launches and company news are interleaved so
  * the grid reads as a page of news rather than a catalogue with a few notes
- * at the end; Océane sits right above its sibling Océane R+1, and the land
- * programmes close the grid as a group of three.
+ * at the end.
+ *
+ * Only programmes the client labels "En lancement" are launches. The land
+ * lots and Jasmin are "Livraison imminente" and the eight others are "En
+ * cours de construction" — further along than a launch, so not news here.
  *
  * Rows on the three-column grid (W = wide card, spans two columns):
- *   Odyssée W · HQE  /  Amaïa · aide · Dyar Al Bahia 2  /  ISO · Izdihar W
- *   Océane W · Odyssée Studios  /  Océane R+1 · Al Youssoufia R+2 · R+3
- * Twelve cards + three wide = 15 slots, so every row is full; with the
- * "Lancements" filter (company cards hidden) it is 9 + 3 = 12, still full.
- * On the two-column grid Izdihar drops back to a single card, so the default
- * view is 2 full-width + 10 singles: again no lone card at the end.
+ *   Odyssée W · HQE  /  Amaïa · aide · Dyar Al Bahia 2  /  Izdihar W · ISO  /
+ *   Odyssée Studios · Océane W
+ * Six launches + three company cards + three wide = 12 slots, every row full;
+ * with the "Lancements" filter (company cards hidden) it is 6 + 3 = 9, still
+ * full. On the two-column grid every W spans the row and the singles pair up
+ * (HQE·Amaïa, aide·Dyar, ISO·Studios), so the default view ends on a full row.
  * Change ORDER and WIDE together, or the grid ends on a lone card again.
  *
  * Anything "en lancement" that is not named here is appended, so a programme
@@ -35,19 +38,13 @@ const ORDER: string[] = [
   "amaia",
   "company:aide",
   "dyar-al-bahia-2",
-  "company:iso",
   "izdihar",
-  "oceane",
+  "company:iso",
   "odyssee-studios",
-  "oceane-r1",
-  "al-youssoufia-r2",
-  "al-youssoufia-r3",
+  "oceane",
 ];
-/**
- * Cards that span two columns — 2560px renders that earn the width. "desk":
- * wide only on the three-column grid (see the row plan above).
- */
-const WIDE: Record<string, Wide> = { odyssee: "all", oceane: "all", izdihar: "desk" };
+/** Cards that span two columns — 2560px renders that earn the width. */
+const WIDE: Record<string, Wide> = { odyssee: "all", oceane: "all", izdihar: "all" };
 type Wide = "all" | "desk" | undefined;
 
 /**

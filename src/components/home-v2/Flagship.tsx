@@ -1,4 +1,4 @@
-import { Figure } from "@/components/media/Figure";
+import { coreRef, Figure } from "@/components/media/Figure";
 import { getCity } from "@/data/cities";
 import { getProject } from "@/data/projects";
 import type { Amenity, MediaRef } from "@/data/types";
@@ -47,7 +47,7 @@ export function Flagship({ locale }: { locale: Locale }) {
 
   const t = flagshipCopy[locale];
   const city = getCity(project.cityId).name[locale];
-  const byKey = (key: string) => project.gallery.find((m) => m.key === key);
+  const byKey = (key: string) => coreRef(project.gallery.find((m) => m.key === key));
 
   const pool = byKey("rg2_TypeB_3");
   const shops = byKey("rg2_Ext_Cam_A1_Commerce_1");

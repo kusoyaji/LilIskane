@@ -26,14 +26,37 @@
   grid-row: span 2;
 }
 
+/* Phones: lead tile, then pairs; an odd one out takes the full row. */
+.grid[data-count="2"] .item[data-i="1"],
+.grid[data-count="4"] .item[data-i="3"],
+.grid[data-count="6"] .item[data-i="5"] {
+  grid-column: span 2;
+}
+
+/* Desktop: four columns, and a layout per count so no count leaves a hole. */
 @media (min-width: 64rem) {
   .grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     grid-auto-rows: clamp(12rem, 19vw, 19rem);
   }
-  .item[data-i="5"],
-  .item[data-i="6"] {
+  .grid[data-count="1"] .item[data-i="0"] {
+    grid-column: span 4;
+  }
+  .grid[data-count="2"] .item[data-i="1"] {
     grid-column: span 2;
+    grid-row: span 2;
+  }
+  .grid[data-count="3"] .item:not([data-i="0"]),
+  .grid[data-count="4"] .item[data-i="1"],
+  .grid[data-count="7"] .item[data-i="5"],
+  .grid[data-count="7"] .item[data-i="6"] {
+    grid-column: span 2;
+  }
+  .grid[data-count="4"] .item[data-i="3"] {
+    grid-column: auto;
+  }
+  .grid[data-count="6"] .item[data-i="5"] {
+    grid-column: span 4;
   }
 }
 
@@ -48,14 +71,78 @@
   overflow: hidden;
   background: var(--color-paper-warm);
 }
+.tile {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+.tile:focus-visible {
+  outline: 3px solid var(--color-ochre-bright);
+  outline-offset: -3px;
+}
 .img {
   inline-size: 100%;
   block-size: 100%;
   object-fit: cover;
+  transition: transform var(--dur-camera) var(--ease-camera);
+}
+@media (hover: hover) {
+  .tile:hover .img {
+    transform: scale(1.03);
+  }
+}
+
+/* The last tile, when there are more pictures than tiles. */
+.more {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display, inherit);
+  font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+  letter-spacing: -0.01em;
+  color: var(--color-paper);
+  background: rgb(28 30 20 / 0.52);
+}
+
+.count {
+  color: var(--color-ink);
+  opacity: 0.6;
+}
+
+.openAll {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-block-size: 2.75rem;
+  padding: 0 1.15rem;
+  border: 1px solid rgb(28 30 20 / 0.22);
+  border-radius: 999px;
+  background: none;
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-small);
+  cursor: pointer;
+}
+@media (hover: hover) {
+  .openAll:hover {
+    border-color: rgb(28 30 20 / 0.5);
+  }
+}
+.openAll:focus-visible {
+  outline: 3px solid var(--color-ochre-bright);
+  outline-offset: 2px;
 }
 
 .note {
   position: absolute;
+  pointer-events: none;
   inset-block-end: 0.75rem;
   inset-inline-end: 0.75rem;
   padding: 0.35rem 0.6rem;

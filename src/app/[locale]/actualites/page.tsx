@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { ChannelFilms } from "@/components/news/ChannelFilms";
 import { Featured } from "@/components/news/Featured";
 import { NewsList } from "@/components/news/NewsList";
 import { NewsMasthead } from "@/components/news/NewsMasthead";
@@ -52,6 +53,9 @@ export default async function NewsPage({ params }: { params: Promise<{ locale: s
       </div>
       <div data-tone="paper">
         <NewsList locale={locale} launches={rest} />
+      </div>
+      <div data-tone="paper">
+        <ChannelFilms locale={locale} />
       </div>
       {/* Toned paper, not ink: the band is an opaque photograph, so the ground
           under it is never seen — but an ink tone would start darkening the

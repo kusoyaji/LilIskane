@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { CtaBand } from "@/components/v2";
 import { Amenities } from "@/components/project/Amenities";
 import { CinematicSequence } from "@/components/project/CinematicSequence";
+import { ProjectFilm } from "@/components/project/ProjectFilm";
 import { ProjectGallery } from "@/components/project/ProjectGallery";
 import { ProjectHero } from "@/components/project/ProjectHero";
 import { ProjectLocation } from "@/components/project/ProjectLocation";
@@ -13,12 +14,13 @@ import { SimulatorSection } from "@/components/project/SimulatorSection";
 import { TourCards } from "@/components/project/TourCards";
 import { Typologies } from "@/components/project/Typologies";
 import { getCity, cityById } from "@/data/cities";
+import { programmeFilms } from "@/data/films";
 import { toListItems } from "@/data/list";
 import { getProject, projects } from "@/data/projects";
 import type { Project } from "@/data/types";
 import { getDictionary } from "@/i18n";
 import { isLocale, LOCALES, type Locale } from "@/i18n/config";
-import { projectCopy, STATUS_LABELS } from "@/content/projects";
+import { projectCopy, statusText } from "@/content/projects";
 import { effectiveTotal, formatPrice } from "@/lib/format";
 
 export function generateStaticParams() {
@@ -126,7 +128,7 @@ export default async function ProjectPage({
         ? c.readyNow
         : p.deliveryYear
           ? c.delivery(String(p.deliveryYear))
-          : STATUS_LABELS[p.status][typedLocale],
+          : statusText(p, typedLocale),
     }));
 
   const allToursDelivered = project.tours.length > 0 && project.tours.every((tour) => tour.ofDelivered);
@@ -165,7 +167,17 @@ export default async function ProjectPage({
 
       {gallery.length > 0 && (
         <div data-tone="paper">
-          <ProjectGallery locale={typedLocale} images={gallery} />
+          <ProjectGallery
+            locale={typedLocale}
+            images={gallery}
+            delivered={project.readyNow === true || project.status === "livre"}
+          />
+        </div>
+      )}
+
+      {programmeFilms[project.slug] && (
+        <div data-tone="paper">
+          <ProjectFilm locale={typedLocale} project={project} film={programmeFilms[project.slug]} />
         </div>
       )}
 

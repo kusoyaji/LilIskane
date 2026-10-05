@@ -13,8 +13,8 @@ import { toListItems } from "@/data/list";
 import { projects } from "@/data/projects";
 import { AMENITIES, SEGMENTS, STATUSES } from "@/data/types";
 import { formatNumber, isLocale, isolateRun, type Locale } from "@/i18n/config";
-import { AMENITY_LABELS, SEGMENT_LABELS, STATUS_LABELS, searchCopy } from "@/content/projects";
-import { facetCount, fromSearchParams, search, toSearchParams, type FacetKey } from "@/lib/filter";
+import { AMENITY_LABELS, projectCopy, SEGMENT_LABELS, STATUS_LABELS, searchCopy, statusText } from "@/content/projects";
+import { facetCount, fromSearchParams, hasStatusFacet, search, STATUS_FACETS, toSearchParams, type FacetKey } from "@/lib/filter";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -95,11 +95,18 @@ export default async function ProjectsPage({
   const segmentFacets: Facet[] = SEGMENTS.filter((seg) => projects.some((p) => p.segment === seg)).map(
     (seg) => ({ value: seg, label: SEGMENT_LABELS[seg][typedLocale], count: count("segments", (p) => p.segment === seg) }),
   );
-  const statusFacets: Facet[] = STATUSES.filter((st) => projects.some((p) => p.status === st)).map((st) => ({
-    value: st,
-    label: STATUS_LABELS[st][typedLocale],
-    count: count("statuses", (p) => p.status === st),
-  }));
+  const statusFacets: Facet[] = STATUS_FACETS.filter((st) => projects.some((p) => hasStatusFacet(p, st))).map(
+    (st) => ({
+      value: st,
+      label:
+        st === "immediate"
+          ? projectCopy[typedLocale].readyNow
+          : st === "imminente"
+            ? statusText({ status: "en-construction", readySoon: true }, typedLocale)
+            : STATUS_LABELS[st][typedLocale],
+      count: count("statuses", (p) => hasStatusFacet(p, st)),
+    }),
+  );
   const bedroomFacets: Facet[] = [1, 2, 3, 4].map((n) => ({
     value: String(n),
     label: isolateRun(`${n}+`, typedLocale),

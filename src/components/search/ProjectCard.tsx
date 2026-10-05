@@ -5,7 +5,7 @@ import { heroMode, statusTone, year } from "@/components/project/view";
 import type { ProjectListItem } from "@/data/list";
 import { getDictionary } from "@/i18n";
 import { formatNumber, type Locale } from "@/i18n/config";
-import { projectCopy, STATUS_LABELS } from "@/content/projects";
+import { projectCopy, statusText } from "@/content/projects";
 import { formatMonthly, formatPrice, formatRange } from "@/lib/format";
 import s from "./ProjectCard.module.css";
 
@@ -63,7 +63,7 @@ export function ProjectCard({
 
           <span className={s.status}>
             <span className={s.dot} style={{ background: statusTone(item.status, true) }} aria-hidden />
-            <span className="u-eyebrow">{STATUS_LABELS[item.status][locale]}</span>
+            <span className="u-eyebrow">{statusText(item, locale)}</span>
           </span>
           {!land && item.hero.nature === "render" && <span className={s.note}>{c.renderShort}</span>}
         </div>

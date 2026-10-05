@@ -2,8 +2,15 @@ import { company, milestones } from "@/data/company";
 import { formatNumber, isolateRun, type Locale } from "@/i18n/config";
 import { heritageCopy } from "@/content/home-opening";
 import { Lattice, LinkButton, Stat } from "@/components/v2";
+import { YouTubeFilm } from "@/components/v2/YouTubeFilm";
+import { corporateFilm } from "@/data/films";
 import { Drift } from "./heritage/Drift";
 import s from "./heritage/Heritage.module.css";
+
+const FILM: Record<Locale, { eyebrow: string; title: string }> = {
+  fr: { eyebrow: "Le film institutionnel", title: "Soixante-quinze ans, en quelques minutes." },
+  ar: { eyebrow: "الفيلم المؤسساتي", title: "خمسة وسبعون عاماً، في دقائق." },
+};
 
 /** The four dates shown on the home strip; the full ten live on /a-propos. */
 const KEY_YEARS = [2000, 2003, 2013, 2025];
@@ -125,6 +132,23 @@ export function Heritage({ locale }: { locale: Locale }) {
               </li>
             ))}
           </ol>
+        </div>
+
+        {/* ---- the corporate film, in the page's language -------------------- */}
+        <div className={s.film}>
+          <div className={`u-enter ${s.filmText}`}>
+            <p className={`u-eyebrow ${s.eyebrow}`}>{FILM[locale].eyebrow}</p>
+            <p className={s.filmTitle}>{FILM[locale].title}</p>
+          </div>
+          <div className={s.filmPlayer} data-reveal="media">
+            <YouTubeFilm
+              locale={locale}
+              youtubeId={corporateFilm.youtubeId[locale]}
+              title={corporateFilm.title[locale]}
+              poster={corporateFilm.poster!}
+              sizes="(min-width: 64rem) 60vw, 100vw"
+            />
+          </div>
         </div>
       </div>
     </section>

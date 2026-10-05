@@ -1,0 +1,72 @@
+.film { display: grid; gap: 1rem; margin: 0; }
+
+.frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--color-ink);
+}
+
+.poster {
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+.poster :global(img) { transition: transform 900ms var(--ease-camera); }
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgb(28 30 20 / 0.45), rgb(28 30 20 / 0) 45%);
+  transition: opacity var(--dur-mid) var(--ease-ui);
+}
+
+/* Bottom corner, not centre: a centred disc lands on whatever the poster is
+   about — more often than not, a face. */
+.play {
+  position: absolute;
+  inset-block-end: clamp(0.85rem, 2vw, 1.5rem);
+  inset-inline-start: clamp(0.85rem, 2vw, 1.5rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55rem 1.15rem 0.55rem 0.6rem;
+  padding-inline: 0.6rem 1.15rem;
+  border-radius: 999px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  box-shadow: 0 10px 40px rgb(28 30 20 / 0.35);
+  font-size: var(--text-small);
+  letter-spacing: 0.01em;
+  transition: transform var(--dur-mid) var(--ease-ui);
+}
+.play svg {
+  display: block;
+  box-sizing: content-box;
+  padding: 0.55rem;
+  border-radius: 999px;
+  color: var(--color-paper);
+  background: var(--color-ink);
+}
+/* The triangle always points right — it is a media glyph, not a direction. */
+.playLabel {
+  white-space: nowrap;
+}
+
+@media (hover: hover) {
+  .poster:hover :global(img) { transform: scale(1.03); }
+  .poster:hover .play { transform: scale(1.06); }
+  .poster:hover .scrim { opacity: 0.8; }
+}
+.poster:focus-visible { outline: 3px solid var(--color-ochre-bright); outline-offset: -3px; }
+
+.iframe { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; border: 0; }
+
+.caption { display: grid; gap: 0.4rem; }
+.eyebrow { color: var(--color-ochre-deep); }
+.title { font-size: var(--text-small); line-height: 1.45; opacity: 0.8; }

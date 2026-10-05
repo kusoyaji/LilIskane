@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Chronology } from "@/components/about/Chronology";
+import { Films } from "@/components/about/Films";
 import { Guarantees } from "@/components/about/Guarantees";
 import { NextChapter } from "@/components/about/NextChapter";
 import { Seals } from "@/components/about/Seals";
@@ -84,6 +85,10 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
 
       <div data-tone="paper">
         <Who locale={locale} />
+      </div>
+
+      <div data-tone="paper">
+        <Films locale={locale} />
       </div>
 
       <div data-tone="ink">

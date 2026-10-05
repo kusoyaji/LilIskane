@@ -5,7 +5,7 @@ import { getCity } from "@/data/cities";
 import type { Project } from "@/data/types";
 import { getDictionary } from "@/i18n";
 import type { Locale } from "@/i18n/config";
-import { KIND_LABELS, projectCopy, SEGMENT_LABELS, STATUS_LABELS } from "@/content/projects";
+import { KIND_LABELS, projectCopy, SEGMENT_LABELS, statusText } from "@/content/projects";
 import { formatPrice } from "@/lib/format";
 import { LandPlan } from "./LandPlan";
 import { heroMode, year } from "./view";
@@ -32,10 +32,10 @@ export function ProjectOverview({
   const city = getCity(project.cityId);
 
   const statusLine = project.readyNow
-    ? `${STATUS_LABELS[project.status][locale]} · ${c.readyNow}`
+    ? `${statusText(project, locale)} · ${c.readyNow}`
     : project.deliveryYear
-      ? `${STATUS_LABELS[project.status][locale]} · ${c.delivery(year(project.deliveryYear))}`
-      : STATUS_LABELS[project.status][locale];
+      ? `${statusText(project, locale)} · ${c.delivery(year(project.deliveryYear))}`
+      : statusText(project, locale);
 
   const rows = [
     { label: c.ficheCity, value: city.name[locale] },
@@ -87,7 +87,7 @@ export function ProjectOverview({
                     ? c.readyNow
                     : sibling.project.deliveryYear
                       ? c.delivery(year(sibling.project.deliveryYear))
-                      : STATUS_LABELS[sibling.project.status][locale]}
+                      : statusText(sibling.project, locale)}
                 </span>
               </span>
               <span className={s.siblingArrow}>

@@ -1,3 +1,4 @@
+import type { GalleryKey } from "./media.gallery.generated";
 import type { MediaKey } from "./media.generated";
 
 /** Every user-facing string in the CMS is a language pair. */
@@ -13,7 +14,13 @@ export const SEGMENTS = [
 ] as const;
 export type Segment = (typeof SEGMENTS)[number];
 
-export const STATUSES = ["en-lancement", "en-promotion", "livre", "complet"] as const;
+/**
+ * The client's own vocabulary. "En cours de construction" is the label on eight
+ * of its fiches; "Livraison imminente" and "Livraison immédiate" are carried as
+ * flags (`readySoon`, `readyNow`) because the client shows them alongside, or
+ * instead of, one of these.
+ */
+export const STATUSES = ["en-lancement", "en-construction", "en-promotion", "livre", "complet"] as const;
 export type Status = (typeof STATUSES)[number];
 
 export const KINDS = [
@@ -94,6 +101,19 @@ export type MediaRef = {
  * `Figure` accepts either, so nothing else has to change.
  */
 export type ResolvedMediaRef = Omit<MediaRef, "alt"> & { alt: string };
+
+/**
+ * A gallery image: either manifest, resolved only on the server by
+ * `GalleryFigure`. `smallOnly` marks the client's low-resolution files (728px
+ * banners and the like) — shown in the viewer at their own size, never
+ * stretched across a lead tile. Every `MediaRef` is a valid `GalleryRef`.
+ */
+export type GalleryRef = {
+  key: MediaKey | GalleryKey;
+  alt: Localized;
+  nature: "render" | "photograph";
+  smallOnly?: true;
+};
 
 /**
  * A render paired with a photograph of the same space in a delivered programme.
@@ -200,7 +220,7 @@ export type Project = {
   amenities: Amenity[];
   summary: Localized;
   hero: MediaRef;
-  gallery: MediaRef[];
+  gallery: GalleryRef[];
   typologies: Typology[];
   tours: VirtualTour[];
   proof: ProofPair[];

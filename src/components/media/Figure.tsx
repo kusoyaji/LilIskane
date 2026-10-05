@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { media } from "@/data/media.generated";
-import type { MediaRef, ResolvedMediaRef } from "@/data/types";
+import type { GalleryRef, MediaRef, ResolvedMediaRef } from "@/data/types";
 import type { Locale } from "@/i18n/config";
 
 type Props = {
@@ -61,4 +61,13 @@ export function Figure({
       }}
     />
   );
+}
+
+/**
+ * Narrow a gallery image to one this component can draw. Gallery images from
+ * the server-only manifest come back undefined, so a caller picking a specific
+ * picture out of a programme's gallery can never ship that manifest by accident.
+ */
+export function coreRef(ref: GalleryRef | undefined): MediaRef | undefined {
+  return ref && ref.key in media ? (ref as MediaRef) : undefined;
 }

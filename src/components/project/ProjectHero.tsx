@@ -7,7 +7,7 @@ import type { Project } from "@/data/types";
 import { getDictionary } from "@/i18n";
 import { formatNumber, isolateRun, type Locale } from "@/i18n/config";
 import { shared } from "@/content/shared";
-import { projectCopy, STATUS_LABELS } from "@/content/projects";
+import { projectCopy, statusText } from "@/content/projects";
 import { effectiveTotal, formatMonthly, formatPrice, formatRange } from "@/lib/format";
 import { LandPlan } from "./LandPlan";
 import { heroMode, statusTone, year } from "./view";
@@ -63,7 +63,7 @@ export function ProjectHero({ locale, project }: { locale: Locale; project: Proj
 
       <p className={s.status}>
         <span className={s.statusDot} style={{ background: statusTone(project.status, true) }} aria-hidden />
-        <span className="u-eyebrow">{STATUS_LABELS[project.status][locale]}</span>
+        <span className="u-eyebrow">{statusText(project, locale)}</span>
       </p>
 
       <h1 className={`u-display ${s.name} ${longName ? s.nameLong : ""}`} data-reveal="mask">

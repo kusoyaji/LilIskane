@@ -1,14 +1,17 @@
+import { galleries } from "./galleries.ts";
 import type { MediaRef, Project, ProofPair } from "./types";
 
 /**
- * Mock portfolio, shaped exactly like the CMS payload the components expect.
+ * The portfolio, shaped exactly like the CMS payload the components expect:
+ * all twenty-three programmes published on liliskane.com.
  *
- * Prices, cities, surfaces, storey counts and amenity lists are taken from
- * liliskane.com as published. Riad Garden II is modelled in full depth — every
- * typology, both Matterport tours, the complete proof set — because it is the
- * page being built. The other thirteen carry enough to stress the components:
- * a 514x293 thumbnail beside an 8000px one, a four-character name beside a
- * twenty-character one, 485 000 DH beside 2 450 000 DH, and land priced per m².
+ * Every address, surface range, height, price, amenity list and status label
+ * was checked against the client's own fiche (review round 2 found v1's
+ * values contradicted half of them, and corrected them). Galleries are the
+ * client's own pictures, curated (`./galleries.ts`). Riad Garden II is the one
+ * programme modelled in full depth — plans, both Matterport tours, the proof
+ * set and the camera move. Where the client's fiche is silent (delivery years,
+ * per-plan prices), the field is empty rather than guessed.
  */
 
 /* -----------------------------------------------------------------------------
@@ -384,7 +387,7 @@ export const projects: Project[] = [
         ar: "مسبح رياض غاردن 1 بعد التسليم، تحيط به مبانٍ وردية مغرة ونخيل، تحت سماء صافية.",
       },
     },
-    gallery: rg2Proof.map((p) => p.photograph),
+    gallery: galleries["riad-garden-i"],
     proof: [],
     tours: [
       {
@@ -464,7 +467,7 @@ export const projects: Project[] = [
         ar: "منظر عام لأمايا: ممر مركزي مغروس بالنخيل تحفّه عمارات وردية مغرة من طابقين، ومحلات تجارية بالطابق الأرضي.",
       },
     },
-    gallery: [],
+    gallery: galleries["amaia"],
     proof: [],
     tours: [],
     typologies: [],
@@ -518,7 +521,7 @@ export const projects: Project[] = [
         ar: "فيلات أوسيان بسيدي رحال، أسقف منخفضة وتراسات مفتوحة، قرب البحر.",
       },
     },
-    gallery: [],
+    gallery: galleries["oceane"],
     proof: [],
     tours: [],
     typologies: [],
@@ -534,7 +537,7 @@ export const projects: Project[] = [
     lat: 33.4716,
     lng: -7.957,
     segment: "terrain",
-    status: "en-lancement",
+    status: "en-construction",
     kinds: ["lot"],
     price: { amount: 4500, unit: "per-sqm", minimumLotSqm: 168 },
     surfaceMin: 168,
@@ -609,7 +612,7 @@ export const projects: Project[] = [
         ar: "عمارات أوديسي بالمحمدية، كتل بيضاء من خمسة طوابق بشرفات ممتدة ومحلات زجاجية بالطابق الأرضي.",
       },
     },
-    gallery: [],
+    gallery: galleries["odyssee"],
     proof: [],
     tours: [],
     typologies: [],
@@ -659,7 +662,7 @@ export const projects: Project[] = [
         ar: "أوديسي ستوديوهات بالمحمدية: مسبح مركزي تحيط به كراسي الاستلقاء والمظلات، بين عمارات بواجهات فاتحة.",
       },
     },
-    gallery: [],
+    gallery: galleries["odyssee-studios"],
     proof: [],
     tours: [],
     typologies: [
@@ -717,7 +720,7 @@ export const projects: Project[] = [
         ar: "شقة نموذجية مُسلَّمة بالسلام طنجة: صالون مؤثث، أرضية فاتحة، ونافذة زجاجية كبيرة.",
       },
     },
-    gallery: [],
+    gallery: galleries["assalam-tg"],
     proof: [],
     tours: [
       {
@@ -791,7 +794,7 @@ export const projects: Project[] = [
         ar: "صالون شقة في بوغانفيلي بالمحمدية: أرضية رخامية فاتحة، ركن طعام بكراسٍ من المخمل الأزرق، ثريا ونوافذ واسعة.",
       },
     },
-    gallery: [],
+    gallery: galleries["bougainvillier"],
     proof: [],
     tours: [
       {
@@ -848,7 +851,7 @@ export const projects: Project[] = [
         ar: "إقامة الازدهار بالصويرة: عمارات بيضاء بمصاريع زرقاء منتظمة حول فناء مغروس.",
       },
     },
-    gallery: [],
+    gallery: galleries["izdihar"],
     proof: [],
     tours: [],
     typologies: [],
@@ -891,7 +894,7 @@ export const projects: Project[] = [
         ar: "عمارات ديار البهية 2 بتمارة، واجهات بيضاء وشرفات.",
       },
     },
-    gallery: [],
+    gallery: galleries["dyar-al-bahia-2"],
     proof: [],
     tours: [
       {
@@ -925,7 +928,7 @@ export const projects: Project[] = [
     lat: 33.4201,
     lng: -7.8446,
     segment: "terrain",
-    status: "en-lancement",
+    status: "en-construction",
     kinds: ["lot"],
     price: { amount: 3450, unit: "per-sqm", minimumLotSqm: 120 },
     surfaceMin: 120,
@@ -966,7 +969,7 @@ export const projects: Project[] = [
     lat: 33.4188,
     lng: -7.8479,
     segment: "terrain",
-    status: "en-lancement",
+    status: "en-construction",
     kinds: ["lot", "local-commercial"],
     price: { amount: 4950, unit: "per-sqm", minimumLotSqm: 147 },
     surfaceMin: 147,
@@ -1035,6 +1038,439 @@ export const projects: Project[] = [
       },
     },
     gallery: [],
+    proof: [],
+    tours: [],
+    typologies: [],
+    nearby: [],
+  },
+
+  /* ---------------------------------------------------------------------------
+   * The nine programmes on liliskane.com that v1 left out, from their fiches:
+   * address, surfaces, height, price, amenities and the client's own status
+   * label. Map pins are the client's own (read from each fiche's map).
+   * ------------------------------------------------------------------------ */
+  {
+    id: "180",
+    slug: "assafa",
+    name: { fr: "Assafa", ar: "الصفاء" },
+    cityId: "had-soualem",
+    neighbourhood: { fr: "Boulevard Mohammed VI", ar: "شارع محمد السادس" },
+    lat: 33.41567,
+    lng: -7.863575,
+    segment: "economique",
+    status: "en-construction",
+    kinds: ["appartement"],
+    price: { amount: 250000, unit: "total" },
+    surfaceMin: 55,
+    surfaceMax: 65,
+    bedroomsMin: 3,
+    bedroomsMax: 3,
+    floors: "R+4",
+    deliveryYear: null,
+    deliveredYear: null,
+    amenities: ["mosquee","centre-commercial","commerces"],
+    summary: {
+      fr: "Assafa est située sur le boulevard Mohammed VI, au cœur de Had Soualem, à dix minutes des plages de Sidi Rahal. Ses immeubles en R+4 avec ascenseurs accueillent des appartements de 55 à 65 m², avec salon, trois chambres, cuisine avec buanderie et salle de bains.",
+      ar: "تقع إقامة الصفاء على شارع محمد السادس، في قلب حد السوالم، على بعد عشر دقائق من شواطئ سيدي رحال. وتضم عماراتها المكوّنة من طابق أرضي وأربعة طوابق والمجهّزة بمصاعد شققاً من 55 إلى 65 م²، بصالون وثلاث غرف ومطبخ مع غرفة غسيل وحمّام.",
+    },
+    hero: {
+      key: "hp_assafa",
+      nature: "render",
+      alt: {
+        fr: "Rendu des immeubles d'Assafa, à Had Soualem : façades blanches et grises sur quatre étages, commerces vitrés en rez-de-chaussée et palmiers le long du trottoir.",
+        ar: "تصوّر لعمارات إقامة الصفاء بحد السوالم: واجهات بيضاء ورمادية من أربعة طوابق، ومحلات تجارية بواجهات زجاجية في الطابق الأرضي، ونخيل على امتداد الرصيف.",
+      },
+    },
+    gallery: galleries["assafa"],
+    proof: [],
+    tours: [
+      {
+        id: "assafa-temoin",
+        label: { fr: "Appartement témoin — 4 pièces", ar: "شقة نموذجية — صالون وثلاث غرف" },
+        matterportId: "qvszE14omLR",
+        ofDelivered: false,
+        poster: {
+          key: "tp_assafa",
+          nature: "photograph",
+          alt: {
+            fr: "Salon de l'appartement témoin d'Assafa, à Had Soualem : banquettes marocaines bleu-vert en angle, lustre circulaire à pampilles et sol en carrelage effet marbre.",
+            ar: "صالون الشقة النموذجية لإقامة الصفاء بحد السوالم: أرائك مغربية زرقاء مخضرّة على شكل زاوية، وثريا دائرية بقطع متدلية، وأرضية من بلاط بمظهر الرخام.",
+          },
+        },
+      },
+    ],
+    typologies: [],
+    nearby: [],
+  },
+
+  {
+    id: "186",
+    slug: "massylia",
+    name: { fr: "Massylia", ar: "ماسيليا" },
+    cityId: "agadir",
+    neighbourhood: { fr: "Avenue Laayoune, Tassila", ar: "شارع العيون، تاسيلا" },
+    lat: 30.3857,
+    lng: -9.5337,
+    segment: "moyen-standing",
+    status: "en-construction",
+    kinds: ["appartement"],
+    price: { amount: 1045000, unit: "total" },
+    surfaceMin: 80,
+    surfaceMax: 96,
+    bedroomsMin: 3,
+    bedroomsMax: 3,
+    floors: "R+5",
+    deliveryYear: null,
+    deliveredYear: null,
+    amenities: ["piscine","mosquee","ecoles","parking-sous-sol","espaces-verts","commerces","centre-commercial","aires-de-jeux"],
+    summary: {
+      fr: "Résidence en R+5 à Tassila, dans l'extension du quartier Al Houda, à l'entrée d'Agadir en venant de Marrakech, avec piscines, espaces verts et ascenseurs. Appartements de 3 chambres de 80 à 96 m², avec balcons, salon, cuisine équipée et deux salles de bains.",
+      ar: "إقامة في عمارات من طابق أرضي وخمسة طوابق بتاسيلا، في امتداد حي الهدى عند مدخل أكادير من جهة مراكش، تضم مسابح ومساحات خضراء ومصاعد. شقق بثلاث غرف نوم من 80 إلى 96 م²، مع شرفات وصالون ومطبخ مجهّز وحمّامين.",
+    },
+    hero: {
+      key: "hp_massylia",
+      nature: "photograph",
+      alt: {
+        fr: "Salon de l'appartement témoin de Massylia, à Agadir : banquettes marocaines terracotta et beiges en angle, grande table basse en noyer et stores jour-nuit sur la fenêtre.",
+        ar: "صالون الشقة النموذجية بإقامة ماسيليا بأكادير: أرائك مغربية بلون الطين والبيج على شكل زاوية، وطاولة منخفضة كبيرة من خشب الجوز، وستائر مخطَّطة على النافذة.",
+      },
+    },
+    gallery: galleries["massylia"],
+    proof: [],
+    tours: [
+      {
+        id: "massylia-temoin",
+        label: { fr: "Appartement témoin — 80 m²", ar: "شقة نموذجية — 80 م²" },
+        matterportId: "YqEQdUUCqBC",
+        ofDelivered: false,
+        poster: {
+          key: "tp_massylia",
+          nature: "photograph",
+          alt: {
+            fr: "Second salon de l'appartement témoin de Massylia, à Agadir : banquettes aux motifs géométriques rouges et noirs, table basse en verre et sol effet bois.",
+            ar: "الصالون الثاني بالشقة النموذجية بإقامة ماسيليا بأكادير: أرائك بزخارف هندسية حمراء وسوداء، وطاولة منخفضة زجاجية، وأرضية بمظهر خشبي.",
+          },
+        },
+      },
+    ],
+    typologies: [],
+    nearby: [],
+  },
+
+  {
+    id: "188",
+    slug: "jnane-souss",
+    name: { fr: "Jnane Souss", ar: "جنان سوس" },
+    cityId: "agadir",
+    neighbourhood: { fr: "Avenue Laayoune, Tassila", ar: "شارع العيون، تاسيلا" },
+    lat: 30.384672,
+    lng: -9.534688,
+    segment: "moyen-standing",
+    status: "en-construction",
+    kinds: ["appartement"],
+    price: { amount: 770000, unit: "total" },
+    surfaceMin: 70,
+    surfaceMax: 91,
+    bedroomsMin: 3,
+    bedroomsMax: 3,
+    floors: "R+5",
+    deliveryYear: null,
+    deliveredYear: null,
+    amenities: ["mosquee","ecoles","parking-sous-sol","espaces-verts","commerces","centre-commercial"],
+    summary: {
+      fr: "Résidence en immeubles R+5 à Tassila, dans l'extension du quartier Al Houda à Agadir, proche des commerces, des transports et des plages, avec ascenseurs et parkings souterrains. Appartements de 3 chambres de 70 à 91 m², avec balcon, salon, cuisine équipée et buanderie, deux salles de bains et toilettes de service.",
+      ar: "إقامة في عمارات من طابق أرضي وخمسة طوابق بتاسيلا، في امتداد حي الهدى بأكادير، قريبة من المتاجر ووسائل النقل والشواطئ، ومجهّزة بمصاعد ومرائب تحت أرضية. شقق بثلاث غرف نوم من 70 إلى 91 م²، مع شرفة وصالون ومطبخ مجهّز وغرفة غسيل وحمّامين ومرحاض للخدمة.",
+    },
+    hero: {
+      key: "hp_jnane_souss",
+      nature: "photograph",
+      alt: {
+        fr: "Salon de l'appartement témoin de Jnane Souss, à Agadir : banquettes marocaines bleu-vert en U, tables basses rondes gigognes et tapis rond sur sol clair.",
+        ar: "صالون الشقة النموذجية بإقامة جنان سوس بأكادير: أرائك مغربية بلون أزرق مخضرّ على شكل حرف U، وطاولات منخفضة دائرية متداخلة، وزربية دائرية على أرضية فاتحة.",
+      },
+    },
+    gallery: galleries["jnane-souss"],
+    proof: [],
+    tours: [
+      {
+        id: "jnane-souss-temoin",
+        label: { fr: "Appartement témoin — 82 m²", ar: "شقة نموذجية — 82 م²" },
+        matterportId: "htjuMq1UjPr",
+        ofDelivered: false,
+        poster: {
+          key: "tp_jnane_souss",
+          nature: "photograph",
+          alt: {
+            fr: "Petit salon de l'appartement témoin de Jnane Souss, à Agadir : canapé d'angle écru, coussins moutarde, table ronde blanche et sol effet bois.",
+            ar: "الصالون الصغير بالشقة النموذجية بإقامة جنان سوس بأكادير: أريكة زاوية بلون عاجي، ووسائد بلون الخردل، وطاولة دائرية بيضاء، وأرضية بمظهر خشبي.",
+          },
+        },
+      },
+    ],
+    typologies: [],
+    nearby: [],
+  },
+
+  {
+    id: "189",
+    slug: "al-anbar",
+    name: { fr: "Al Anbar", ar: "العنبر" },
+    cityId: "marrakech",
+    neighbourhood: { fr: "M'Hamid Sud", ar: "المحاميد الجنوبية" },
+    lat: 31.579312,
+    lng: -8.046941,
+    segment: "moyen-standing",
+    status: "en-construction",
+    kinds: ["appartement"],
+    price: { amount: 545000, unit: "total" },
+    surfaceMin: 60,
+    surfaceMax: 122,
+    bedroomsMin: 2,
+    bedroomsMax: 3,
+    floors: "R+4",
+    deliveryYear: null,
+    deliveredYear: null,
+    amenities: ["aires-de-jeux","centre-commercial","commerces","espaces-verts","mosquee","parking-sous-sol","terrains-de-sport","ascenseur"],
+    summary: {
+      fr: "Résidence en R+4 à M'Hamid Sud, à Marrakech, dotée d'ascenseurs et d'un parking en sous-sol, à une dizaine de minutes de l'avenue Mohammed VI. Elle propose des appartements et des duplex de 60 à 122 m², de deux à trois chambres avec salon et cuisine équipée, dans un projet éligible au programme d'aide directe au logement.",
+      ar: "إقامة من طابق أرضي وأربعة طوابق بحي المحاميد الجنوبية بمراكش، مجهّزة بمصاعد ومرأب تحت أرضي، على بعد نحو عشر دقائق من شارع محمد السادس. تضمّ شققًا وشقق دوبلكس من 60 إلى 122 م²، من غرفتين إلى ثلاث غرف مع صالون ومطبخ مجهّز، ضمن مشروع مؤهَّل لبرنامج الدعم المباشر للسكن.",
+    },
+    hero: {
+      key: "hp_al_anbar",
+      nature: "render",
+      alt: {
+        fr: "Rendu de la résidence Al Anbar, à Marrakech, vue depuis un carrefour : immeubles ocre rose aux fenêtres à ferronnerie et petits balcons, palmiers et passage piéton au premier plan.",
+        ar: "تصوّر لإقامة العنبر بمراكش من أحد ملتقيات الطرق: عمارات بلون المغرة الوردية بنوافذ ذات مشبّكات حديدية وشرفات صغيرة، ونخيل وممرّ للراجلين في المقدّمة.",
+      },
+    },
+    gallery: galleries["al-anbar"],
+    proof: [],
+    tours: [],
+    typologies: [],
+    nearby: [],
+  },
+
+  {
+    id: "210",
+    slug: "al-anbra",
+    name: { fr: "Al Anbra", ar: "العنبرة" },
+    cityId: "essaouira",
+    neighbourhood: { fr: "Al Ghazoua", ar: "الغزوة" },
+    lat: 31.453728,
+    lng: -9.733704,
+    segment: "moyen-standing",
+    status: "en-construction",
+    kinds: ["appartement"],
+    price: { amount: 595000, unit: "total" },
+    surfaceMin: 52,
+    surfaceMax: 111,
+    bedroomsMin: 1,
+    bedroomsMax: 3,
+    floors: "R+3",
+    deliveryYear: null,
+    deliveredYear: null,
+    amenities: ["piscine","espaces-verts","aires-de-jeux","mosquee","ecoles","commerces"],
+    summary: {
+      fr: "À Al Ghazoua, au cœur du programme Essaouira El Jadida et à quelques minutes de la médina, Al Anbra est une résidence en R+3 dont les ouvertures donnent sur une piscine et des espaces verts. Ses appartements de 52 à 111 m² comptent une à trois chambres, dont une suite parentale avec dressing et salle de bain privative, ainsi qu'une cuisine équipée.",
+      ar: "في الغزوة، في قلب مشروع الصويرة الجديدة وعلى بُعد دقائق من المدينة العتيقة، تقوم إقامة العنبرة على طابق أرضي وثلاثة طوابق، وتنفتح نوافذها على مسبح ومساحات خضراء. تضمّ شققها، من 52 إلى 111 م²، من غرفة إلى ثلاث غرف، منها جناح أبوي بغرفة ملابس وحمّام خاص، إلى جانب مطبخ مجهّز.",
+    },
+    hero: {
+      key: "hp_al_anbra",
+      nature: "photograph",
+      alt: {
+        fr: "Entrée d'un immeuble d'Al Anbra, à Essaouira : façades beige et sable rythmées de persiennes et de hublots, allée pavée et plantations récentes.",
+        ar: "مدخل إحدى عمارات إقامة العنبرة بالصويرة: واجهات بلون البيج والرمل تتخللها شرائح تهوية ونوافذ دائرية، وممرّ مرصوف ونباتات حديثة الغرس.",
+      },
+    },
+    gallery: galleries["al-anbra"],
+    proof: [],
+    tours: [],
+    typologies: [],
+    nearby: [],
+  },
+
+  {
+    id: "77",
+    slug: "al-yassamine",
+    name: { fr: "Al Yassamine", ar: "الياسمين" },
+    cityId: "essaouira",
+    neighbourhood: { fr: "Al Ghazoua", ar: "الغزوة" },
+    lat: 31.452654,
+    lng: -9.734583,
+    segment: "moyen-standing",
+    status: "livre",
+    readyNow: true,
+    kinds: ["appartement"],
+    price: { amount: 586000, unit: "total" },
+    surfaceMin: 77,
+    surfaceMax: 142,
+    bedroomsMin: 2,
+    bedroomsMax: 3,
+    floors: "R+3",
+    deliveryYear: null,
+    deliveredYear: null,
+    amenities: ["espaces-verts","mosquee","ecoles","commerces"],
+    summary: {
+      fr: "À Al Ghazoua, à 7 km d'Essaouira et près des plages, Al Yassamine est une résidence livrée d'immeubles en R+3 implantés au milieu de larges espaces verts, avec des espaces communs aménagés et sécurisés. Ses appartements de 77 à 142 m², disponibles immédiatement, comptent deux ou trois chambres, deux salles de bain et une cuisine.",
+      ar: "في الغزوة، على بُعد 7 كلم من الصويرة وعلى مقربة من الشواطئ، تضمّ إقامة الياسمين المُسلَّمة عمارات من طابق أرضي وثلاثة طوابق وسط مساحات خضراء واسعة، مع فضاءات مشتركة مهيّأة ومؤمَّنة. شققها، من 77 إلى 142 م²، متاحة فوراً، وتضمّ غرفتين أو ثلاث غرف وحمّامين ومطبخاً.",
+    },
+    hero: {
+      key: "hp_al_yassamine",
+      nature: "photograph",
+      alt: {
+        fr: "Salon d'un appartement meublé de la résidence livrée Al Yassamine, à Essaouira : canapé d'angle à la marocaine, table basse en bois et plafond à moulures.",
+        ar: "صالون شقة مؤثثة بإقامة الياسمين المُسلَّمة بالصويرة: أريكة زاوية على الطراز المغربي، طاولة خشبية منخفضة، وسقف بزخارف جبسية.",
+      },
+    },
+    gallery: galleries["al-yassamine"],
+    proof: [],
+    tours: [],
+    typologies: [],
+    nearby: [],
+  },
+
+  {
+    id: "179",
+    slug: "jasmin",
+    name: { fr: "Jasmin", ar: "جاسمين" },
+    cityId: "mohammedia",
+    neighbourhood: { fr: "Bd Sidi Mohammed Ben Abdellah, route côtière", ar: "شارع سيدي محمد بن عبد الله، الطريق الساحلية" },
+    lat: 33.689406,
+    lng: -7.402682,
+    segment: "moyen-standing",
+    status: "en-construction",
+    readySoon: true,
+    kinds: ["appartement"],
+    price: { amount: 732000, unit: "total" },
+    surfaceMin: 70,
+    surfaceMax: 154,
+    bedroomsMin: 2,
+    bedroomsMax: 3,
+    floors: "R+5",
+    deliveryYear: null,
+    deliveredYear: null,
+    amenities: ["centre-commercial","spa","espaces-verts","mosquee","parking-sous-sol","terrains-de-sport","aires-de-jeux","ecoles","commerces"],
+    summary: {
+      fr: "Résidence en R+5 sur le boulevard Sidi Mohammed Ben Abdellah, à cinq minutes du grand parc et des plages de Mohammedia. Elle propose des appartements de 70 à 154 m², avec séjour, deux ou trois chambres, cuisine équipée, salle de bains et WC, ainsi qu'un parking en sous-sol et des espaces verts aménagés dans un cadre sécurisé.",
+      ar: "إقامة من طابق أرضي وخمسة طوابق على شارع سيدي محمد بن عبد الله، على بُعد خمس دقائق من المنتزه الكبير وشواطئ المحمدية. تضم شققاً من 70 إلى 154 م² بصالون وغرفتين أو ثلاث غرف ومطبخ مجهّز وحمّام ومرحاض، إلى جانب مرآب تحت أرضي ومساحات خضراء مهيّأة في إطار آمن.",
+    },
+    hero: {
+      key: "hp_jasmin",
+      nature: "photograph",
+      alt: {
+        fr: "Séjour de l'appartement témoin de Jasmin, à Mohammedia : grand canapé d'angle crème, table ronde en verre, lustre à globes et voilages pleine hauteur.",
+        ar: "صالون الشقة النموذجية في جاسمين بالمحمدية: أريكة زاوية كبيرة بلون كريمي، طاولة مستديرة من الزجاج، ثريا بكرات زجاجية وستائر بكامل الارتفاع.",
+      },
+    },
+    gallery: galleries["jasmin"],
+    proof: [],
+    tours: [
+      {
+        id: "jasmin-temoin",
+        label: { fr: "Appartement témoin 76 m²", ar: "شقة نموذجية 76 م²" },
+        matterportId: "jqeL68ktXZK",
+        ofDelivered: false,
+        poster: {
+          key: "tp_jasmin",
+          nature: "photograph",
+          alt: {
+            fr: "Séjour de l'appartement témoin de Jasmin, à Mohammedia : coin repas à table ronde et chaises bouclées, miroir rond et porte d'entrée en bois.",
+            ar: "صالون الشقة النموذجية في جاسمين بالمحمدية: ركن طعام بطاولة مستديرة وكراسٍ منجّدة، مرآة دائرية وباب مدخل خشبي.",
+          },
+        },
+      },
+    ],
+    typologies: [],
+    nearby: [],
+  },
+
+  {
+    id: "192",
+    slug: "patio-verde",
+    name: { fr: "Patio Verde", ar: "باتيو فيردي" },
+    cityId: "mohammedia",
+    neighbourhood: { fr: "Avenue Hassan II, rue d'Agadir", ar: "شارع الحسن الثاني، زنقة أكادير" },
+    lat: 33.687831,
+    lng: -7.401695,
+    segment: "moyen-standing",
+    status: "en-construction",
+    kinds: ["appartement","studio"],
+    price: { amount: 607000, unit: "total" },
+    surfaceMin: 46,
+    surfaceMax: 130,
+    bedroomsMin: 1,
+    bedroomsMax: 2,
+    floors: "R+5",
+    deliveryYear: null,
+    deliveredYear: null,
+    amenities: ["centre-commercial","spa","espaces-verts","parking-sous-sol","ecoles","commerces","mosquee","terrains-de-sport"],
+    summary: {
+      fr: "Sur l'avenue Hassan II à Mohammedia, Patio Verde réunit des immeubles en R+5 avec ascenseurs et parking en sous-sol. Studios de 46 à 83 m² avec balcon, et appartements de 88 à 130 m² à deux chambres, dont une suite parentale avec salle de bains et dressing.",
+      ar: "على شارع الحسن الثاني بالمحمدية، تضم إقامة باتيو فيردي عمارات من طابق أرضي وخمسة طوابق مجهّزة بمصاعد ومرأب تحت أرضي. ستوديوهات من 46 إلى 83 م² بشرفات، وشقق من 88 إلى 130 م² بغرفتين، إحداهما جناح رئيسي بحمّام وغرفة ملابس.",
+    },
+    hero: {
+      key: "hp_patio_verde",
+      nature: "photograph",
+      alt: {
+        fr: "Séjour de l'appartement témoin de Patio Verde, à Mohammedia : canapés en bouclette crème, table basse ronde, plafond à éclairage indirect et baie voilée.",
+        ar: "صالون الشقة النموذجية بباتيو فيردي بالمحمدية: أرائك من قماش البوكليه بلون كريمي، وطاولة منخفضة دائرية، وسقف بإضاءة غير مباشرة، ونافذة واسعة بستائر خفيفة.",
+      },
+    },
+    gallery: galleries["patio-verde"],
+    proof: [],
+    tours: [
+      {
+        id: "patio-verde-temoin",
+        label: { fr: "Appartement témoin — 95 m²", ar: "شقة نموذجية — 95 م²" },
+        matterportId: "5XxiaEBrAZT",
+        ofDelivered: false,
+        poster: {
+          key: "tp_patio_verde",
+          nature: "photograph",
+          alt: {
+            fr: "Séjour de l'appartement témoin de Patio Verde, à Mohammedia, vu vers l'entrée : canapé d'angle, claustra en lames de bois et meuble télé suspendu.",
+            ar: "صالون الشقة النموذجية بباتيو فيردي بالمحمدية من جهة المدخل: أريكة زاوية، وحاجز من شرائح خشبية، وخزانة تلفاز معلّقة.",
+          },
+        },
+      },
+    ],
+    typologies: [],
+    nearby: [],
+  },
+
+  {
+    id: "79",
+    slug: "les-pins-de-maamora",
+    name: { fr: "Les Pins de Maamora", ar: "لي بان دو معمورة" },
+    cityId: "sala-al-jadida",
+    neighbourhood: { fr: "Avenue Lalla Meryem, zone villas", ar: "شارع للا مريم، منطقة الفيلات" },
+    lat: 33.998633,
+    lng: -6.735781,
+    segment: "moyen-standing",
+    status: "en-construction",
+    kinds: ["appartement"],
+    price: { amount: 850000, unit: "total" },
+    surfaceMin: 72,
+    surfaceMax: 97,
+    bedroomsMin: 2,
+    bedroomsMax: 3,
+    floors: "R+3",
+    deliveryYear: null,
+    deliveredYear: null,
+    amenities: ["commerces","ecoles","mosquee","parking-sous-sol","aires-de-jeux","piscine"],
+    summary: {
+      fr: "Immeubles R+3 de moyen standing aux abords de la forêt, avenue Lalla Meryem à Sala Al Jadida, avec un ascenseur desservant le parking en sous-sol et un rez-de-chaussée commercial. Les appartements de 72 à 97 m² comptent deux à trois chambres, dont une suite parentale avec salle de bain, et une cuisine équipée avec buanderie.",
+      ar: "عمارات من طابق أرضي وثلاثة طوابق، من فئة السكن المتوسط، على مشارف الغابة بشارع للا مريم في سلا الجديدة، بمصعد يصل إلى المرأب تحت الأرضي وطابق أرضي تجاري. شقق من 72 إلى 97 م²، من غرفتين إلى ثلاث غرف، منها جناح أبوي بحمّام خاص، ومطبخ مجهّز مع غرفة غسيل.",
+    },
+    hero: {
+      key: "hp_les_pins_de_maamora",
+      nature: "render",
+      alt: {
+        fr: "Rendu de la façade des Pins de Maamora, à Sala Al Jadida : immeuble R+3 blanc à balcons en retrait, panneaux ajourés et commerces en rez-de-chaussée.",
+        ar: "تصوّر لواجهة إقامة لي بان دو معمورة بسلا الجديدة: عمارة بيضاء من طابق أرضي وثلاثة طوابق بشرفات غائرة، ألواح مُخرَّمة ومحلات تجارية في الطابق الأرضي.",
+      },
+    },
+    gallery: galleries["les-pins-de-maamora"],
     proof: [],
     tours: [],
     typologies: [],

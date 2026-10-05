@@ -1,4 +1,4 @@
-import { Figure } from "@/components/media/Figure";
+import { coreRef, Figure } from "@/components/media/Figure";
 import { LinkButton } from "@/components/v2";
 import { about } from "@/content/about";
 import { getProject } from "@/data/projects";
@@ -18,7 +18,7 @@ export function NextChapter({ locale }: { locale: Locale }) {
   const t = about[locale].next;
   const project = getProject("riad-garden-ii");
   if (!project) return null;
-  const media = project.gallery.find((m) => m.key === "rg2_Ext_Cam_c1_jardin_1") ?? project.hero;
+  const media = coreRef(project.gallery.find((m) => m.key === "rg2_Ext_Cam_c1_jardin_1")) ?? project.hero;
 
   return (
     <section className={`${s.band} ${s.bandNext}`} data-nav-media>

@@ -30,10 +30,35 @@ export const KIND_LABELS: Record<Kind, { fr: string; ar: string }> = {
 
 export const STATUS_LABELS: Record<Status, { fr: string; ar: string }> = {
   "en-lancement": { fr: "En lancement", ar: "في طور الإطلاق" },
-  "en-promotion": { fr: "En promotion", ar: "في طور التسويق" },
+  "en-construction": { fr: "En cours de construction", ar: "في طور البناء" },
+  // The client's "En promotion" is a discount offer, not "on the market".
+  "en-promotion": { fr: "En promotion", ar: "عرض ترويجي" },
   livre: { fr: "Livré", ar: "مُسلَّم" },
   complet: { fr: "Complet", ar: "مكتمل" },
 };
+
+const READY_SOON = { fr: "Livraison imminente", ar: "تسليم وشيك" };
+
+/**
+ * The status as the client words it, for every badge on the site.
+ *
+ * "Livraison imminente" replaces the status outright (it is the only label the
+ * client gives those programmes); a promotion carries its discount ("En
+ * promotion · Remise 6 %"), because a promotion without its figure is not
+ * the client's offer. `readyNow` is not folded in here — callers show
+ * "Livraison immédiate" as its own line.
+ */
+export function statusText(
+  p: { status: Status; readySoon?: boolean; remisePct?: number | null },
+  locale: Locale,
+): string {
+  if (p.readySoon) return READY_SOON[locale];
+  const label = STATUS_LABELS[p.status][locale];
+  if (p.status !== "en-promotion" || !p.remisePct) return label;
+  return locale === "ar"
+    ? `${label} · تخفيض ⁦${p.remisePct}⁩٪`
+    : `${label} · Remise ${p.remisePct} %`;
+}
 
 export const AMENITY_LABELS: Record<Amenity, { fr: string; ar: string }> = {
   piscine: { fr: "Piscine", ar: "مسبح" },
