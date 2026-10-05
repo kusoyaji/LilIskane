@@ -1,0 +1,4 @@
+# Source originals for the media pipeline (1.2 GB) — the build only needs public/media.
+assets-src
+*.log
+.claude
