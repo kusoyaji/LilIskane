@@ -11,6 +11,13 @@ type Props = {
   locale: Locale;
   basePrice: number;
   typologies: Typology[];
+  /**
+   * The introduction above the controls. Defaults to the project-page copy;
+   * pass your own, or `false` where the surrounding page already introduces
+   * the simulator (the buying guide) — the default copy is written for a
+   * project page and would be wrong anywhere else.
+   */
+  intro?: false | { eyebrow?: string; title: string; body?: string };
 };
 
 const DURATIONS = [10, 15, 20, 25];
@@ -29,7 +36,7 @@ const DURATIONS = [10, 15, 20, 25];
  * here is the same one that decided whether this project appeared in a budget
  * search at all.
  */
-export function CreditSimulator({ locale, basePrice, typologies }: Props) {
+export function CreditSimulator({ locale, basePrice, typologies, intro }: Props) {
   const t = getDictionary(locale);
   const depositId = useId();
   const priceId = useId();
@@ -55,30 +62,33 @@ export function CreditSimulator({ locale, basePrice, typologies }: Props) {
   return (
     <section
       id="financement"
-      aria-labelledby="simulator-title"
+      aria-labelledby={intro === false ? undefined : "simulator-title"}
+      aria-label={intro === false ? t.simulator.title : undefined}
       style={{ background: "var(--color-ink)", color: "var(--color-paper)" }}
     >
       <div className="u-shell" style={{ paddingBlock: "clamp(4rem, 9vw, 7rem)" }}>
-        <div className="max-w-[48ch]">
-          <p className="u-eyebrow" style={{ color: "var(--color-ochre-bright)" }}>
-            {t.simulator.title}
-          </p>
-          <h2
-            id="simulator-title"
-            className="u-display mt-5"
-            style={{ fontSize: "var(--text-display)" }}
-          >
-            {t.project.simulatorTitle}
-          </h2>
-          <p
-            className="u-body mt-6"
-            style={{ color: "color-mix(in oklab, var(--color-paper) 78%, transparent)" }}
-          >
-            {t.project.simulatorBody}
-          </p>
-        </div>
+        {intro !== false && (
+          <div className="max-w-[48ch]">
+            <p className="u-eyebrow" style={{ color: "var(--color-ochre-bright)" }}>
+              {intro?.eyebrow ?? t.simulator.title}
+            </p>
+            <h2
+              id="simulator-title"
+              className="u-display mt-5"
+              style={{ fontSize: "var(--text-display)" }}
+            >
+              {intro?.title ?? t.project.simulatorTitle}
+            </h2>
+            <p
+              className="u-body mt-6"
+              style={{ color: "color-mix(in oklab, var(--color-paper) 78%, transparent)" }}
+            >
+              {intro ? intro.body : t.project.simulatorBody}
+            </p>
+          </div>
+        )}
 
-        <div className="mt-12 grid gap-x-16 gap-y-12 lg:grid-cols-2">
+        <div className={`${intro === false ? "" : "mt-12 "}grid gap-x-16 gap-y-12 lg:grid-cols-2`}>
           <div className="flex flex-col gap-8">
             {typologies.length > 0 && (
               <div>

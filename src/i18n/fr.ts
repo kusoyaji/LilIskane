@@ -270,14 +270,14 @@ export const fr = {
     successBody:
       "Un conseiller vous rappelle sous 24 heures ouvrées. Vous pouvez aussi nous joindre directement.",
     privacy:
-      "Vos coordonnées servent uniquement à traiter cette demande. Elles ne sont ni revendues ni utilisées pour de la prospection.",
+      "Vos coordonnées servent à traiter cette demande et peuvent être utilisées pour vous informer de nos programmes. Vous pouvez vous y opposer à tout moment.",
   },
 
   footer: {
     address: "239 Boulevard Mohammed V, Casablanca",
     hours: "Lundi — Samedi, 9h à 18h",
     company: "Chaabi Lil Iskane",
-    group: "Groupe Ynna Holding",
+    group: "Groupe Ynna",
     sitemap: "Plan du site",
     legal: "Mentions légales",
     privacy: "Données personnelles",

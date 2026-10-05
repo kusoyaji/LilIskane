@@ -61,8 +61,8 @@ export const milestones: Milestone[] = [
     year: 2000,
     title: { fr: "Essaouira El Jadida", ar: "الصويرة الجديدة" },
     body: {
-      fr: "Lancement d'une ville nouvelle : 180 hectares, environ 11 000 logements.",
-      ar: "إطلاق مدينة جديدة على مساحة 180 هكتاراً، بحوالي 11 000 مسكن.",
+      fr: "Lancement d'une ville nouvelle : 180 hectares, environ 11 000 logements.",
+      ar: "إطلاق مدينة جديدة على مساحة 180 هكتاراً، بحوالي 11 000 مسكن.",
     },
   },
   {

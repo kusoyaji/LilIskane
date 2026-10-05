@@ -432,6 +432,10 @@ export const privacy: Copy<LegalDoc> = {
           },
           {
             kind: "p",
+            text: "Comme l'indiquent nos formulaires, elles peuvent également être utilisées par Chaabi Lil Iskane pour vous informer de ses programmes. Vous pouvez vous y opposer à tout moment (voir « Vos droits »).",
+          },
+          {
+            kind: "p",
             text: "Elles sont conservées le temps nécessaire au traitement de votre demande et au suivi de la relation qui en découle.",
           },
         ],
@@ -571,6 +575,10 @@ export const privacy: Copy<LegalDoc> = {
           {
             kind: "p",
             text: "تُستعمل بياناتكم لمعالجة الطلب الذي توجّهونه إلينا: الرد عليكم، معاودة الاتصال بكم، وتنظيم موعدكم مع مستشار تجاري وتأكيده.",
+          },
+          {
+            kind: "p",
+            text: "وكما تشير إليه استماراتنا، يمكن أن يستعملها الشعبي للإسكان أيضاً لإخباركم ببرامجه. ويحق لكم الاعتراض على ذلك في أي وقت (انظر «حقوقكم»).",
           },
           {
             kind: "p",

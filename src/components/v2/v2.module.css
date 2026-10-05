@@ -125,7 +125,12 @@
   line-height: 0.9;
   letter-spacing: -0.04em;
   font-variant-numeric: tabular-nums;
+  /* The figure is dir="ltr" so digits never reorder; without this a stretched
+     grid item would push it to the left edge of an RTL cell, away from its
+     label. */
+  justify-self: start;
 }
+.statFigureMd { font-size: clamp(2.4rem, 4.6vw, 4.5rem); }
 .statLabel { font-size: var(--text-small); line-height: 1.45; max-inline-size: 24ch; opacity: 0.78; }
 
 /* ----------------------------------------------------------------- cta ---- */

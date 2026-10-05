@@ -11,12 +11,8 @@ const BASE_PRICE = 1_000_000;
  * Step 3's instrument, full width, on ink — the anchor the home page links
  * to (`#simulateur`).
  *
- * `CreditSimulator` was written for a project page and opens with that page's
- * own heading ("Votre mensualité pour ce projet" / pre-filled with Riad
- * Garden II's price), which would be wrong here. The component is shared and
- * not ours to change, so its intro block is hidden by this stage's stylesheet
- * and replaced with a heading that fits a general guide. The calculator,
- * results and disclaimer are untouched.
+ * `CreditSimulator` is introduced by this stage's own heading, so its built-in
+ * project-page intro is switched off with `intro={false}`.
  */
 export function SimulatorStage({ locale }: { locale: Locale }) {
   const t = guide[locale].sim;
@@ -33,7 +29,7 @@ export function SimulatorStage({ locale }: { locale: Locale }) {
         <p className={`u-enter ${s.simLead}`}>{t.lead}</p>
       </div>
       <div className={s.simEmbed}>
-        <CreditSimulator locale={locale} basePrice={BASE_PRICE} typologies={[]} />
+        <CreditSimulator locale={locale} basePrice={BASE_PRICE} typologies={[]} intro={false} />
       </div>
     </div>
   );

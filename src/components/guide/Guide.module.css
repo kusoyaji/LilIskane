@@ -396,16 +396,12 @@
   opacity: 0.85;
 }
 
-/* CreditSimulator opens with its project-page intro ("pour ce projet",
-   pre-filled with Riad Garden II). That intro is replaced by the heading
-   above, so it is taken out here; the instrument itself is untouched. Its
-   own section background is cleared so the lattice reads continuously. */
+/* CreditSimulator paints its own ink; cleared so the lattice reads through.
+   Its intro is switched off by prop (intro={false}). */
 .simEmbed > section { background: transparent !important; }
 .simEmbed > section > div {
   padding-block-start: clamp(2.5rem, 6vh, 4rem) !important;
 }
-.simEmbed > section > div > div:first-child { display: none; }
-.simEmbed > section > div > div:nth-child(2) { margin-block-start: 0; }
 
 /* ============================================================= finance ==== */
 .finance {

@@ -9,10 +9,8 @@ import s from "./SimulatorSection.module.css";
 /**
  * The shared credit simulator, introduced for *this* programme.
  *
- * `CreditSimulator` is used unchanged, but its built-in introduction names
- * Riad Garden II whatever page it is on. Here that introduction is replaced by
- * one written from the programme's own name and entry price; the instrument
- * below it is untouched.
+ * Introduced from the programme's own name and entry price; the simulator's
+ * built-in project-page intro is switched off with `intro={false}`.
  */
 export function SimulatorSection({ locale, project }: { locale: Locale; project: Project }) {
   const t = getDictionary(locale);
@@ -33,7 +31,7 @@ export function SimulatorSection({ locale, project }: { locale: Locale; project:
         <p className={`u-enter ${s.body}`}>{land ? c.simulatorBodyLand(price) : c.simulatorBody(price)}</p>
       </div>
       <div className={s.instrument}>
-        <CreditSimulator locale={locale} basePrice={base} typologies={project.typologies} />
+        <CreditSimulator locale={locale} basePrice={base} typologies={project.typologies} intro={false} />
       </div>
     </div>
   );

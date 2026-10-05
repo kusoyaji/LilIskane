@@ -85,11 +85,18 @@ export function Field({ initialTone = "paper" }: { initialTone?: string }) {
 
       let t = 0;
       if (next && !reduced) {
-        // Blended across the last two-thirds of a viewport before the incoming
-        // section reaches the midline, so the ground has finished changing by
-        // the time that section's type is legible on it. Blending on arrival
-        // instead reads as the page correcting itself a beat too late.
-        const span = window.innerHeight * 0.66;
+        // Blended across a fifth of a viewport, finishing exactly as the
+        // incoming section reaches the midline — the moment ownership switches,
+        // so there is no jump when `index` advances.
+        //
+        // This was two-thirds of a viewport. That started the blend the moment
+        // the next section peeked in at the bottom, and left the last half
+        // screen of every section — its closing figures, captions, fine print
+        // — sitting on a mid-tone olive-grey where neither light nor dark type
+        // reads. Six independent reviews of the v2 build flagged it. A short
+        // blend still reads as the ground turning, not as a cut, and costs
+        // legibility for a fifth of a screen instead of half of one.
+        const span = window.innerHeight * 0.2;
         const remaining = next.getBoundingClientRect().top - line;
         t = Math.min(1, Math.max(0, 1 - remaining / span));
       }

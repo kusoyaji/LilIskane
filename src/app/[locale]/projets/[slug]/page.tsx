@@ -228,6 +228,7 @@ export default async function ProjectPage({
           locale={typedLocale}
           title={c.ctaTitle(project.name[typedLocale])}
           media={project.segment === "terrain" ? LAND_CTA_MEDIA : undefined}
+          href={`/${typedLocale}/contact?projet=${project.slug}`}
         />
       </div>
     </>

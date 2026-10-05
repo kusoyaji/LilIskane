@@ -55,7 +55,7 @@ export function PageHero({
 
       <div className="u-shell w-full">
         {crumb && (
-          <nav aria-label="Fil d'Ariane" className={`u-eyebrow u-enter ${s.crumbs}`}>
+          <nav aria-label={locale === "ar" ? "مسار التصفح" : "Fil d'Ariane"} className={`u-eyebrow u-enter ${s.crumbs}`}>
             <Link href={`/${locale}`}>{shared[locale].home}</Link>
             <span aria-hidden>/</span>
             <span aria-current="page">{crumb}</span>

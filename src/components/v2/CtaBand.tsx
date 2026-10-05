@@ -26,11 +26,14 @@ export function CtaBand({
   media = DEFAULT_MEDIA,
   title,
   body,
+  href,
 }: {
   locale: Locale;
   media?: MediaRef;
   title?: string;
   body?: string;
+  /** Booking destination; project pages pass /contact?projet=<slug> so the form arrives prefilled. */
+  href?: string;
 }) {
   const t = shared[locale];
   return (
@@ -50,7 +53,7 @@ export function CtaBand({
           {body ?? t.ctaBody}
         </p>
         <div className="u-enter" style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", marginBlockStart: "2.25rem" }}>
-          <LinkButton href={`/${locale}/contact`} variant="light">
+          <LinkButton href={href ?? `/${locale}/contact`} variant="light">
             {t.bookVisit}
           </LinkButton>
           <LinkButton href={company.phoneHref} variant="outline" arrow={false}>

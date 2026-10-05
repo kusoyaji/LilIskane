@@ -20,6 +20,7 @@ export function Stat({
   suffix = "",
   plain = false,
   duration = 1600,
+  size = "lg",
 }: {
   value: number;
   label: string;
@@ -28,6 +29,8 @@ export function Stat({
   suffix?: string;
   plain?: boolean;
   duration?: number;
+  /** `md` fits four figures across a row even when one is "11 000". */
+  size?: "lg" | "md";
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [shown, setShown] = useState(value);
@@ -65,7 +68,7 @@ export function Stat({
 
   return (
     <div ref={ref} className={s.stat}>
-      <span className={s.statFigure} dir="ltr">
+      <span className={`${s.statFigure} ${size === "md" ? s.statFigureMd : ""}`} dir="ltr">
         {prefix}
         {text}
         {suffix}

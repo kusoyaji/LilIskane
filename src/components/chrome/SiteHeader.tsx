@@ -111,20 +111,32 @@ export function SiteHeader({ locale }: { locale: Locale }) {
         className={`relative flex h-full items-center justify-between gap-6 ${light ? "on-media" : ""}`}
         style={{ paddingInline: "var(--gutter)" }}
       >
+        {/* A bilingual lockup: the company's name in both of its scripts, the way
+            it signs its own buildings. On phones only the reader's language
+            fits beside the call button, so the other script steps out. */}
         <Link
           href={`/${locale}`}
-          className="flex h-11 shrink-0 items-center"
+          className={`flex h-11 shrink-0 items-center gap-3 ${locale === "ar" ? "flex-row-reverse" : ""}`}
           aria-label={t.footer.company}
-          style={{ lineHeight: 0 }}
+          style={{ lineHeight: 0, color: light ? "var(--color-paper)" : "var(--color-ink)" }}
         >
           <Image
             src={light ? "/brand/wordmark-paper.png" : "/brand/wordmark-ink.png"}
-            alt={t.footer.company}
+            alt=""
             width={371}
             height={28}
             priority
-            className="h-[0.62rem] w-auto sm:h-[0.88rem]"
+            className={`h-[0.62rem] w-auto sm:h-[0.88rem] ${locale === "ar" ? "hidden sm:block" : ""}`}
           />
+          <span aria-hidden className="hidden h-4 w-px sm:block" style={{ background: "currentColor", opacity: 0.35 }} />
+          <span
+            lang="ar"
+            dir="rtl"
+            className={locale === "ar" ? "" : "hidden sm:inline"}
+            style={{ fontFamily: "var(--font-plex-arabic), sans-serif", fontWeight: 600, fontSize: "1.02rem", lineHeight: 1, letterSpacing: 0 }}
+          >
+            الشعبي للإسكان
+          </span>
         </Link>
 
         <ul className="hidden items-center gap-8 lg:flex" style={{ listStyle: "none", margin: 0, padding: 0 }}>
@@ -178,7 +190,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
               whole time — never an icon that hides it, and never a popup. */}
           <a
             href={t.nav.phoneHref}
-            className="u-eyebrow u-numeric flex items-center gap-2 rounded-full px-4 py-2.5 u-press"
+            className="u-eyebrow u-numeric flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-2.5 u-press"
             style={{
               background: light ? "color-mix(in oklab, var(--color-paper) 92%, transparent)" : "var(--color-ink)",
               color: light ? "var(--color-ink)" : "var(--color-paper)",
@@ -264,12 +276,6 @@ export function SiteHeader({ locale }: { locale: Locale }) {
               </Link>
             </li>
           </ul>
-          <p
-            className="u-eyebrow"
-            style={{ padding: "0 var(--gutter)", color: "var(--color-ink-mute)" }}
-          >
-            {t.footer.hours}
-          </p>
         </div>
       )}
     </header>

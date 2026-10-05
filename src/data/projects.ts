@@ -668,8 +668,8 @@ export const projects: Project[] = [
       key: "th_odyssee_studios",
       nature: "render",
       alt: {
-        fr: "Studio Odyssée : séjour compact ouvert sur le balcon, cuisine équipée en enfilade et chambre séparée.",
-        ar: "ستوديو أوديسي: صالون صغير مفتوح على الشرفة، مطبخ مجهّز متتابع، وغرفة منفصلة.",
+        fr: "Odyssée Studios à Mohammedia : piscine centrale bordée de transats et de parasols, entre des immeubles aux façades claires.",
+        ar: "أوديسي ستوديوهات بالمحمدية: مسبح مركزي تحيط به كراسي الاستلقاء والمظلات، بين عمارات بواجهات فاتحة.",
       },
     },
     gallery: [],
@@ -780,8 +780,8 @@ export const projects: Project[] = [
       key: "th_bougainvillier",
       nature: "photograph",
       alt: {
-        fr: "Résidence Bougainvillier à Mohammedia : façades claires en R+4 ordonnées autour d'espaces verts plantés.",
-        ar: "إقامة بوغانفيلي بالمحمدية: واجهات فاتحة من أربعة طوابق منتظمة حول مساحات خضراء مغروسة.",
+        fr: "Séjour d'un appartement de Bougainvillier à Mohammedia : sol en marbre clair, salle à manger aux chaises de velours bleu, lustre et grandes baies.",
+        ar: "صالون شقة في بوغانفيلي بالمحمدية: أرضية رخامية فاتحة، ركن طعام بكراسٍ من المخمل الأزرق، ثريا ونوافذ واسعة.",
       },
     },
     gallery: [],
@@ -795,8 +795,8 @@ export const projects: Project[] = [
           key: "th_bougainvillier",
           nature: "photograph",
           alt: {
-            fr: "Résidence Bougainvillier à Mohammedia : façades claires en R+4 ordonnées autour d'espaces verts plantés.",
-            ar: "إقامة بوغانفيلي بالمحمدية: واجهات فاتحة من أربعة طوابق منتظمة حول مساحات خضراء مغروسة.",
+            fr: "Séjour d'un appartement de Bougainvillier à Mohammedia : sol en marbre clair, salle à manger aux chaises de velours bleu, lustre et grandes baies.",
+            ar: "صالون شقة في بوغانفيلي بالمحمدية: أرضية رخامية فاتحة، ركن طعام بكراسٍ من المخمل الأزرق، ثريا ونوافذ واسعة.",
           },
         },
         // Show flat, not a delivered unit. Poster is the programme hero for
