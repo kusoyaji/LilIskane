@@ -2,7 +2,8 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { formatNumber, type Locale } from "@/i18n/config";
-import { searchCopy } from "@/content/projects";
+import { KIND_LABELS, searchCopy } from "@/content/projects";
+import { KINDS, type Kind } from "@/data/types";
 import { maxAffordablePrice } from "@/lib/credit";
 import { DEFAULT_DEPOSIT, listOf, scalarOf, toggleInList, withScalar, type ListKey } from "./query";
 import { useSearchState } from "./SearchShell";
@@ -46,8 +47,14 @@ export function SearchControls({
 
   const budgetParam = Number(scalarOf(query, "mensualite")) || null;
   const deposit = Number(scalarOf(query, "apport") ?? DEFAULT_DEPOSIT);
-  const city = scalarOf(query, "ville");
+  // `ville` is one city or several (a region typed into the hero search).
+  // The select edits one; several are listed as removable chips above it.
+  const selectedCities = listOf(query, "ville");
+  const city = selectedCities.length === 1 ? selectedCities[0] : null;
+  const multiCity = selectedCities.length > 1;
   const rooms = scalarOf(query, "chambres");
+  const priceMax = Number(scalarOf(query, "prix")) || null;
+  const kinds = listOf(query, "type").filter((k): k is Kind => (KINDS as readonly string[]).includes(k));
 
   // The slider moves locally and commits when the hand stops, so dragging it
   // is one navigation rather than forty.
@@ -65,6 +72,12 @@ export function SearchControls({
   };
 
   const [more, setMore] = useState(() => listOf(query, "equipements").length > 0);
+  // An amenity chosen elsewhere (the hero's sentence search, a shared link)
+  // must never filter the list from behind a folded panel.
+  const hasAmenity = listOf(query, "equipements").length > 0;
+  useEffect(() => {
+    if (hasAmenity) setMore(true);
+  }, [hasAmenity]);
   const [openMobile, setOpenMobile] = useState(false);
 
   const shownBudget = Math.min(budget, BUDGET_NONE);
@@ -72,7 +85,9 @@ export function SearchControls({
   const ceiling = hasBudget ? maxAffordablePrice(shownBudget, deposit) : null;
   const active =
     (budgetParam ? 1 : 0) +
-    (city ? 1 : 0) +
+    (priceMax ? 1 : 0) +
+    selectedCities.length +
+    kinds.length +
     (rooms ? 1 : 0) +
     listOf(query, "standing").length +
     listOf(query, "statut").length +
@@ -99,8 +114,44 @@ export function SearchControls({
     });
   };
 
+  const cityName = (id: string) => cities.find((facet) => facet.value === id)?.label ?? id;
+  const activeChips: Array<{ key: string; label: string; next: string }> = [
+    ...(priceMax
+      ? [{ key: "prix", label: c.priceChip(formatNumber(priceMax, locale)), next: withScalar(query, "prix", null) }]
+      : []),
+    ...kinds.map((kind) => ({ key: `type-${kind}`, label: KIND_LABELS[kind][locale], next: toggleInList(query, "type", kind) })),
+    ...(multiCity
+      ? selectedCities.map((id) => ({ key: `ville-${id}`, label: cityName(id), next: toggleInList(query, "ville", id) }))
+      : []),
+  ];
+
   return (
     <div className={s.controls}>
+      {/* Values set by the hero's sentence search or a shared link, which no
+          control below shows on its own: visible, and removable one by one. */}
+      {activeChips.length > 0 && (
+        <div className={s.active}>
+          <span className={`u-eyebrow ${s.activeLabel}`}>{c.activeTitle}</span>
+          <ul className={s.activeChips}>
+            {activeChips.map((chip) => (
+              <li key={chip.key} className={s.activeChip}>
+                <span className="u-numeric">{chip.label}</span>
+                <button
+                  type="button"
+                  className={s.smartChipX}
+                  aria-label={c.removeChip(chip.label)}
+                  onClick={() => navigate(chip.next)}
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden>
+                    <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+                  </svg>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* ---------------------------------------------------------- budget */}
       <div className={s.budget}>
         <div className={s.budgetTop}>
@@ -165,9 +216,14 @@ export function SearchControls({
           <select
             id={cityId}
             className={s.select}
-            value={city ?? ""}
+            value={multiCity ? "__several" : (city ?? "")}
             onChange={(event) => navigate(withScalar(query, "ville", event.target.value || null))}
           >
+            {multiCity && (
+              <option value="__several" disabled>
+                {c.citiesSelected(selectedCities.length, formatNumber(selectedCities.length, locale))}
+              </option>
+            )}
             <option value="">{c.allCities}</option>
             {cities.map((facet) => (
               <option key={facet.value} value={facet.value}>

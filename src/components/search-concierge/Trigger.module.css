@@ -1,0 +1,153 @@
+/* Header triggers for the concierge search. Display is decided here, not with
+   Tailwind utilities on the same element: CSS Modules are unlayered and would
+   beat `xl:hidden` anyway (see the layering note in globals.css). */
+
+.glyph {
+  flex: none;
+  display: block;
+}
+
+/* ------------------------------------------------------------- the pill ---- */
+.bar {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  block-size: 2.125rem;
+  min-inline-size: 2.125rem;
+  padding: 0;
+  border: 1px solid color-mix(in oklab, var(--color-ink) 24%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.bar[data-light] {
+  border-color: color-mix(in oklab, var(--color-paper) 46%, transparent);
+  background: color-mix(in oklab, var(--color-paper) 8%, transparent);
+  color: var(--color-paper);
+}
+
+.barLabel {
+  display: none;
+  font-size: var(--text-label);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  line-height: 1;
+}
+.kbd {
+  display: none;
+  align-items: center;
+  padding: 0.22rem 0.4rem;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  font: inherit;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  opacity: 0.6;
+}
+
+@media (min-width: 80rem) {
+  .bar {
+    display: inline-flex;
+  }
+  /* Arabic: the nav is half the width of the French one, so the full pill fits
+     from 1280. */
+  .bar[data-locale="ar"] {
+    padding-inline: 0.95rem 0.8rem;
+  }
+  .bar[data-locale="ar"] .barLabel {
+    display: inline;
+  }
+}
+@media (min-width: 90rem) {
+  .bar {
+    padding-inline: 0.95rem 1.05rem;
+  }
+  .bar .barLabel {
+    display: inline;
+  }
+  .bar[data-locale="ar"] .kbd {
+    display: inline-flex;
+  }
+  .bar[data-locale="ar"] {
+    padding-inline: 0.95rem 0.5rem;
+  }
+}
+@media (min-width: 96rem) {
+  .bar {
+    padding-inline: 0.95rem 0.5rem;
+  }
+  .bar .kbd {
+    display: inline-flex;
+  }
+}
+:global([lang="ar"]) .barLabel {
+  text-transform: none;
+  font-size: 0.875rem;
+  letter-spacing: 0;
+}
+
+/* ------------------------------------------------- the icon (below 1280) ---- */
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+.icon[data-light] {
+  color: var(--color-paper);
+}
+@media (min-width: 80rem) {
+  .icon {
+    display: none;
+  }
+}
+
+@media (hover: hover) {
+  .bar:hover {
+    border-color: var(--color-ink);
+    opacity: 1;
+  }
+  .bar[data-light]:hover {
+    border-color: var(--color-paper);
+    background: color-mix(in oklab, var(--color-paper) 14%, transparent);
+  }
+}
+
+/* ------------------------------------------------ the mobile menu row ---- */
+.menuRow {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  inline-size: 100%;
+  min-block-size: 3.5rem;
+  padding-inline: 1.15rem;
+  border: 1px solid color-mix(in oklab, var(--color-ink) 16%, transparent);
+  border-radius: 999px;
+  background: var(--color-paper-warm);
+  color: var(--color-ink-soft);
+  font-size: 1rem;
+  text-align: start;
+  cursor: pointer;
+}
+.menuRow > span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.menuRow .glyph {
+  color: var(--color-ochre-deep);
+}

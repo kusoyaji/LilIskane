@@ -546,6 +546,8 @@
 }
 .heroGrid {
   display: grid;
+  /* minmax(0, …): the sentence field must never widen the column past the screen. */
+  grid-template-columns: minmax(0, 1fr);
   gap: clamp(2.5rem, 6vh, 3.5rem);
 }
 @media (min-width: 64rem) {
@@ -645,4 +647,276 @@
     flex: 1 1 auto;
     min-block-size: 7rem;
   }
+}
+
+/* --------------------------------------------------------- smart input -- */
+/* The sentence search in the hero: one long field on the ink ground, the
+   values it understood as ochre chips beneath (the overlay's chips), and a
+   quiet line saying how many programmes that is. Transform/opacity only. */
+.smart {
+  flex: 1 1 100%;
+  display: grid;
+  gap: 1rem;
+  max-inline-size: 40rem;
+}
+
+.smartField {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-block: 0.35rem;
+  padding-inline: 1.1rem 0.35rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-paper) 8%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-paper) 26%, transparent);
+  transition: box-shadow var(--dur-ui) var(--ease-ui), background-color var(--dur-ui) var(--ease-ui);
+}
+.smartField:focus-within {
+  background: color-mix(in oklab, var(--color-paper) 12%, transparent);
+  box-shadow: inset 0 0 0 1.5px var(--color-ochre-bright);
+}
+.smartIcon {
+  flex: none;
+  color: var(--color-ochre-bright);
+}
+.smartInput {
+  /* A zero basis: an input's intrinsic width (wider in the Arabic face) must
+     not set the field's minimum width on a phone. */
+  flex: 1 1 0;
+  inline-size: 0;
+  min-inline-size: 0;
+  min-block-size: 3rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-paper);
+  font: inherit;
+  /* ≥ 16px everywhere, so iOS never zooms the page on focus. */
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.1875rem);
+  outline: none;
+}
+.smartInput::placeholder {
+  color: color-mix(in oklab, var(--color-paper) 58%, transparent);
+  opacity: 1;
+}
+.smartInput::-webkit-search-cancel-button {
+  filter: invert(1);
+  opacity: 0.6;
+}
+.smartSubmit {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-block-size: 2.75rem;
+  max-inline-size: 15rem;
+  padding-inline: 1.15rem;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-ochre-bright);
+  color: var(--color-ink);
+  font-size: var(--text-small);
+  font-weight: 600;
+  cursor: pointer;
+}
+.smartSubmit:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+.smartSubmit:focus-visible {
+  outline: 2px solid var(--color-paper);
+  outline-offset: 2px;
+}
+.smartSubmitText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.smartArrow {
+  flex: none;
+  transition: transform var(--dur-ui) var(--ease-ui);
+}
+:dir(rtl) .smartArrow {
+  transform: scaleX(-1);
+}
+@media (hover: hover) {
+  .smartSubmit:hover .smartArrow {
+    transform: translateX(3px);
+  }
+  :dir(rtl) .smartSubmit:hover .smartArrow {
+    transform: scaleX(-1) translateX(3px);
+  }
+}
+/* Phones: the arrow alone, so the field keeps the width for the sentence. */
+@media (max-width: 29.99rem) {
+  .smartSubmit {
+    inline-size: 2.75rem;
+    padding: 0;
+    justify-content: center;
+  }
+  .smartSubmitText {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+.smartBelow {
+  display: grid;
+  gap: 0.75rem;
+  padding-inline: 0.25rem;
+  min-block-size: 2.75rem;
+}
+.smartChipsRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.85rem;
+  min-inline-size: 0;
+}
+.smartChipsLabel {
+  flex: none;
+  color: color-mix(in oklab, var(--color-paper) 56%, transparent);
+}
+.smartChips,
+.smartExamples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  min-inline-size: 0;
+}
+.smartChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  min-block-size: 2rem;
+  padding-inline: 0.85rem 0.2rem;
+  border-radius: 999px;
+  background: var(--color-ochre-bright);
+  color: var(--color-ink);
+  font-size: var(--text-small);
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  animation: smart-chip-in 180ms var(--ease-ui) both;
+}
+@keyframes smart-chip-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+.smartChipX {
+  display: grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color var(--dur-ui) var(--ease-ui);
+}
+.smartChipX:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: -2px;
+}
+@media (hover: hover) {
+  .smartChipX:hover {
+    background: color-mix(in oklab, var(--color-ink) 14%, transparent);
+  }
+}
+.smartExample,
+.smartNamedLink {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2rem;
+  padding-inline: 0.8rem;
+  border: 1px solid color-mix(in oklab, var(--color-paper) 26%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: color-mix(in oklab, var(--color-paper) 86%, transparent);
+  font-size: var(--text-small);
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color var(--dur-ui) var(--ease-ui), color var(--dur-ui) var(--ease-ui);
+}
+.smartExample:focus-visible,
+.smartNamedLink:focus-visible {
+  outline: 2px solid var(--color-ochre-bright);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .smartExample:hover,
+  .smartNamedLink:hover {
+    border-color: var(--color-ochre-bright);
+    color: var(--color-paper);
+  }
+}
+.smartNamedCity {
+  margin-inline-start: 0.3em;
+  color: color-mix(in oklab, var(--color-paper) 58%, transparent);
+}
+.smartStatus {
+  min-block-size: 1.25em;
+  font-size: var(--text-small);
+  color: color-mix(in oklab, var(--color-paper) 68%, transparent);
+}
+.smartStatus:empty {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .smartChip {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------- active search values -- */
+/* Values only a sentence or a shared link sets (a price ceiling, a kind of
+   home, several cities): shown above the facets so they can be seen and
+   removed, never silently filtering the list. */
+.active {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.85rem;
+}
+.activeLabel {
+  color: var(--color-ink-mute);
+}
+.activeChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.activeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  min-block-size: 2.25rem;
+  padding-inline: 0.95rem 0.25rem;
+  border-radius: 999px;
+  background: var(--color-ochre-bright);
+  color: var(--color-ink);
+  font-size: var(--text-small);
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.activeChip .smartChipX {
+  inline-size: 2rem;
+  block-size: 2rem;
 }

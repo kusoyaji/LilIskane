@@ -3,3 +3,4 @@ export { normalize, words } from "./normalize.ts";
 export { emptyQuery, parseQuery } from "./parse.ts";
 export { searchDocs } from "./rank.ts";
 export { toProjetsHref } from "./link.ts";
+export { namedProgramme } from "./rank.ts";

@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
 import { getDictionary } from "@/i18n";
 import type { Locale } from "@/i18n/config";
+import { SearchMenuRow, SearchTrigger, useConcierge } from "@/components/search-concierge/Concierge";
 import { useNavOverMedia } from "./useNavOverMedia";
 import { Wordmark } from "./Wordmark";
 
@@ -18,6 +19,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
   const menuId = useId();
   const toggleRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const concierge = useConcierge(locale);
 
   const links = [
     { href: `/${locale}/projets`, label: t.nav.projects },
@@ -158,7 +160,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
 
       <nav
         aria-label={t.nav.menu}
-        className={`relative flex h-full items-center justify-between gap-3 sm:gap-6 ${light ? "on-media" : ""}`}
+        className={`relative flex h-full items-center justify-between gap-2 min-[360px]:gap-3 sm:gap-6 xl:gap-4 ${light ? "on-media" : ""}`}
         style={{ paddingInline: "var(--gutter)" }}
       >
         {/* A bilingual lockup: the company's name in both of its scripts, the way
@@ -185,7 +187,7 @@ export function SiteHeader({ locale }: { locale: Locale }) {
           </span>
         </Link>
 
-        <ul className="hidden items-center gap-8 xl:flex" style={{ listStyle: "none", margin: 0, padding: 0 }}>
+        <ul className="hidden items-center gap-6 xl:flex min-[100rem]:gap-8" style={{ listStyle: "none", margin: 0, padding: 0 }}>
           {links.map((link) => {
             const active = pathname === link.href || pathname.startsWith(`${link.href}/`);
             return (
@@ -214,7 +216,10 @@ export function SiteHeader({ locale }: { locale: Locale }) {
           })}
         </ul>
 
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-4">
+        {/* Below 360px the three round controls sit edge to edge (each keeps its
+            full 44px target; the glyphs still read as spaced): with the search
+            button added, any gap pushed the menu button off a 320px screen. */}
+        <div className="flex shrink-0 items-center gap-0 min-[360px]:gap-1.5 sm:gap-4 xl:gap-3">
           {/* Hidden below `xl`, where it moves into the menu panel. (The
               inline nav needs ~1280px in French: between 1024 and 1279 its
               labels wrapped onto three lines and spilled out of the bar.)
@@ -235,6 +240,8 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             {t.nav.switchTo}
           </Link>
 
+          <SearchTrigger variant="bar" locale={locale} light={light} show={concierge.show} warm={concierge.warm} />
+
           {/* The phone number is the conversion: from 640px it is the real
               number. Below that the pill says "Nous appeler", and under 420px
               — most Android phones in Morocco are 360 — it becomes a 44px
@@ -254,6 +261,8 @@ export function SiteHeader({ locale }: { locale: Locale }) {
             <span className="hidden sm:inline">{t.nav.phone}</span>
             <span className="sr-only min-[420px]:not-sr-only sm:hidden">{t.nav.callUs}</span>
           </a>
+
+          <SearchTrigger variant="icon" locale={locale} light={light} show={concierge.show} warm={concierge.warm} />
 
           <button
             ref={toggleRef}
@@ -298,6 +307,18 @@ export function SiteHeader({ locale }: { locale: Locale }) {
           data-lenis-prevent
           style={{ background: "var(--color-paper)" }}
         >
+          <div style={{ padding: "var(--gutter) var(--gutter) 0" }}>
+            <SearchMenuRow
+              locale={locale}
+              warm={concierge.warm}
+              onActivate={() => {
+                // The menu closes first (releasing its own scroll lock), and
+                // focus comes back to the menu button when search closes.
+                setMenuOpen(false);
+                concierge.show(toggleRef.current);
+              }}
+            />
+          </div>
           <ul
             className="flex flex-col"
             style={{ listStyle: "none", margin: 0, padding: "var(--gutter)" }}
@@ -336,6 +357,8 @@ export function SiteHeader({ locale }: { locale: Locale }) {
           </ul>
         </div>
       )}
+
+      {concierge.overlay}
     </header>
   );
 }

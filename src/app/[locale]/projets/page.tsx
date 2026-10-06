@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CtaBand, LinkButton } from "@/components/v2";
+import { CtaBand } from "@/components/v2";
 import { ProjectCard } from "@/components/search/ProjectCard";
 import { MapPanel } from "@/components/search/MapPanel";
 import { SearchHero } from "@/components/search/SearchHero";
+import { SmartQuery } from "@/components/search/SmartQuery";
+import { statusFacetLabel } from "@/components/search/labels";
 import { SearchControls, type Facet } from "@/components/search/SearchControls";
 import { SearchMap, type MapCity } from "@/components/search/SearchMap";
 import { PendingRegion, SearchShell } from "@/components/search/SearchShell";
@@ -13,8 +15,17 @@ import { toListItems } from "@/data/list";
 import { projects } from "@/data/projects";
 import { AMENITIES, SEGMENTS, STATUSES } from "@/data/types";
 import { formatNumber, isLocale, isolateRun, type Locale } from "@/i18n/config";
-import { AMENITY_LABELS, projectCopy, SEGMENT_LABELS, STATUS_LABELS, searchCopy, statusText } from "@/content/projects";
-import { facetCount, fromSearchParams, hasStatusFacet, search, STATUS_FACETS, toSearchParams, type FacetKey } from "@/lib/filter";
+import { AMENITY_LABELS, SEGMENT_LABELS, searchCopy } from "@/content/projects";
+import {
+  facetCount,
+  fromSearchParams,
+  hasStatusFacet,
+  isActive,
+  search,
+  STATUS_FACETS,
+  toQueryString,
+  type FacetKey,
+} from "@/lib/filter";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -61,29 +72,22 @@ export default async function ProjectsPage({
       projects.some((p) => hasStatusFacet(p, st)) &&
       !(st === "livre" && projects.filter((p) => p.status === "livre").every((p) => p.readyNow)),
   );
-  // A stale or hand-made URL may carry a status no chip offers; dropping it
-  // here keeps the relaxation from widening a filter the visitor cannot see.
+  // A stale or hand-made URL may carry a status no chip offers, or a city id
+  // that is not one; dropping them here keeps the relaxation from widening a
+  // filter the visitor cannot see.
   const parsed = fromSearchParams(await searchParams);
   const filters = {
     ...parsed,
+    cities: parsed.cities.filter((id) => cityById.has(id)),
     statuses: parsed.statuses.filter((st) => (offeredStatuses as readonly string[]).includes(st)),
   };
   const result = search(filters);
-  const query = toSearchParams(filters).toString().replace(/%2C/gi, ",");
+  const query = toQueryString(filters);
   const items = toListItems(result.projects, typedLocale);
 
   // The relaxation walks a fixed order and records every facet it stepped
   // past, set or not. Only the ones the visitor actually chose were widened.
-  const active: Record<FacetKey, boolean> = {
-    amenities: filters.amenities.length > 0,
-    surfaceMin: filters.surfaceMin !== null,
-    bedrooms: filters.bedrooms !== null,
-    segments: filters.segments.length > 0,
-    statuses: filters.statuses.length > 0,
-    city: Boolean(filters.city),
-    budget: filters.budget !== null,
-  };
-  const widened = result.relaxed.filter((facet) => active[facet]);
+  const widened = result.relaxed.filter((facet) => isActive(filters, facet));
 
   const count = (facet: FacetKey, predicate: Parameters<typeof facetCount>[2]) =>
     facetCount(filters, facet, predicate);
@@ -109,18 +113,11 @@ export default async function ProjectsPage({
   const segmentFacets: Facet[] = SEGMENTS.filter((seg) => projects.some((p) => p.segment === seg)).map(
     (seg) => ({ value: seg, label: SEGMENT_LABELS[seg][typedLocale], count: count("segments", (p) => p.segment === seg) }),
   );
-  const statusFacets: Facet[] = offeredStatuses.map(
-    (st) => ({
-      value: st,
-      label:
-        st === "immediate"
-          ? projectCopy[typedLocale].readyNow
-          : st === "imminente"
-            ? statusText({ status: "en-construction", readySoon: true }, typedLocale)
-            : STATUS_LABELS[st][typedLocale],
-      count: count("statuses", (p) => hasStatusFacet(p, st)),
-    }),
-  );
+  const statusFacets: Facet[] = offeredStatuses.map((st) => ({
+    value: st,
+    label: statusFacetLabel(st, typedLocale),
+    count: count("statuses", (p) => hasStatusFacet(p, st)),
+  }));
   const bedroomFacets: Facet[] = [1, 2, 3, 4].map((n) => ({
     value: String(n),
     label: isolateRun(`${n}+`, typedLocale),
@@ -142,11 +139,7 @@ export default async function ProjectsPage({
           eyebrow={c.heroEyebrow}
           title={c.heroTitle}
           lead={c.heroLead(formatNumber(projects.length, typedLocale), formatNumber(cityIds.length, typedLocale))}
-          actions={
-            <LinkButton href="#recherche" variant="light">
-              {c.heroAction}
-            </LinkButton>
-          }
+          actions={<SmartQuery locale={typedLocale} />}
         />
       </div>
 

@@ -1,0 +1,1011 @@
+/* The concierge overlay — ink ground, the facade lattice, display type, ochre
+   chips. Tokens only. Motion: transform/opacity, ≤300ms, nothing animates per
+   keystroke; (hover: hover) gates every hover; reduced motion turns it off. */
+
+.dialog {
+  position: fixed;
+  inset: var(--vvt, 0) 0 auto 0;
+  /* 100%, not 100vw: while the page is locked its scrollbar gutter is kept,
+     and the fixed containing block excludes it (the root's ground turns ink
+     to fill it — see the lock in the component). */
+  inline-size: 100%;
+  block-size: var(--vvh, 100dvh);
+  max-inline-size: none;
+  max-block-size: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  color: var(--color-paper);
+  background: var(--color-ink);
+  opacity: 0;
+  transition:
+    opacity var(--dur-ui) var(--ease-ui),
+    overlay var(--dur-ui) allow-discrete,
+    display var(--dur-ui) allow-discrete;
+}
+.dialog[open] {
+  opacity: 1;
+}
+@starting-style {
+  .dialog[open] {
+    opacity: 0;
+  }
+}
+.dialog::backdrop {
+  background: transparent;
+}
+
+.shell {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  block-size: 100%;
+  transform: translateY(8px);
+  transition: transform 260ms var(--ease-reveal);
+}
+.dialog[open] .shell {
+  transform: none;
+}
+@starting-style {
+  .dialog[open] .shell {
+    transform: translateY(8px);
+  }
+}
+/* The lattice reads from the top corner on the reading side, like the ink
+   panels of the home page. */
+.shell > svg:first-child {
+  opacity: 0.07;
+  mask-image: radial-gradient(90% 70% at 100% 0%, #000 0%, transparent 72%);
+}
+:global([dir="rtl"]) .shell > svg:first-child {
+  mask-image: radial-gradient(90% 70% at 0% 0%, #000 0%, transparent 72%);
+}
+
+/* Columns shared by every band, so the field, the results and the footer
+   line up on one measure. */
+.top,
+.query,
+.body,
+.foot {
+  inline-size: 100%;
+  max-inline-size: 86rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* ---------------------------------------------------------------- top ---- */
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-block-size: var(--nav-h);
+}
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0;
+  color: var(--color-ochre-bright);
+}
+/* One cell of the moucharabieh, the site's bullet. */
+.cell {
+  inline-size: 0.6rem;
+  block-size: 0.6rem;
+  border: 2px solid currentColor;
+}
+.close {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-block-size: 2.75rem;
+  padding: 0 1rem 0 1.1rem;
+  border: 1px solid color-mix(in oklab, var(--color-paper) 26%, transparent);
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  font-size: var(--text-small);
+  cursor: pointer;
+}
+.closeGlyph {
+  flex: none;
+}
+
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 1.4rem;
+  padding: 0.2rem 0.38rem;
+  border: 1px solid color-mix(in oklab, var(--color-paper) 30%, transparent);
+  border-radius: 4px;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: color-mix(in oklab, var(--color-paper) 78%, transparent);
+}
+
+/* -------------------------------------------------------------- field ---- */
+.query {
+  display: grid;
+  gap: 1rem;
+  padding-block: clamp(0.5rem, 3vh, 2.25rem) 1rem;
+}
+.field {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(0.75rem, 1.6vw, 1.25rem);
+  padding-block: 0.4rem 0.9rem;
+  border-block-end: 1px solid color-mix(in oklab, var(--color-paper) 22%, transparent);
+}
+/* The rule under the field lights up in ochre while it has focus — that is
+   its focus indicator, so it is drawn at full contrast. */
+.field::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: -1px;
+  block-size: 2px;
+  background: var(--color-ochre-bright);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 280ms var(--ease-reveal);
+}
+:global([dir="rtl"]) .field::after {
+  transform-origin: right;
+}
+.field:focus-within::after {
+  transform: scaleX(1);
+}
+.fieldGlyph {
+  flex: none;
+  inline-size: clamp(1.35rem, 2.6vw, 2rem);
+  block-size: auto;
+  color: var(--color-ochre-bright);
+}
+
+.inputWrap {
+  position: relative;
+  min-inline-size: 0;
+}
+.input {
+  display: block;
+  inline-size: 100%;
+  block-size: 1.3em;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-paper);
+  caret-color: var(--color-ochre-bright);
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 3.25rem);
+  font-weight: 500;
+  font-stretch: 108%;
+  letter-spacing: -0.025em;
+  line-height: 1.3em;
+  text-align: start;
+}
+:global([lang="ar"]) .input {
+  font-weight: 500;
+}
+.input:focus,
+.input:focus-visible {
+  outline: none;
+}
+.input::placeholder {
+  color: color-mix(in oklab, var(--color-paper) 36%, transparent);
+  opacity: 1;
+}
+.input[data-ph]::placeholder {
+  color: transparent;
+}
+/* The highlight layer: same box, same type, transparent text; only the
+   understood words show, as ochre under-strokes behind the real field. */
+.mirror {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  white-space: pre;
+  color: transparent;
+  pointer-events: none;
+}
+.mark {
+  color: transparent;
+  background: color-mix(in oklab, var(--color-ochre-bright) 14%, transparent);
+  box-shadow: inset 0 -0.08em 0 var(--color-ochre-bright);
+  border-radius: 2px;
+}
+/* The cycling example under an empty field. */
+.ph {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: color-mix(in oklab, var(--color-paper) 36%, transparent);
+  pointer-events: none;
+  animation: ph-cycle 3200ms var(--ease-ui) both;
+}
+@keyframes ph-cycle {
+  0% {
+    opacity: 0;
+    transform: translateY(0.18em);
+  }
+  9%,
+  90% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-0.12em);
+  }
+}
+
+.clear {
+  display: grid;
+  place-items: center;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  padding: 0;
+  border: 1px solid color-mix(in oklab, var(--color-paper) 24%, transparent);
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* --------------------------------------------------------- parsed chips ---- */
+.chipsRow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem 0.9rem;
+  min-inline-size: 0;
+}
+.chipsLabel {
+  flex: none;
+  color: color-mix(in oklab, var(--color-paper) 56%, transparent);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  min-block-size: 2rem;
+  padding-inline: 0.85rem 0.2rem;
+  border-radius: 999px;
+  background: var(--color-ochre-bright);
+  color: var(--color-ink);
+  font-size: var(--text-small);
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  animation: chip-in 180ms var(--ease-ui) both;
+}
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+.chipX {
+  display: grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color var(--dur-ui) var(--ease-ui);
+}
+.chipX:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: -2px;
+}
+
+/* ----------------------------------------------------- mobile filter bar ---- */
+.mobileFilters {
+  display: none;
+}
+
+/* --------------------------------------------------------------- body ---- */
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 17.5rem;
+  align-items: start;
+  gap: clamp(2rem, 4vw, 4.5rem);
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-block: 0.75rem 2rem;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--color-paper) 22%, transparent) transparent;
+}
+/* The band scrolls, but the shared max width would put its scrollbar in the
+   middle of a wide screen: the scrolling box spans the dialog and the measure
+   is restored with padding instead. */
+@media (min-width: 86rem) {
+  .body {
+    max-inline-size: none;
+    padding-inline: max(var(--gutter), calc((100% - 86rem) / 2 + var(--gutter)));
+  }
+}
+
+.results {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  min-inline-size: 0;
+}
+.ideas {
+  min-inline-size: 0;
+}
+.sectionHead {
+  margin: 0 0 0.9rem;
+  color: color-mix(in oklab, var(--color-paper) 56%, transparent);
+}
+
+.ideaList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.idea {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  min-block-size: 2.75rem;
+  padding: 0.65rem 1.05rem;
+  border: 1px solid color-mix(in oklab, var(--color-paper) 20%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-paper) 4%, transparent);
+  color: var(--color-paper);
+  font-size: var(--text-small);
+  text-align: start;
+  cursor: pointer;
+}
+.ideaQuote {
+  color: var(--color-ochre-bright);
+  font-family: var(--font-display);
+  font-size: 1.15em;
+  line-height: 0;
+}
+
+.relaxed {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.9rem 1.1rem;
+  border-inline-start: 2px solid var(--color-ochre-bright);
+  background: color-mix(in oklab, var(--color-ochre-bright) 9%, transparent);
+  font-size: var(--text-small);
+  line-height: 1.5;
+}
+.relaxed p {
+  margin: 0;
+}
+.relaxedLead {
+  font-weight: 600;
+}
+
+.state {
+  display: grid;
+  justify-items: start;
+  gap: 0.9rem;
+  padding-block: 1rem;
+}
+.state p {
+  margin: 0;
+}
+.retry {
+  min-block-size: 2.75rem;
+  padding-inline: 1.2rem;
+  border: 1px solid color-mix(in oklab, var(--color-paper) 30%, transparent);
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.loading {
+  display: grid;
+  gap: 0.6rem;
+}
+.skeleton {
+  display: block;
+  block-size: 5.5rem;
+  border-radius: 3px;
+  background: color-mix(in oklab, var(--color-paper) 5%, transparent);
+  animation: pulse 1.4s ease-in-out infinite;
+}
+.skeleton:nth-child(odd) {
+  animation-delay: 0.2s;
+}
+@keyframes pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* ------------------------------------------------------------ listbox ---- */
+.listbox {
+  display: grid;
+  gap: 0.6rem;
+}
+.groupHead {
+  margin: 0.9rem 0 0.15rem;
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: color-mix(in oklab, var(--color-paper) 56%, transparent);
+}
+.listbox > .groupHead:first-child {
+  margin-block-start: 0;
+}
+:global([lang="ar"]) .groupHead {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: var(--text-small);
+}
+.options,
+.pages {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A programme. */
+.option {
+  position: relative;
+  display: grid;
+  grid-template-columns: 6.5rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(1rem, 2vw, 1.6rem);
+  padding: 0.85rem 1rem;
+  border-block-start: 1px solid color-mix(in oklab, var(--color-paper) 9%, transparent);
+  cursor: pointer;
+  transition: background-color 120ms var(--ease-ui);
+}
+.option:first-child {
+  border-block-start-color: transparent;
+}
+/* The active row: a lit field and an ochre stile on the reading side. */
+.option::before,
+.page::before {
+  content: "";
+  position: absolute;
+  inset-block: 0.85rem;
+  inset-inline-start: 0;
+  inline-size: 2px;
+  background: var(--color-ochre-bright);
+  transform: scaleY(0);
+  transition: transform 160ms var(--ease-ui);
+}
+.option[aria-selected="true"],
+.page[aria-selected="true"] {
+  background: color-mix(in oklab, var(--color-paper) 7%, transparent);
+}
+.option[aria-selected="true"]::before,
+.page[aria-selected="true"]::before {
+  transform: scaleY(1);
+}
+
+.thumb {
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--color-paper) 8%, transparent);
+}
+.thumbImg {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  transition: transform 300ms var(--ease-ui);
+}
+.option[aria-selected="true"] .thumbImg {
+  transform: scale(1.04);
+}
+
+.main {
+  display: grid;
+  gap: 0.3rem;
+  min-inline-size: 0;
+}
+.name {
+  font-size: clamp(1.15rem, 1.6vw, 1.45rem);
+  color: var(--color-paper);
+}
+.place {
+  overflow: hidden;
+  font-size: var(--text-small);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: color-mix(in oklab, var(--color-paper) 66%, transparent);
+}
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.85rem;
+  margin-block-start: 0.15rem;
+  font-size: var(--text-label);
+  line-height: 1.3;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  color: var(--color-paper);
+}
+.dot {
+  inline-size: 0.45rem;
+  block-size: 0.45rem;
+  border-radius: 50%;
+  background: var(--color-ochre-bright);
+}
+.badge[data-status-tone="olive"] .dot {
+  background: var(--color-olive-bright);
+}
+.segment {
+  color: color-mix(in oklab, var(--color-paper) 60%, transparent);
+}
+.tour {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.12rem 0.45rem;
+  border: 1px solid color-mix(in oklab, var(--color-paper) 30%, transparent);
+  border-radius: 999px;
+  font-weight: 600;
+  color: var(--color-paper);
+}
+
+.side {
+  display: grid;
+  justify-items: end;
+  gap: 0.15rem;
+  text-align: end;
+}
+.priceLabel {
+  font-size: var(--text-label);
+  color: color-mix(in oklab, var(--color-paper) 58%, transparent);
+}
+.price {
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 1.3vw, 1.25rem);
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--color-paper);
+}
+.landPrice {
+  font-size: var(--text-small);
+  font-weight: 600;
+  line-height: 1.35;
+  white-space: nowrap;
+  color: var(--color-paper);
+}
+.spec {
+  font-size: var(--text-label);
+  white-space: nowrap;
+  color: color-mix(in oklab, var(--color-paper) 62%, transparent);
+}
+
+/* The chosen row while its page loads: a thin ochre line fills under it. */
+.progress {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  block-size: 2px;
+  background: var(--color-ochre-bright);
+  transform: scaleX(0);
+  transform-origin: left;
+  opacity: 0;
+}
+:global([dir="rtl"]) .progress {
+  transform-origin: right;
+}
+.option[data-pending] .progress {
+  opacity: 1;
+  animation: progress 1.6s var(--ease-camera) forwards;
+}
+@keyframes progress {
+  to {
+    transform: scaleX(0.9);
+  }
+}
+
+/* A site page. */
+.page {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.8rem 1rem;
+  border-block-start: 1px solid color-mix(in oklab, var(--color-paper) 9%, transparent);
+  cursor: pointer;
+  transition: background-color 120ms var(--ease-ui);
+}
+.page:first-child {
+  border-block-start-color: transparent;
+}
+.pageMark {
+  inline-size: 0.55rem;
+  block-size: 0.55rem;
+  border: 2px solid var(--color-ochre-bright);
+}
+.pageText {
+  display: grid;
+  gap: 0.1rem;
+}
+.pageLabel {
+  font-weight: 600;
+}
+.pageHint {
+  font-size: var(--text-small);
+  color: color-mix(in oklab, var(--color-paper) 62%, transparent);
+}
+.pageArrow {
+  color: color-mix(in oklab, var(--color-paper) 55%, transparent);
+}
+:global([dir="rtl"]) .pageArrow,
+:global([dir="rtl"]) .mapArrow {
+  transform: scaleX(-1);
+}
+/* Empty field: the pages are quick links, laid out as a compact grid. */
+.pages[data-browse] {
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: 0.4rem;
+}
+.pages[data-browse] .page {
+  border: 1px solid color-mix(in oklab, var(--color-paper) 12%, transparent);
+  border-radius: 3px;
+}
+
+/* -------------------------------------------------------------- aside ---- */
+.aside {
+  position: sticky;
+  inset-block-start: 0;
+  display: grid;
+  gap: 1.35rem;
+  padding-inline-start: clamp(1.5rem, 2.5vw, 2.5rem);
+  border-inline-start: 1px solid color-mix(in oklab, var(--color-paper) 12%, transparent);
+}
+.aside .sectionHead {
+  margin: 0;
+}
+.fgroup {
+  display: grid;
+  gap: 0.55rem;
+}
+.fgroupTitle {
+  margin: 0;
+  font-size: var(--text-small);
+  font-weight: 600;
+  color: color-mix(in oklab, var(--color-paper) 88%, transparent);
+}
+.fchips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.fchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-block-size: 2.25rem;
+  padding-inline: 0.75rem;
+  border: 1px solid color-mix(in oklab, var(--color-paper) 22%, transparent);
+  border-radius: 999px;
+  background: none;
+  color: var(--color-paper);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.fcount {
+  font-size: var(--text-label);
+  color: color-mix(in oklab, var(--color-paper) 55%, transparent);
+}
+.fchip[aria-pressed="true"] {
+  border-color: var(--color-ochre-bright);
+  background: var(--color-ochre-bright);
+  color: var(--color-ink);
+}
+.fchip[aria-pressed="true"] .fcount {
+  color: color-mix(in oklab, var(--color-ink) 70%, transparent);
+}
+.fchip[data-empty] {
+  opacity: 0.4;
+}
+
+/* --------------------------------------------------------------- foot ---- */
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.85rem max(0.85rem, env(safe-area-inset-bottom));
+  border-block-start: 1px solid color-mix(in oklab, var(--color-paper) 12%, transparent);
+  background: var(--color-ink);
+}
+@media (min-width: 86rem) {
+  .foot {
+    max-inline-size: none;
+    padding-inline: max(var(--gutter), calc((100% - 86rem) / 2 + var(--gutter)));
+  }
+}
+.map {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-block-size: 2.75rem;
+  padding-inline: 1.15rem 1.25rem;
+  border-radius: 999px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-size: var(--text-small);
+  font-weight: 600;
+  text-decoration: none;
+}
+.hints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.2rem;
+  margin: 0;
+  font-size: var(--text-label);
+  color: color-mix(in oklab, var(--color-paper) 60%, transparent);
+}
+.hints > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* --------------------------------------------------------------- focus ---- */
+.close:focus-visible,
+.clear:focus-visible,
+.idea:focus-visible,
+.fchip:focus-visible,
+.cat:focus-visible,
+.retry:focus-visible,
+.map:focus-visible {
+  outline: 2px solid var(--color-ochre-bright);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------- hover ---- */
+@media (hover: hover) {
+  .close:hover,
+  .clear:hover,
+  .retry:hover {
+    border-color: color-mix(in oklab, var(--color-paper) 60%, transparent);
+  }
+  .idea:hover {
+    border-color: color-mix(in oklab, var(--color-paper) 50%, transparent);
+    opacity: 1;
+  }
+  .fchip:hover {
+    border-color: color-mix(in oklab, var(--color-paper) 60%, transparent);
+    opacity: 1;
+  }
+  .fchip[aria-pressed="true"]:hover {
+    border-color: var(--color-ochre-bright);
+  }
+  .chipX:hover {
+    background: color-mix(in oklab, var(--color-ink) 14%, transparent);
+  }
+}
+
+/* -------------------------------------------------------------- phones ---- */
+@media (max-width: 63.99rem) {
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .aside {
+    display: none;
+  }
+  .hints {
+    display: none;
+  }
+  .foot {
+    justify-content: center;
+  }
+  .map {
+    inline-size: 100%;
+    justify-content: center;
+  }
+
+  .mobileFilters {
+    display: grid;
+    gap: 0.5rem;
+    margin-inline: calc(-1 * var(--gutter));
+  }
+  .mobileCats,
+  .mobileChips {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    padding-inline: var(--gutter);
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+  }
+  .mobileCats::-webkit-scrollbar,
+  .mobileChips::-webkit-scrollbar {
+    display: none;
+  }
+  .mobileChips[hidden] {
+    display: none;
+  }
+  .cat {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 0.4rem;
+    min-block-size: 2.5rem;
+    padding-inline: 0.9rem 0.75rem;
+    border: 1px solid color-mix(in oklab, var(--color-paper) 22%, transparent);
+    border-radius: 999px;
+    background: none;
+    color: var(--color-paper);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .cat[aria-expanded="true"] {
+    border-color: var(--color-paper);
+    background: color-mix(in oklab, var(--color-paper) 10%, transparent);
+  }
+  .cat[data-active] {
+    border-color: var(--color-ochre-bright);
+  }
+  .catCount {
+    display: grid;
+    place-items: center;
+    min-inline-size: 1.2rem;
+    block-size: 1.2rem;
+    padding-inline: 0.25rem;
+    border-radius: 999px;
+    background: var(--color-ochre-bright);
+    color: var(--color-ink);
+    font-size: 0.6875rem;
+  }
+  .catChevron {
+    transition: transform var(--dur-ui) var(--ease-ui);
+  }
+  .cat[aria-expanded="true"] .catChevron {
+    transform: rotate(180deg);
+  }
+  .mobileChips .fchip {
+    flex: none;
+  }
+}
+
+@media (max-width: 40rem) {
+  .top {
+    min-block-size: 3.75rem;
+  }
+  .close > span:first-child,
+  .close .kbd {
+    display: none;
+  }
+  .close {
+    inline-size: 2.75rem;
+    padding: 0;
+    justify-content: center;
+  }
+  .query {
+    gap: 0.75rem;
+    padding-block: 0 0.75rem;
+  }
+  .chipsRow {
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: var(--gutter);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .chipsRow::-webkit-scrollbar {
+    display: none;
+  }
+  .chips {
+    flex-wrap: nowrap;
+  }
+  .option {
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    align-items: start;
+    gap: 0.4rem 0.9rem;
+    padding: 0.8rem 0.6rem;
+  }
+  .side {
+    grid-column: 2;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.1rem 0.4rem;
+    text-align: start;
+  }
+  .side .spec,
+  .side .landPrice {
+    flex-basis: 100%;
+  }
+  .ideaList {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline: calc(-1 * var(--gutter));
+    padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+  .ideaList::-webkit-scrollbar {
+    display: none;
+  }
+  .idea {
+    white-space: nowrap;
+  }
+  .pages[data-browse] {
+    grid-template-columns: 1fr 1fr;
+  }
+  .pages[data-browse] .page {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 0.7rem 0.8rem;
+  }
+  .pages[data-browse] .pageMark,
+  .pages[data-browse] .pageArrow,
+  .pages[data-browse] .pageHint {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog,
+  .shell,
+  .field::after,
+  .option,
+  .page,
+  .option::before,
+  .page::before,
+  .thumbImg,
+  .catChevron {
+    transition: none;
+  }
+  .shell,
+  .dialog[open] .shell {
+    transform: none;
+  }
+  .chip,
+  .skeleton,
+  .ph {
+    animation: none;
+  }
+  .option[aria-selected="true"] .thumbImg {
+    transform: none;
+  }
+  .option[data-pending] .progress {
+    animation: none;
+    transform: scaleX(1);
+    opacity: 0.6;
+  }
+}

@@ -1,17 +1,21 @@
+import { DEFAULT_DEPOSIT } from "@/lib/credit";
+
 /**
  * Query-string editing for the search controls, in the browser.
  *
  * The keys are the public URL contract defined by `src/lib/filter.ts`
- * (`mensualite`, `apport`, `ville`, `standing`, `chambres`, `statut`,
- * `equipements`). That module is not imported here because it imports the full
- * portfolio, which must never reach a client bundle; the server parses the URL
- * with it, and this file only edits the string.
+ * (`ville`, `prix`, `mensualite`, `apport`, `standing`, `type`, `chambres`,
+ * `statut`, `equipements`). `ville` is one city id or a comma list: the city
+ * select and a map pin set one, a region typed into the search sets several.
+ * That module is not imported here because it imports the full portfolio,
+ * which must never reach a client bundle; the server parses the URL with it,
+ * and this file only edits the string.
  */
-export type ListKey = "standing" | "statut" | "equipements";
-export type ScalarKey = "mensualite" | "apport" | "ville" | "chambres";
+export type ListKey = "ville" | "standing" | "type" | "statut" | "equipements";
+export type ScalarKey = "mensualite" | "apport" | "ville" | "chambres" | "prix";
 
-/** Mirrors `DEFAULT_DEPOSIT` in `src/lib/filter.ts`: the value that is left out of the URL. */
-export const DEFAULT_DEPOSIT = 150_000;
+/** The deposit left out of the URL (lib/credit.ts has no imports, so it is safe in the browser). */
+export { DEFAULT_DEPOSIT };
 
 /** Lists stay legible in a shared link: "statut=immediate,imminente", not %2C. */
 const legible = (params: URLSearchParams) => params.toString().replace(/%2C/gi, ",");

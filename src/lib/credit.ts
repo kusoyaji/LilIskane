@@ -21,6 +21,14 @@ export const CREDIT_DEFAULTS = {
   insuranceAnnualRate: 0.0035,
 } as const;
 
+/**
+ * The deposit /projets assumes when nobody has typed one (and leaves out of its
+ * URL). Lives here, beside the maths, so every surface that turns a monthly
+ * budget into a price ceiling — /projets, the home budget finder, the concierge
+ * search — starts from the same figure.
+ */
+export const DEFAULT_DEPOSIT = 150_000;
+
 export type CreditInput = {
   price: number;
   deposit: number;

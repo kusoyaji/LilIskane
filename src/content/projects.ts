@@ -340,7 +340,6 @@ export const searchCopy: Copy<{
   heroEyebrow: string;
   heroTitle: string;
   heroLead: (programmes: string, cities: string) => string;
-  heroAction: string;
   budget: string;
   budgetAny: string;
   perMonth: string;
@@ -360,7 +359,28 @@ export const searchCopy: Copy<{
   noExact: string;
   relaxedPrefix: string;
   relaxedSuffix: string;
-  relaxed: Record<"budget" | "city" | "surfaceMin" | "bedrooms" | "amenities" | "segments" | "statuses", string>;
+  relaxed: Record<
+    "budget" | "price" | "city" | "surfaceMin" | "bedrooms" | "amenities" | "segments" | "kinds" | "statuses",
+    string
+  >;
+  /** The removable chips above the facets for values only a search or a link sets (prix, type, several cities). */
+  activeTitle: string;
+  removeChip: (label: string) => string;
+  priceChip: (amount: string) => string;
+  /** The city select's own line while several cities are chosen. */
+  citiesSelected: (n: number, formatted: string) => string;
+  /** The sentence search in the hero. */
+  smartLabel: string;
+  smartPlaceholder: string;
+  smartSubmit: string;
+  smartOpen: (name: string) => string;
+  smartUnderstood: string;
+  smartTry: string;
+  /** Example sentences that fill the field — suggestions, never popularity claims. */
+  smartExamples: string[];
+  smartNamed: string;
+  smartCount: (n: number, formatted: string) => string;
+  smartClosest: string;
   mapEyebrow: string;
   mapHint: string;
   mapLabel: string;
@@ -376,8 +396,7 @@ export const searchCopy: Copy<{
     heroEyebrow: "Nos projets",
     heroTitle: "Trouvez votre adresse.",
     heroLead: (programmes, cities) =>
-      `${programmes} programmes dans ${cities} villes, du studio au lot de terrain, en lancement ou déjà livrés. Commencez par la mensualité, la ville ou le standing.`,
-    heroAction: "Explorer la carte",
+      `${programmes} programmes dans ${cities} villes, du studio au lot de terrain, en lancement ou déjà livrés. Décrivez ce que vous cherchez, en français ou en arabe.`,
     budget: "Mensualité maximale",
     budgetAny: "Sans limite",
     perMonth: "DH/mois",
@@ -399,13 +418,30 @@ export const searchCopy: Copy<{
     relaxedSuffix: "pour vous montrer les plus proches.",
     relaxed: {
       budget: "la mensualité",
+      price: "le prix",
       city: "la ville",
       surfaceMin: "la surface",
       bedrooms: "le nombre de chambres",
       amenities: "les équipements",
       segments: "le standing",
+      kinds: "le type de bien",
       statuses: "la disponibilité",
     },
+    activeTitle: "Votre recherche",
+    removeChip: (label) => `Retirer « ${label} »`,
+    priceChip: (amount) => `Prix ≤ ${amount} DH`,
+    citiesSelected: (n, formatted) => `${formatted} ${n > 1 ? "villes choisies" : "ville choisie"}`,
+    smartLabel: "Décrivez ce que vous cherchez",
+    smartPlaceholder: "Décrivez ce que vous cherchez…",
+    smartSubmit: "Rechercher",
+    smartOpen: (name) => `Ouvrir ${name}`,
+    smartUnderstood: "Compris",
+    smartTry: "Par exemple",
+    smartExamples: ["3 chambres à Agadir", "Près de Casablanca", "Terrain moins de 1 million", "شقة بمراكش"],
+    smartNamed: "Programmes",
+    smartCount: (n, formatted) =>
+      n === 1 ? "1 programme correspond" : `${formatted} programmes correspondent`,
+    smartClosest: "Aucun programme exact : les plus proches seront affichés",
     mapEyebrow: "La carte",
     mapHint: "Choisissez une ville pour filtrer.",
     mapLabel: "Carte du Maroc — les villes où se trouvent nos programmes",
@@ -422,8 +458,7 @@ export const searchCopy: Copy<{
     heroEyebrow: "مشاريعنا",
     heroTitle: "اعثروا على عنوانكم.",
     heroLead: (programmes, cities) =>
-      `${programmes} مشروعاً في ${cities} مدن، من الاستوديو إلى البقعة الأرضية، في طور الإطلاق أو مُسلَّمة. ابدؤوا بالقسط الشهري أو المدينة أو الفئة.`,
-    heroAction: "استكشاف الخريطة",
+      `${programmes} مشروعاً في ${cities} مدن، من الاستوديو إلى البقعة الأرضية، في طور الإطلاق أو مُسلَّمة. صِفوا ما تبحثون عنه، بالعربية أو بالفرنسية.`,
     budget: "القسط الشهري الأقصى",
     budgetAny: "دون حد",
     perMonth: "درهم شهرياً",
@@ -445,13 +480,31 @@ export const searchCopy: Copy<{
     relaxedSuffix: "لنعرض عليكم الأقرب.",
     relaxed: {
       budget: "القسط الشهري",
+      price: "السعر",
       city: "المدينة",
       surfaceMin: "المساحة",
       bedrooms: "عدد الغرف",
       amenities: "التجهيزات",
       segments: "الفئة",
+      kinds: "نوع العقار",
       statuses: "الوضعية",
     },
+    activeTitle: "بحثكم",
+    removeChip: (label) => `إزالة «${label}»`,
+    priceChip: (amount) => `السعر ≤ ${amount} درهم`,
+    citiesSelected: (n, formatted) =>
+      arCount(n, "مدينة واحدة مختارة", "مدينتان مختارتان", "مدن مختارة", "مدينة مختارة", formatted),
+    smartLabel: "صِفوا ما تبحثون عنه",
+    smartPlaceholder: "صِفوا ما تبحثون عنه…",
+    smartSubmit: "ابحثوا",
+    smartOpen: (name) => `فتح ${name}`,
+    smartUnderstood: "فهمنا",
+    smartTry: "مثلاً",
+    smartExamples: ["شقة بمراكش", "قرب الدار البيضاء", "بقعة أرضية أقل من مليون", "3 chambres à Agadir"],
+    smartNamed: "المشاريع",
+    smartCount: (n, formatted) =>
+      arCount(n, "مشروع واحد مطابق", "مشروعان مطابقان", "مشاريع مطابقة", "مشروعاً مطابقاً", formatted),
+    smartClosest: "لا يوجد مشروع مطابق تماماً: ستُعرض الأقرب",
     mapEyebrow: "الخريطة",
     mapHint: "اختاروا مدينة للتصفية.",
     mapLabel: "خريطة المغرب — المدن التي توجد بها مشاريعنا",

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { formatNumber, type Locale } from "@/i18n/config";
 import { searchCopy } from "@/content/projects";
-import { scalarOf, withScalar } from "./query";
+import { listOf, toggleInList, withScalar } from "./query";
 import { useSearchState } from "./SearchShell";
 import s from "./search.module.css";
 
@@ -30,7 +30,7 @@ export type Pin = {
 export function MapPins({ locale, pins }: { locale: Locale; pins: Pin[] }) {
   const c = searchCopy[locale];
   const { query, navigate } = useSearchState();
-  const active = scalarOf(query, "ville");
+  const selected = listOf(query, "ville");
   const [hovered, setHovered] = useState<string | null>(null);
 
   // Cards carry `data-city`; one delegated listener lights the matching pin.
@@ -43,7 +43,18 @@ export function MapPins({ locale, pins }: { locale: Locale; pins: Pin[] }) {
     return () => document.removeEventListener("pointerover", over);
   }, []);
 
-  const toggle = (id: string) => navigate(withScalar(query, "ville", active === id ? null : id));
+  /**
+   * With one city chosen (or none), a pin works as it always has: it picks
+   * that city, or clears it. With several — a region typed into the search,
+   * "près de Casablanca" — the pins edit that set instead of replacing it:
+   * a lit pin leaves the selection, an unlit one joins it.
+   */
+  const toggle = (id: string) =>
+    navigate(
+      selected.length > 1
+        ? toggleInList(query, "ville", id)
+        : withScalar(query, "ville", selected[0] === id ? null : id),
+    );
 
   const radius = (pin: Pin) => 7 + Math.sqrt(pin.total) * 3.5;
 
@@ -106,7 +117,7 @@ export function MapPins({ locale, pins }: { locale: Locale; pins: Pin[] }) {
       </g>
 
       {pins.map((pin) => {
-        const on = active === pin.id;
+        const on = selected.includes(pin.id);
         const lit = on || hovered === pin.id;
         const empty = pin.count === 0;
         const r = radius(pin);

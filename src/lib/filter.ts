@@ -1,7 +1,13 @@
-import { maxAffordablePrice } from "./credit";
-import { effectiveTotal } from "./format";
-import { projects } from "@/data/projects";
-import type { Amenity, Project, Segment } from "@/data/types";
+import { DEFAULT_DEPOSIT, maxAffordablePrice } from "./credit.ts";
+import { projects } from "../data/projects.ts";
+import { KINDS, type Amenity, type Kind, type Price, type Project, type Segment } from "../data/types.ts";
+import { hasStatusFacet, STATUS_FACETS, type StatusFacet } from "./status-facets.ts";
+
+/*
+ * Relative imports with explicit extensions, on purpose: `filter.test.ts`
+ * runs this module under `node --test`, which resolves neither the `@/` alias
+ * nor extensionless paths (same rule as src/lib/search/*).
+ */
 
 /**
  * Search state, and the only place it is turned into and out of a URL.
@@ -14,43 +20,73 @@ export type Filters = {
   /** Maximum monthly payment in DH. The primary axis. */
   budget: number | null;
   deposit: number;
-  city: string | null;
+  /**
+   * City ids, OR-combined. Usually zero or one (the city select, a map pin);
+   * several when a search named a region ("près de Casablanca" →
+   * mohammedia, had-soualem, sidi-rahal).
+   */
+  cities: string[];
+  /** Ceiling on the entry price in DH — the smallest lot's total for land. */
+  priceMax: number | null;
   segments: Segment[];
+  /** Kinds of home (villa, studio, appartement…), OR-combined. */
+  kinds: Kind[];
   bedrooms: number | null;
   surfaceMin: number | null;
   statuses: StatusFacet[];
   amenities: Amenity[];
 };
 
-import { hasStatusFacet, STATUS_FACETS, type StatusFacet } from "./status-facets.ts";
-
 export { hasStatusFacet, STATUS_FACETS, type StatusFacet };
 
-export const DEFAULT_DEPOSIT = 150_000;
+export { DEFAULT_DEPOSIT };
 
 export const EMPTY_FILTERS: Filters = {
   budget: null,
   deposit: DEFAULT_DEPOSIT,
-  city: null,
+  cities: [],
+  priceMax: null,
   segments: [],
+  kinds: [],
   bedrooms: null,
   surfaceMin: null,
   statuses: [],
   amenities: [],
 };
 
-/** Query-string keys are French because the URLs are user-facing. */
+/**
+ * Entry price in DH: the published "à partir de", or the smallest lot's total
+ * for land quoted per m². The same rule as `effectiveTotal` in lib/format.ts
+ * (not imported: that module reaches the `@/` alias, which `node --test`
+ * cannot resolve) and `entryPrice` in lib/search/docs.ts.
+ */
+function entryPrice(price: Price): number {
+  return price.unit === "per-sqm" ? price.amount * (price.minimumLotSqm ?? 1) : price.amount;
+}
+
+/**
+ * Query-string keys are French because the URLs are user-facing. The key
+ * order is the one `toProjetsHref` (lib/search/link.ts) writes, so a link
+ * from the concierge search and the URL the page settles on read the same.
+ */
 export function toSearchParams(filters: Filters): URLSearchParams {
   const params = new URLSearchParams();
+  if (filters.cities.length) params.set("ville", filters.cities.join(","));
+  if (filters.priceMax) params.set("prix", String(filters.priceMax));
   if (filters.budget) params.set("mensualite", String(filters.budget));
   if (filters.deposit !== DEFAULT_DEPOSIT) params.set("apport", String(filters.deposit));
-  if (filters.city) params.set("ville", filters.city);
   if (filters.segments.length) params.set("standing", filters.segments.join(","));
+  if (filters.kinds.length) params.set("type", filters.kinds.join(","));
   if (filters.bedrooms) params.set("chambres", String(filters.bedrooms));
   if (filters.surfaceMin) params.set("surface", String(filters.surfaceMin));
   if (filters.statuses.length) params.set("statut", filters.statuses.join(","));
   if (filters.amenities.length) params.set("equipements", filters.amenities.join(","));
   return params;
+}
+
+/** `toSearchParams`, with list commas left as commas so a shared link stays legible. */
+export function toQueryString(filters: Filters): string {
+  return toSearchParams(filters).toString().replace(/%2C/gi, ",");
 }
 
 export function fromSearchParams(params: URLSearchParams | Record<string, string | string[] | undefined>): Filters {
@@ -61,7 +97,9 @@ export function fromSearchParams(params: URLSearchParams | Record<string, string
   };
   const list = <T extends string>(key: string): T[] => {
     const raw = get(key);
-    return raw ? (raw.split(",").filter(Boolean) as T[]) : [];
+    if (!raw) return [];
+    // Trimmed and de-duplicated: "ville=temara, temara" is one city.
+    return [...new Set(raw.split(",").map((v) => v.trim()).filter(Boolean))] as T[];
   };
   const num = (key: string): number | null => {
     const raw = get(key);
@@ -73,8 +111,10 @@ export function fromSearchParams(params: URLSearchParams | Record<string, string
   return {
     budget: num("mensualite"),
     deposit: num("apport") ?? DEFAULT_DEPOSIT,
-    city: get("ville"),
+    cities: list<string>("ville"),
+    priceMax: num("prix"),
     segments: list<Segment>("standing"),
+    kinds: list<Kind>("type").filter((v) => (KINDS as readonly string[]).includes(v)),
     bedrooms: num("chambres"),
     surfaceMin: num("surface"),
     statuses: list<StatusFacet>("statut").filter((v) => (STATUS_FACETS as readonly string[]).includes(v)),
@@ -83,15 +123,28 @@ export function fromSearchParams(params: URLSearchParams | Record<string, string
 }
 
 /** Which facets are actually narrowing the result, for the "relaxed" notice. */
-export type FacetKey = "amenities" | "surfaceMin" | "bedrooms" | "segments" | "statuses" | "city" | "budget";
+export type FacetKey =
+  | "amenities"
+  | "surfaceMin"
+  | "bedrooms"
+  | "kinds"
+  | "segments"
+  | "statuses"
+  | "city"
+  | "budget"
+  | "price";
 
 function matches(project: Project, filters: Filters, ignore: Set<FacetKey>): boolean {
+  if (!ignore.has("price") && filters.priceMax && entryPrice(project.price) > filters.priceMax) return false;
   if (!ignore.has("budget") && filters.budget) {
     const ceiling = maxAffordablePrice(filters.budget, filters.deposit);
-    if (effectiveTotal(project.price) > ceiling) return false;
+    if (entryPrice(project.price) > ceiling) return false;
   }
-  if (!ignore.has("city") && filters.city && project.cityId !== filters.city) return false;
+  if (!ignore.has("city") && filters.cities.length && !filters.cities.includes(project.cityId)) return false;
   if (!ignore.has("segments") && filters.segments.length && !filters.segments.includes(project.segment)) {
+    return false;
+  }
+  if (!ignore.has("kinds") && filters.kinds.length && !filters.kinds.some((k) => project.kinds.includes(k))) {
     return false;
   }
   if (!ignore.has("statuses") && filters.statuses.length && !filters.statuses.some((f) => hasStatusFacet(project, f))) {
@@ -109,19 +162,48 @@ function matches(project: Project, filters: Filters, ignore: Set<FacetKey>): boo
 /**
  * Relaxation order: least meaningful constraint dropped first.
  *
- * Budget is last precisely because it is the one people care most about — by
- * the time we are widening it we have exhausted everything else, and the notice
- * says so explicitly rather than silently returning results they cannot afford.
+ * Money is last precisely because it is what people care most about — by the
+ * time we are widening it we have exhausted everything else, and the notice
+ * says so explicitly rather than silently returning results they cannot
+ * afford. The monthly payment goes before the price ceiling: the price is the
+ * harder number (a figure the visitor typed), the payment an estimate that
+ * already depends on an assumed deposit.
  */
-const RELAX_ORDER: FacetKey[] = [
+export const RELAX_ORDER: readonly FacetKey[] = [
   "amenities",
   "surfaceMin",
   "bedrooms",
+  "kinds",
   "segments",
   "statuses",
   "city",
   "budget",
+  "price",
 ];
+
+/** Whether the visitor set this facet at all — the relaxation steps past unset ones too. */
+export function isActive(filters: Filters, facet: FacetKey): boolean {
+  switch (facet) {
+    case "amenities":
+      return filters.amenities.length > 0;
+    case "surfaceMin":
+      return filters.surfaceMin !== null;
+    case "bedrooms":
+      return filters.bedrooms !== null;
+    case "kinds":
+      return filters.kinds.length > 0;
+    case "segments":
+      return filters.segments.length > 0;
+    case "statuses":
+      return filters.statuses.length > 0;
+    case "city":
+      return filters.cities.length > 0;
+    case "budget":
+      return filters.budget !== null;
+    case "price":
+      return filters.priceMax !== null;
+  }
+}
 
 export type SearchResult = {
   projects: Project[];
