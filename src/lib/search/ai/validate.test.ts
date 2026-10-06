@@ -405,3 +405,17 @@ test("a place the fiche names only as a neighbour cannot become the programme's 
   assert.equal(run(asked, answer({ summary: "Assafa est située à Sidi Rahal, dès 250 000 DH.", results }))?.summary, null);
   assert.ok(run(asked, answer({ summary: "Assafa, à dix minutes des plages de Sidi Rahal, dès 250 000 DH.", results }))?.summary);
 });
+
+test("the visitor's budget restated with 'avec'/'pour' passes; a programme's price cannot ride on it", () => {
+  const asked = "Avec 30 millions, un appartement 3 chambres près de la mer ?";
+  const results = [{ slug: "assafa", fit: "close", criteria: [] }];
+  // Real Gemini answers (2026-10-06), withheld before this fix.
+  for (const summary of [
+    "Avec 300 000 DH (30 millions), le programme Assafa à Had Soualem, situé à dix minutes des plages, propose des appartements de 3 chambres à partir de 250 000 DH.",
+    "Pour 300 000 DH et 3 chambres près de la côte, nous vous proposons Assafa à Had Soualem à partir de 250 000 DH, à 10 minutes des plages.",
+  ]) {
+    assert.equal(run(asked, answer({ summary, results }))?.summary, summary);
+  }
+  // The visitor's 300 000 DH given as Assafa's price is still refused.
+  assert.equal(run(asked, answer({ summary: "Assafa à Had Soualem est proposé à 300 000 DH.", results }))?.summary, null);
+});

@@ -192,7 +192,7 @@ const CREDIT_WORDS = /(apport|mensualit|par mois|\/\s*mois|taux|\bans\b|financem
 const VISITOR_STRICT = /(?:\b(?:votre|vos)\s+(?:\S+\s+){0,3}|ميزانيت\S*\s+(?:\S+\s+){0,2})$/i;
 /** In a clause that names no programme, a budget word is enough. */
 const VISITOR_LOOSE =
-  /(votre|vos\b|vous|budget|plafond|moins de|jusqu|maximum|max\b|sous\b|ne d[ée]pass|inf[ée]rieur|≤|<|en dessous|ميزاني|حددتم|حددت|يمكنكم|بإمكانكم|أقل من|اقل من|حتى|في حدود|لا يتجاوز|لا تتجاوز)/i;
+  /(votre|vos\b|vous|budget|plafond|moins de|jusqu|maximum|max\b|sous\b|ne d[ée]pass|inf[ée]rieur|≤|<|en dessous|\bavec\b|\bpour\b|ميزاني|حددتم|حددت|يمكنكم|بإمكانكم|أقل من|اقل من|حتى|في حدود|لا يتجاوز|لا تتجاوز|بمبلغ)/i;
 const MONTHLY_AFTER = /^\s*(?:dh|dhs|mad|درهم)?\s*(?:\/\s*mois|par mois|mensuel|chaque mois|شهري|في الشهر|كل شهر)/i;
 /** A ceiling in a suggested query: "moins de 900 000", "≤ 6 000", "أقل من مليون". */
 const CEILING_BEFORE = /(moins de|max(?:imum)?|jusqu'?à?|budget|sous|inf[ée]rieur à|≤|<|أقل من|اقل من|حتى|ميزانية|في حدود)\s*$/i;
