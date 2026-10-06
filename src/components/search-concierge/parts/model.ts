@@ -4,7 +4,7 @@ import type { Segment } from "@/data/types";
 import { formatNumber, isolateRun, type Locale } from "@/i18n/config";
 import { DEFAULT_DEPOSIT, maxAffordablePrice } from "@/lib/credit";
 import { parseQuery, searchDocs, type ParsedQuery, type QuerySpan, type SearchDoc, type SearchOutcome } from "@/lib/search";
-import { orderWithAi, type RankedRow } from "@/lib/search/ai/merge";
+import { admitRows, orderWithAi, type RankedRow } from "@/lib/search/ai/merge";
 import type { AiAnswer } from "@/lib/search/ai/types";
 import { REGION_CITIES, UNSERVED_CITIES } from "@/lib/search/lexicon";
 import { STATUS_FACETS, type StatusFacet } from "@/lib/status-facets";
@@ -33,7 +33,8 @@ import {
  *   visitor left empty, never a value the visitor removed, and its picks come
  *   first in the order. A pick outside the instant results is shown only when
  *   it satisfies everything the visitor picked by hand (map, budget, panel) —
- *   a hand-picked value is a hard constraint, a model's reading is not.
+ *   a hand-picked value is a hard constraint, a model's reading is not — and
+ *   a "close" pick only when the result was widened anyway (admitRows).
  */
 
 type C = (typeof searchCopy)["fr"];
@@ -112,7 +113,7 @@ export function resolveSearch(
   const query = withAiFilters(user, answer, dismissed);
   const outcome = searchDocs(docs, query);
   const hit = new Set(outcome.hits.map((h) => h.doc.slug));
-  const rows = orderWithAi(docs, outcome.hits, answer).filter((row) => hit.has(row.doc.slug) || passesPicked(row.doc, extra));
+  const rows = admitRows(orderWithAi(docs, outcome.hits, answer), hit, outcome.exact, (doc) => passesPicked(doc, extra));
   return { query, outcome, rows };
 }
 

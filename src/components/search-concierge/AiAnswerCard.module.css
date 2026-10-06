@@ -1,6 +1,6 @@
-/* The concierge's answer card. Ink ground by default (overlay, home hero,
+/* The concierge's answer. Ink ground by default (overlay, home hero,
    /projets hero); a paper tone for light surfaces. Motion per the site's
-   rules: transform/opacity only, ≤ 300 ms, nothing under reduced motion. */
+   rules: transform/opacity (and a 3px blur bridge on arrival), ≤ 300 ms. */
 
 .card {
   --ai-fg: var(--color-paper);
@@ -15,11 +15,11 @@
   background: var(--ai-wash);
   box-shadow: inset 0 0 0 1px var(--ai-line);
   color: var(--ai-fg);
-  /* Arrives: opacity + a 6px rise, 220 ms ease-out. Its box is reserved
-     before the first frame (no figure inside re-flows as it lands). */
-  animation: ai-card-in 220ms var(--ease-reveal) backwards;
+  /* Lands: out of a 3px blur into focus while the wait fades away under it
+     (AiSlot), 220 ms ease-out. Nothing moves: the place was kept. */
+  animation: ai-land 220ms var(--ease-reveal) backwards;
 }
-.card[data-tone="paper"] {
+.card[data-ai-tone="paper"] {
   --ai-fg: var(--color-ink);
   --ai-mute: var(--color-ink-mute);
   --ai-accent: var(--color-ochre-deep);
@@ -30,11 +30,19 @@
   gap: 0.45rem;
   padding: 0.7rem 0.85rem;
 }
+/* The home hero: no box — the answer reads as the line under the question. */
+.card[data-variant="plain"] {
+  gap: 0.55rem;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
 
-@keyframes ai-card-in {
+@keyframes ai-land {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    filter: blur(3px);
   }
 }
 
@@ -61,6 +69,18 @@
 .summary[lang="ar"] {
   line-height: 1.7;
 }
+.card[data-variant="plain"] .summary {
+  font-size: clamp(1.0625rem, 1.3vw, 1.25rem);
+  max-inline-size: 38em;
+}
+
+/* In the summary's place when there is no sentence, quieter. */
+.lead {
+  margin: 0;
+  font-size: var(--text-small);
+  line-height: 1.4;
+  color: var(--ai-mute);
+}
 
 .chips {
   display: flex;
@@ -69,6 +89,16 @@
   margin: 0;
   padding: 0;
   list-style: none;
+}
+/* The suggestions follow the sentence in, one after another (30 ms apart). */
+.chips > li {
+  animation: ai-chip-in 180ms var(--ease-reveal) calc(80ms + var(--i, 0) * 30ms) backwards;
+}
+@keyframes ai-chip-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
 }
 .chip {
   display: inline-flex;
@@ -90,6 +120,11 @@
     box-shadow var(--dur-ui) var(--ease-ui),
     transform var(--dur-press) var(--ease-ui);
 }
+.card[data-variant="plain"] .chip {
+  min-block-size: 2rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8125rem;
+}
 .chip:active {
   transform: scale(0.97);
 }
@@ -107,6 +142,28 @@
   color: var(--ai-accent);
 }
 
+/* Phones (the home hero): one row that scrolls sideways, never three chips stacked. */
+@media (max-width: 40rem) {
+  .card[data-variant="plain"] .chips {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-block: -3px;
+    margin-inline-end: calc(-1 * var(--gutter));
+    padding-block: 3px;
+    padding-inline-end: var(--gutter);
+    scrollbar-width: none;
+  }
+  .card[data-variant="plain"] .chips::-webkit-scrollbar {
+    display: none;
+  }
+  .card[data-variant="plain"] .chips > li {
+    flex: none;
+  }
+  .card[data-variant="plain"] .chip {
+    white-space: nowrap;
+  }
+}
+
 .disclosure {
   margin: 0;
   font-size: var(--text-label);
@@ -114,131 +171,21 @@
   color: var(--ai-mute);
 }
 
-/* ------------------------------------------------------------ thinking -- */
-/* One quiet line — never a spinner, never in the way. A band of light
-   crosses the words in the reading direction (1.2 s, looping): a bright
-   copy of the line seen through a soft-edged window. The window moves one
-   way and the copy inside it the other by the same distance, so the bright
-   letters stay exactly over the dim ones — two transforms, no repaint of
-   the text. */
-.thinking {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0;
-  min-block-size: 2.25rem;
-  font-size: var(--text-small);
-  color: color-mix(in oklab, var(--color-paper) 60%, transparent);
-  animation: ai-line-in 180ms var(--ease-reveal) backwards;
-}
-.thinking[data-tone="paper"] {
-  color: var(--color-ink-mute);
-}
-/* Inside a line that already exists: no box of its own, no height added. */
-.thinking[data-inline] {
-  display: inline-flex;
-  gap: 0.4rem;
-  min-block-size: 0;
-  max-inline-size: 100%;
-  font-size: inherit;
-}
-.thinking[data-inline] .thinkingSpark {
-  inline-size: 0.85em;
-  block-size: 0.85em;
-}
-.thinkingSpark {
-  flex: none;
-  color: var(--color-ochre-bright);
-}
-.thinking[data-tone="paper"] .thinkingSpark {
-  color: var(--color-ochre-deep);
-}
-.thinkingText {
-  position: relative;
-  min-inline-size: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.sweep {
-  position: absolute;
-  inset-block: 0;
-  inset-inline-start: 0;
-  inline-size: 30%;
-  overflow: hidden;
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 45%, #000 55%, transparent);
-  mask-image: linear-gradient(90deg, transparent, #000 45%, #000 55%, transparent);
-  animation: ai-sweep 1.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-  pointer-events: none;
-}
-.sweepText {
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline-start: 0;
-  /* The whole line's width (the window is 30% of it). */
-  inline-size: calc(100% / 0.3);
-  white-space: nowrap;
-  color: var(--color-paper);
-  animation: ai-sweep-text 1.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-}
-.thinking[data-tone="paper"] .sweepText {
-  color: var(--color-ink);
-}
-:global([dir="rtl"]) .sweep {
-  animation-name: ai-sweep-rtl;
-}
-:global([dir="rtl"]) .sweepText {
-  animation-name: ai-sweep-text-rtl;
-}
-/* Window: from just before the line (−0.3 W) to just past it (+W). */
-@keyframes ai-sweep {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(333.333%);
-  }
-}
-/* Its contents: the opposite, in their own width (W). */
-@keyframes ai-sweep-text {
-  from {
-    transform: translateX(30%);
-  }
-  to {
-    transform: translateX(-100%);
-  }
-}
-@keyframes ai-sweep-rtl {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(-333.333%);
-  }
-}
-@keyframes ai-sweep-text-rtl {
-  from {
-    transform: translateX(-30%);
-  }
-  to {
-    transform: translateX(100%);
-  }
-}
-@keyframes ai-line-in {
-  from {
-    opacity: 0;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .card,
-  .thinking {
-    animation: none;
+  /* A plain fade: no blur, no scale. */
+  .card {
+    animation-name: ai-land-fade;
+    animation-duration: 150ms;
   }
-  .sweep {
-    display: none;
+  .chips > li {
+    animation: none;
   }
   .chip {
     transition: none;
+  }
+}
+@keyframes ai-land-fade {
+  from {
+    opacity: 0;
   }
 }

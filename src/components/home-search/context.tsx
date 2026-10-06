@@ -61,7 +61,8 @@ export type HomeSearch = {
   instant: SearchOutcome;
   /** The outcome behind `rows` (with the AI's filters folded in). */
   outcome: SearchOutcome;
-  ai: { state: AiState; answer: AiAnswer | null; ask: () => void };
+  /** willAsk: the concierge will be asked about this text (its place can be kept ready). */
+  ai: { state: AiState; answer: AiAnswer | null; ask: () => void; willAsk: boolean };
   /** Display order: the AI's picks first when it has answered this exact text, then the instant hits. */
   rows: RankedRow[];
   /** True when nothing had to be widened. */
@@ -311,7 +312,7 @@ export function HomeSearchProvider({
     query: resolved.query,
     instant,
     outcome: resolved.outcome,
-    ai: { state: aiHook.state, answer, ask: aiHook.ask },
+    ai: { state: aiHook.state, answer, ask: aiHook.ask, willAsk: aiHook.willAsk },
     rows,
     exact: resolved.outcome.exact,
     cityCount: new Set(rows.map((row) => row.doc.cityId)).size,

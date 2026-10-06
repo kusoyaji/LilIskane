@@ -24,17 +24,39 @@
   mask-image: radial-gradient(90% 80% at 0% 0%, #000 0%, transparent 72%);
 }
 
+/* The question and, right under it, the concierge's answer to it; the result
+   beside them (desktop: spanning both rows, so the answer arriving under the
+   pickers never moves the pickers or the result column). Phones and tablets
+   (one column): the result comes straight after the question — the count and
+   the way to the list never move for the concierge — and its wait and answer
+   come last, growing only the hero's bottom edge. */
 .grid {
   display: grid;
-  gap: clamp(2.5rem, 6vh, 3.5rem);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "ask" "res" "reply";
+}
+.ask {
+  grid-area: ask;
+}
+.answer {
+  grid-area: res;
+  margin-block-start: clamp(2.5rem, 6vh, 3.5rem);
+}
+.reply {
+  grid-area: reply;
 }
 @media (min-width: 64rem) {
   .grid {
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas: "ask res" "reply res";
     align-items: stretch;
-    gap: 0;
   }
-  .ask {
+  .answer {
+    margin-block-start: 0;
+  }
+  .ask,
+  .reply {
     padding-inline-end: clamp(3rem, 5vw, 5.5rem);
   }
   .answer {
@@ -91,6 +113,54 @@
      push the words, the chips and the answer down. */
   min-block-size: calc(2.75rem + 1.05rem + 2px);
 }
+/* While the concierge reads: a soft light runs along the rule (1.4 s loop),
+   over the ochre — the field itself says "working on it", phones included. */
+.busyRule {
+  position: absolute;
+  z-index: 1;
+  inset-inline: 0;
+  inset-block-end: -2px;
+  block-size: 2px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms var(--ease-ui);
+}
+.busyRule::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 35%;
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--color-paper) 92%, transparent), transparent);
+  transform: translateX(-100%);
+}
+.field[data-busy] .busyRule {
+  opacity: 1;
+}
+.field[data-busy] .busyRule::after {
+  animation: rule-run 1.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+:global([dir="rtl"]) .field[data-busy] .busyRule::after {
+  animation-name: rule-run-rtl;
+}
+/* From just before the rule to just past it: the band is 35% of the rule. */
+@keyframes rule-run {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(286%);
+  }
+}
+@keyframes rule-run-rtl {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(-286%);
+  }
+}
 /* Focus draws the ochre rule from the reading-start edge (280 ms, ease-out);
    leaving the field takes it back, faster — unless there is text in it,
    which keeps the field lit as "this is your search". */
@@ -136,10 +206,34 @@
   font-stretch: 108%;
   letter-spacing: -0.02em;
 }
+/* A long sentence steps the type down (35+ and 60+ characters), so 60–90
+   characters read whole on two or three lines instead of running out of the
+   field. Instant: it changes with a keystroke, it is not an animation. */
+.field[data-size="m"] .input {
+  font-size: clamp(1.125rem, 1.45vw, 1.5rem);
+}
+.field[data-size="l"] .input {
+  font-size: clamp(1.0625rem, 1.35vw, 1.375rem);
+  letter-spacing: -0.012em;
+}
 @media (max-width: 48rem) {
   .input {
     font-size: 1.25rem;
     letter-spacing: -0.01em;
+  }
+  /* Never under 16px on a phone (iOS would zoom). */
+  .field[data-size="m"] .input {
+    font-size: 1.125rem;
+  }
+  .field[data-size="l"] .input {
+    font-size: 1.0625rem;
+  }
+}
+/* The narrowest phones: a 90-character question still reads whole (four
+   lines, MarkedInput's maxLines) at 16px — the floor that keeps iOS from zooming. */
+@media (max-width: 25rem) {
+  .field[data-size="l"] .input {
+    font-size: 1rem;
   }
 }
 .clear,
@@ -162,6 +256,35 @@
   border: 0;
   background: var(--color-ochre-bright);
   color: var(--color-ink);
+}
+/* The arrow and the busy dots share the button; asked, they cross (120 ms
+   out, 160 ms in) within a frame of the Enter / the click. */
+.submitArrow,
+.submitDots {
+  grid-area: 1 / 1;
+  transition:
+    opacity 160ms var(--ease-reveal),
+    transform 160ms var(--ease-reveal);
+}
+.submitArrow {
+  display: grid;
+  place-items: center;
+}
+.submitDots {
+  opacity: 0;
+  transform: scale(0.8);
+}
+.submit:not([data-busy]) .submitDots > span {
+  animation: none;
+}
+.submit[data-busy] .submitArrow {
+  opacity: 0;
+  transform: scale(0.8);
+  transition-duration: 120ms;
+}
+.submit[data-busy] .submitDots {
+  opacity: 1;
+  transform: none;
 }
 /* The arrow travels 3px in the reading direction on hover / keyboard focus,
    and back; the press is the site's asymmetric .u-press (down 100, up 180). */
@@ -195,6 +318,29 @@
 .chipsRow {
   margin-block-start: 1.1rem;
   min-block-size: 2.75rem;
+}
+/* What was understood: one row at every width — the concierge adding its
+   readings ("3 chambres et +", "≤ 250 000 DH") must never wrap it onto a
+   second line and push the pickers down. Past the edge it scrolls sideways
+   and fades out (every chip is removable, and the results bar repeats them). */
+.chipsRow > ul:not(.ideas) {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  margin-block: -3px;
+  padding-block: 3px;
+  scrollbar-width: none;
+  mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+}
+:global([dir="rtl"]) .chipsRow > ul:not(.ideas) {
+  mask-image: linear-gradient(to left, #000 calc(100% - 2.5rem), transparent);
+}
+.chipsRow > ul:not(.ideas)::-webkit-scrollbar {
+  display: none;
+}
+.chipsRow > ul:not(.ideas) > li {
+  flex: none;
 }
 .rowLabel {
   flex: none;
@@ -361,13 +507,6 @@
 .answerEyebrow {
   color: var(--color-ochre-bright);
 }
-/* Desktop: the figure faces the title, the pictures and the way to the
-   results face the field and the pickers. */
-@media (min-width: 64rem) {
-  .thumbs {
-    margin-block-start: auto;
-  }
-}
 .count {
   display: flex;
   align-items: center;
@@ -395,26 +534,9 @@
   font-weight: 400;
   color: color-mix(in oklab, var(--color-paper) 62%, transparent);
 }
-/* "dans N villes", or the concierge's thinking line over it (one cell). */
-.countSub {
-  display: grid;
-  min-inline-size: 0;
-  font-size: var(--text-small);
-  font-weight: 400;
-  line-height: 1.35;
-}
-.countSub > * {
-  grid-area: 1 / 1;
-  min-inline-size: 0;
-}
-.countSub > .countCities {
-  transition: opacity 140ms var(--ease-ui);
-}
-.countSub[data-thinking] > .countCities {
-  opacity: 0;
-}
 
-/* The top matches, six slots that cross-fade. */
+/* The top matches — only as many as there are (at most six), each picture
+   cross-fading when the answer changes. */
 .thumbs {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -452,6 +574,11 @@
   position: absolute;
   inset: 0;
   background: color-mix(in oklab, var(--color-paper) 8%, transparent);
+}
+/* A slot emptying (fewer matches) shows nothing while its last picture fades —
+   never a grey square that reads as a picture failing to load. */
+.layer:empty {
+  background: none;
 }
 /* The answer changed: the old picture shrinks a little and fades (180 ms),
    the new one fades in over it, slot after slot (40 ms apart). */
@@ -583,21 +710,52 @@
   font-size: 0.6875rem;
 }
 
-.relaxed {
-  margin-block-start: 1.25rem;
-  padding: 0.75rem 1rem;
+/* ----------------------------------------------- the answer, under the ask -- */
+.reply {
+  display: grid;
+  align-content: start;
+  min-inline-size: 0;
+}
+/* Desktop: its place is kept from the moment the sentence is worth asking
+   about (under the pickers, where nothing else is), so the wait and the
+   answer fill it rather than open it — and it stays when the concierge
+   could not answer, so nothing below jumps back up either. */
+@media (min-width: 64rem) {
+  .reply[data-reserve] {
+    min-block-size: 9.25rem;
+  }
+  /* Taken from the search's state, not from the line being on screen, so
+     the place never changes height during the wait or at its end. */
+  .reply[data-reserve][data-widened] {
+    min-block-size: calc(9.25rem + 2.4rem);
+  }
+}
+.reply:has(> .widened, > [data-state="pending"], > [data-state="answer"]) {
+  margin-block-start: clamp(1.75rem, 4vh, 2.5rem);
+}
+@media (max-width: 63.99rem) {
+  /* After the result on one column: a clear break from the pictures above. */
+  .reply:has(> .widened, > [data-state="pending"], > [data-state="answer"]) {
+    margin-block-start: 2rem;
+  }
+}
+@media (min-width: 64rem) {
+  .reply[data-reserve] {
+    margin-block-start: clamp(1.75rem, 4vh, 2.5rem);
+  }
+}
+/* What had to be widened, in one quiet line (the concierge's sentence says it
+   instead once it has answered). */
+.widened {
+  margin: 0;
+  padding-inline-start: 0.75rem;
   border-inline-start: 2px solid var(--color-ochre-bright);
-  background: color-mix(in oklab, var(--color-paper) 6%, transparent);
   font-size: var(--text-small);
-  line-height: 1.5;
-  color: color-mix(in oklab, var(--color-paper) 86%, transparent);
+  line-height: 1.4;
+  color: color-mix(in oklab, var(--color-paper) 72%, transparent);
 }
-.aiSlot {
-  margin-block-start: 1.25rem;
-}
-/* The thinking line carries data-tone (the grounds rule would paint it). */
-.aiSlot > p {
-  background: none;
+.widened + .aiSlot:not([data-state="empty"]) {
+  margin-block-start: 1.1rem;
 }
 
 .ctas {
@@ -664,10 +822,8 @@
   /* Count and the way to the results first; the pictures after. */
   .answerEyebrow { order: 1; }
   .count { order: 2; }
-  .relaxed { order: 3; }
-  .aiSlot { order: 4; }
-  .ctas { order: 5; }
-  .thumbs { order: 6; }
+  .ctas { order: 3; }
+  .thumbs { order: 4; }
 }
 @media (max-width: 40rem) {
   .hero {
@@ -730,6 +886,22 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* The rule's light does not travel: the whole rule pulses gently instead. */
+  .field[data-busy] .busyRule::after,
+  :global([dir="rtl"]) .field[data-busy] .busyRule::after {
+    inset-inline: 0;
+    inline-size: auto;
+    transform: none;
+    animation: rule-pulse 1.6s ease-in-out infinite;
+    /* Past the site-wide reduced-motion cut (globals.css): the wait still shows. */
+    animation-duration: 1.6s !important;
+    animation-iteration-count: infinite !important;
+  }
+  .submitArrow,
+  .submitDots,
+  .submit[data-busy] .submitArrow {
+    transform: none;
+  }
   .field::after,
   .chevron,
   .glyph,
@@ -753,5 +925,14 @@
   .slotLink:focus-visible,
   .slotLink:hover {
     transform: none;
+  }
+}
+@keyframes rule-pulse {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.8;
   }
 }

@@ -22,7 +22,10 @@ import { isAiWorthy } from "@/lib/search/ai/worthy";
  * - "no-key" turns the layer off for the session; "rate-limited" pauses it a
  *   minute.
  * - Development: add `?aimock=1` to the page URL (or sessionStorage
- *   "concierge-mock" = "1") to get the route's canned answers without a key.
+ *   "concierge-mock" = "1") to get the route's canned answers without a key
+ *   (`?aimock=fail`: the answer never comes);
+ *   add `&aimockdelay=4000` (or sessionStorage "concierge-mock-delay") to make
+ *   them take that long, to see and capture the waiting states.
  */
 
 const DEBOUNCE_MS = 900;
@@ -52,12 +55,14 @@ function keyOf(raw: string, locale: Locale): string {
   return `${locale}|${normalize(raw.trim())}`;
 }
 
-function mockRequested(): boolean {
-  if (process.env.NODE_ENV === "production" || typeof window === "undefined") return false;
+/** DEV ONLY: "1" (canned answers) or "fail" (a timeout), from ?aimock= or sessionStorage "concierge-mock". */
+function mockRequested(): string | null {
+  if (process.env.NODE_ENV === "production" || typeof window === "undefined") return null;
   try {
-    return new URLSearchParams(window.location.search).get("aimock") === "1" || sessionStorage.getItem("concierge-mock") === "1";
+    const mode = new URLSearchParams(window.location.search).get("aimock") ?? sessionStorage.getItem("concierge-mock");
+    return mode === "1" || mode === "fail" ? mode : null;
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -82,9 +87,23 @@ function withTimeout(signal: AbortSignal, ms: number): { signal: AbortSignal; do
   };
 }
 
+/** DEV ONLY: how long the canned answer should take (ms), when asked for. */
+function mockDelay(): string | null {
+  try {
+    return new URLSearchParams(window.location.search).get("aimockdelay") ?? sessionStorage.getItem("concierge-mock-delay");
+  } catch {
+    return null;
+  }
+}
+
 async function request(raw: string, locale: Locale, key: string, signal: AbortSignal): Promise<AiAnswer | null> {
   const headers: Record<string, string> = { "content-type": "application/json" };
-  if (mockRequested()) headers["x-search-mock"] = "1";
+  const mock = mockRequested();
+  if (mock) {
+    headers["x-search-mock"] = mock;
+    const delay = mockDelay();
+    if (delay) headers["x-search-mock-delay"] = delay;
+  }
   const limited = withTimeout(signal, AI_PATIENCE_MS);
   let response: Response;
   try {
@@ -176,6 +195,12 @@ export function useAiSearch({ raw, locale, instant }: { raw: string; locale: Loc
   /** The `raw` the current answer belongs to (answers for an older query are never shown). */
   forQuery: string | null;
   ask: () => void;
+  /**
+   * The concierge will be asked about this text (it is worth asking, not yet
+   * answered or refused, the layer is on): a surface can keep the answer's
+   * place ready while the visitor is still typing.
+   */
+  willAsk: boolean;
 } {
   const parsed = useMemo(() => parseQuery(raw), [raw]);
   const worthy = useMemo(() => isAiWorthy(raw, parsed, instant), [raw, parsed, instant]);
@@ -199,22 +224,25 @@ export function useAiSearch({ raw, locale, instant }: { raw: string; locale: Loc
     if (empty || answers.has(key)) return;
     if (!worthy && !isForced) return;
     if (aiPaused()) {
+      // Switched off (no key, rate-limited): no wait to show — ask() may already have started one.
+      setThinking((t) => (t === key ? null : t));
       setFailed(key);
       return;
     }
     const controller = new AbortController();
-    const timer = setTimeout(
-      () => {
-        setThinking(key);
-        fetchAiAnswer(rawRef.current, locale, { signal: controller.signal }).then((answer) => {
-          if (controller.signal.aborted) return;
-          setThinking((k) => (k === key ? null : k));
-          if (!answer) setFailed(key);
-          setVersion((v) => v + 1);
-        });
-      },
-      isForced ? 0 : DEBOUNCE_MS,
-    );
+    const run = () => {
+      setThinking(key);
+      fetchAiAnswer(rawRef.current, locale, { signal: controller.signal }).then((answer) => {
+        if (controller.signal.aborted) return;
+        setThinking((k) => (k === key ? null : k));
+        if (!answer) setFailed(key);
+        setVersion((v) => v + 1);
+      });
+    };
+    // Asked (Enter, the arrow): the busy state shows on the very next frame, not after a timer tick.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    if (isForced) run();
+    else timer = setTimeout(run, DEBOUNCE_MS);
     return () => {
       clearTimeout(timer);
       controller.abort();
@@ -229,13 +257,20 @@ export function useAiSearch({ raw, locale, instant }: { raw: string; locale: Loc
     if (!rawRef.current.trim() || answers.has(k) || thinkingRef.current === k) return;
     // A bare name or city the instant engine already resolves ("Agadir", "massylia"): nothing to ask.
     if (!worthyRef.current) return;
+    // The layer is switched off: nothing will be asked, so no wait either (it would never end).
+    if (aiPaused()) {
+      setFailed(k);
+      return;
+    }
     setFailed((f) => (f === k ? null : f));
+    // Thinking from this very render (the effect below then starts the request): the wait shows at once.
+    setThinking(k);
     setForced((f) => ({ key: k, nonce: (f?.nonce ?? 0) + 1 }));
   }, [locale]);
 
   const cached = empty ? undefined : answers.get(key);
-  if (cached && cached !== "unavailable") return { state: "ready", answer: cached, forQuery: raw, ask };
-  if (thinking === key) return { state: "thinking", answer: null, forQuery: null, ask };
-  if (cached === "unavailable" || failed === key) return { state: "unavailable", answer: null, forQuery: null, ask };
-  return { state: "idle", answer: null, forQuery: null, ask };
+  if (cached && cached !== "unavailable") return { state: "ready", answer: cached, forQuery: raw, ask, willAsk: false };
+  if (thinking === key) return { state: "thinking", answer: null, forQuery: null, ask, willAsk: true };
+  if (cached === "unavailable" || failed === key) return { state: "unavailable", answer: null, forQuery: null, ask, willAsk: false };
+  return { state: "idle", answer: null, forQuery: null, ask, willAsk: !empty && worthy && !aiPaused() };
 }

@@ -6,7 +6,7 @@ import { parseQuery } from "../parse.ts";
 import { searchDocs } from "../rank.ts";
 import { answerProgramme, inferredFilters, mergeAiFilters, projetsQuery } from "./apply.ts";
 import { evaluate } from "./criteria.ts";
-import { orderWithAi } from "./merge.ts";
+import { admitRows, orderWithAi } from "./merge.ts";
 import type { AiAnswer, AiFilters } from "./types.ts";
 
 const docs = buildDocs("fr");
@@ -143,4 +143,35 @@ test("answerProgramme: one exact programme → open it; a question with one exac
     ),
     null,
   );
+});
+
+test("admitRows: an exact result is not padded with the AI's close fits (client query, 2026-10-06)", () => {
+  // "Budget of 25m … apartment for my family": the AI read 3 bedrooms, ≤ 250 000 DH, apartments;
+  // one exact fit (Assafa) and close fits whose budget check failed.
+  const query = { ...parseQuery("appartement"), bedroomsMin: 3, priceMax: 250_000 };
+  const outcome = searchDocs(docs, query);
+  assert.equal(outcome.exact, true);
+  const answer = ai([
+    { slug: "assafa", fit: "exact", criteria: [{ key: "budget", ok: true }] },
+    { slug: "izdihar", fit: "close", criteria: [{ key: "budget", ok: false }] },
+    { slug: "al-anbar", fit: "close", criteria: [{ key: "budget", ok: false }] },
+    { slug: "al-yassamine", fit: "close", criteria: [{ key: "budget", ok: false }] },
+  ]);
+  const hits = new Set(outcome.hits.map((h) => h.doc.slug));
+  const rows = admitRows(orderWithAi(docs, outcome.hits, answer), hits, outcome.exact, () => true);
+  assert.equal(rows[0]?.doc.slug, "assafa");
+  assert.deepEqual(new Set(rows.map((r) => r.doc.slug)), hits);
+  assert.ok(rows.every((r) => r.doc.price <= 250_000));
+});
+
+test("admitRows: a widened result keeps the AI's close fits, within what was picked by hand", () => {
+  const query = { ...parseQuery("villa"), priceMax: 100_000 };
+  const outcome = searchDocs(docs, query);
+  assert.equal(outcome.exact, false);
+  const answer = ai([{ slug: "izdihar", fit: "close", criteria: [] }, { slug: "assafa", fit: "close", criteria: [] }]);
+  const hits = new Set(outcome.hits.map((h) => h.doc.slug));
+  const all = admitRows(orderWithAi(docs, outcome.hits, answer), hits, outcome.exact, () => true);
+  assert.deepEqual(all.slice(0, 2).map((r) => r.doc.slug), ["izdihar", "assafa"]);
+  const picked = admitRows(orderWithAi(docs, outcome.hits, answer), hits, outcome.exact, (d) => d.slug !== "izdihar");
+  assert.ok(!picked.some((r) => r.doc.slug === "izdihar" && !hits.has("izdihar")));
 });

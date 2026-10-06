@@ -28,3 +28,20 @@ export function orderWithAi(docs: SearchDoc[], instant: Hit[], answer: AiAnswer 
   for (const hit of instant) if (!seen.has(hit.doc.slug)) rows.push({ doc: hit.doc, ai: null });
   return rows;
 }
+
+/**
+ * Which of the ordered rows the page shows: every instant hit; an AI pick the
+ * instant engine left out only when it passes everything the visitor picked
+ * by hand (`passes`) — and a "close" pick only when the search had to be
+ * widened anyway. An exact result is never padded with programmes that miss
+ * one of its criteria: the count would say "6 programmes dans 3 villes" under
+ * a budget five of them exceed. Pure; node-importable.
+ */
+export function admitRows(
+  rows: RankedRow[],
+  hits: ReadonlySet<string>,
+  exact: boolean,
+  passes: (doc: SearchDoc) => boolean,
+): RankedRow[] {
+  return rows.filter((row) => hits.has(row.doc.slug) || (row.ai !== null && (row.ai.fit === "exact" || !exact) && passes(row.doc)));
+}

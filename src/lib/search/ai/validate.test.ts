@@ -362,9 +362,14 @@ test("summary: two kinds of product in one sentence are not one impossible progr
       "Selon votre profil financier, plusieurs appartements et lots de terrain sont accessibles, notamment à Had Soualem dès 250 000 DH ou Essaouira dès 485 000 DH.",
     ),
   );
-  // …but a beach the data does not list is still withheld (real Gemini answer, 2026-10-06).
-  assert.equal(
+  // Jnane Souss's own fiche says "proche … des plages" / "قريبة من … الشواطئ": repeating it is allowed
+  // (real Gemini answer, 2026-10-06)…
+  assert.ok(
     summaryOf("شقة قريبة من البحر في أكادير", [R("jnane-souss", "close"), R("massylia", "close")], "نقترح عليكم مشروع جنان سوس القريب من الشواطئ بأكادير ابتداءً من 770 000 درهم، وكذلك مشروع ماسيليا."),
+  );
+  // …but a beach no fiche mentions is still withheld (Al Anbar is in Marrakech).
+  assert.equal(
+    summaryOf("شقة قريبة من البحر في مراكش", [R("al-anbar", "close")], "نقترح عليكم مشروع العنبر القريب من الشواطئ بمراكش ابتداءً من 545 000 درهم."),
     null,
   );
 });
@@ -376,4 +381,27 @@ test("text with letters of another script is dropped whole (a garbled word from 
   assert.equal(sanitizeText("Massylia, à Agadir, dès 1 045 000 DH (80 à 96 m²).", 240), "Massylia, à Agadir, dès 1 045 000 DH (80 à 96 m²).");
   assert.equal(sanitizeText("نقترح عليكم ماسيليا بأكادير ابتداءً من 1 045 000 درهم.", 240), "نقترح عليكم ماسيليا بأكادير ابتداءً من 1 045 000 درهم.");
   assert.equal(sanitizeText("Océane · œuvre · Ça · L'Aïn", 240), "Océane · œuvre · Ça · L'Aïn");
+});
+
+test("figures the programme's own fiche states in words or in its nearby list are allowed; invented ones are not", () => {
+  // Gemini's real answers, dropped before this fix: Assafa's fiche says "à dix minutes des plages de Sidi Rahal".
+  const asked = "Avec un budget de 25 millions, où acheter un appartement près de la mer pour ma famille ?";
+  const results = [{ slug: "assafa", fit: "close", criteria: [] }];
+  for (const summary of [
+    "Avec un budget de 250 000 DH, découvrez le projet Assafa à Had Soualem, à 10 minutes des plages de Sidi Rahal, avec 3 chambres pour votre famille.",
+    "Pour un budget de 250 000 DH, Assafa à Had Soualem propose des appartements de 3 chambres à dix minutes des plages.",
+  ]) {
+    assert.equal(run(asked, answer({ summary, results }))?.summary, summary);
+  }
+  // A distance the fiche does not give is still a hallucination.
+  const invented = "Assafa à Had Soualem est à 7 minutes des plages, dès 250 000 DH.";
+  assert.equal(run(asked, answer({ summary: invented, results }))?.summary, null);
+});
+
+test("a place the fiche names only as a neighbour cannot become the programme's address", () => {
+  const asked = "appartement près de la mer";
+  const results = [{ slug: "assafa", fit: "close", criteria: [] }];
+  // Assafa's fiche: "à dix minutes des plages de Sidi Rahal" — Assafa is in Had Soualem.
+  assert.equal(run(asked, answer({ summary: "Assafa est située à Sidi Rahal, dès 250 000 DH.", results }))?.summary, null);
+  assert.ok(run(asked, answer({ summary: "Assafa, à dix minutes des plages de Sidi Rahal, dès 250 000 DH.", results }))?.summary);
 });

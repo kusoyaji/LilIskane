@@ -31,6 +31,12 @@ import type { Vocabulary } from "./vocab.ts";
 export type ProgrammeFacts = CheckedDoc & {
   slug: string;
   numbers: number[];
+  /**
+   * What the programme's OWN fiche text mentions (summary, both scripts), read by the
+   * parser: Assafa's says "à dix minutes des plages de Sidi Rahal", so a sentence may
+   * repeat it about Assafa without being taken for a beach amenity or a Sidi Rahal address.
+   */
+  mentions: { cities: string[]; amenities: CheckedDoc["amenities"]; statuses: CheckedDoc["statuses"]; kinds: CheckedDoc["kinds"]; segments: Array<CheckedDoc["segment"]> };
   /** The ways a sentence may name it, as folded word sequences (both scripts). */
   names: string[][];
 };
@@ -171,6 +177,8 @@ function namedIn(clause: string, ctx: ValidationContext): ProgrammeFacts[] {
   return [...new Set(kept.map((h) => h.fact))];
 }
 
+/** Words that make a place a neighbour rather than an address. */
+const PROXIMITY = /(minutes?\b|\bmin\b|\bprès\b|\bpres\b|\bproche|à côté|non loin|aux portes|قرب|قريب|بجوار|دقيقة|دقائق)/i;
 /** The visitor addressed: their wish, their search, their budget. */
 const WISH = /(\bpour\b|\bvotre\b|\bvos\b|\bvous\b|souhait|recherch|cherchez|لكم|تبحثون|ترغبون|ميزانيتك|حسب|بحثكم|طلبكم)/i;
 /** A link, an address or a domain in model text: the item is dropped, not just cleaned. */
@@ -294,12 +302,16 @@ function claimsHold(clause: string, named: ProgrammeFacts[], portfolio: Programm
   const places = q.cities.filter((id) => SERVED_CITY_IDS.has(id));
   if (named.length > 0) {
     const some = (test: (f: ProgrammeFacts) => boolean) => named.some(test);
+    // A place the fiche itself names counts only as a neighbour ("à 10 minutes des plages de
+    // Sidi Rahal"), never as the programme's address ("Assafa est à Sidi Rahal" still fails).
+    const nearby = PROXIMITY.test(clause);
     return (
-      q.statuses.every((st) => some((f) => f.statuses.includes(st))) &&
-      q.amenities.every((a) => some((f) => f.amenities.includes(a))) &&
-      q.kinds.every((k) => some((f) => f.kinds.includes(k))) &&
-      q.segments.every((seg) => some((f) => f.segment === seg)) &&
-      (places.length === 0 || some((f) => places.includes(f.cityId)))
+      q.statuses.every((st) => some((f) => f.statuses.includes(st) || f.mentions.statuses.includes(st))) &&
+      q.amenities.every((a) => some((f) => f.amenities.includes(a) || f.mentions.amenities.includes(a))) &&
+      q.kinds.every((k) => some((f) => f.kinds.includes(k) || f.mentions.kinds.includes(k))) &&
+      q.segments.every((seg) => some((f) => f.segment === seg || f.mentions.segments.includes(seg))) &&
+      (places.length === 0 ||
+        some((f) => places.some((id) => id === f.cityId || (nearby && f.mentions.cities.includes(id)))))
     );
   }
   // The visitor's wish restated as theirs ("Pour une retraite en bord de mer, …") is not a claim;

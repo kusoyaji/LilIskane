@@ -44,6 +44,28 @@
   overflow: hidden;
   pointer-events: none;
 }
+/* Multiline (the home hero): the textarea grows with the sentence (its
+   block-size is set by MarkedInput, up to its maxLines); the underline layer
+   covers the same box and wraps the same way, so each stroke stays under its
+   word on whichever line it falls. */
+.inputWrap[data-multi] .input {
+  block-size: 1.3em;
+  resize: none;
+  overflow: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  scrollbar-width: none;
+}
+.inputWrap[data-multi] .input::-webkit-scrollbar {
+  display: none;
+}
+.inputWrap[data-multi] .layer {
+  block-size: auto;
+}
+.inputWrap[data-multi] .layer.mirror {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
 /* The understood words, as ochre under-strokes behind the real text. */
 .layer.mirror {
   white-space: pre;
@@ -331,5 +353,55 @@
   .chip,
   .chipX > svg {
     transition: none;
+  }
+}
+
+/* ---------------------------------------------------------- busy dots ---- */
+/* Breathing in turn (scale + opacity, 1 s, 140 ms apart); under reduced
+   motion only their opacity pulses. */
+.dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.dots > span {
+  inline-size: 4px;
+  block-size: 4px;
+  border-radius: 999px;
+  background: currentColor;
+  animation: dot-breathe 1s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+.dots > span:nth-child(2) {
+  animation-delay: 140ms;
+}
+.dots > span:nth-child(3) {
+  animation-delay: 280ms;
+}
+@keyframes dot-breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.7);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* !important: past the site-wide reduced-motion cut (globals.css) — the wait still shows. */
+  .dots > span {
+    animation-name: dot-pulse;
+    animation-duration: 1.6s !important;
+    animation-iteration-count: infinite !important;
+  }
+}
+@keyframes dot-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
   }
 }

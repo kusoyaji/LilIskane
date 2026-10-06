@@ -6,9 +6,10 @@ import { CREDIT_DEFAULTS, DEFAULT_DEPOSIT } from "../../credit.ts";
 import { STATUS_FACETS, hasStatusFacet } from "../../status-facets.ts";
 import { CITY_REGION, REGION_CITIES } from "../lexicon.ts";
 import { words } from "../normalize.ts";
+import { parseQuery } from "../parse.ts";
 import type { RegionId } from "../types.ts";
 import { monthlyCeiling } from "./criteria.ts";
-import { numbersIn } from "./numbers.ts";
+import { figuresIn } from "./numbers.ts";
 import type { ProgrammeFacts, ValidationContext } from "./validate.ts";
 import { AI_AMENITIES, AI_CITY_IDS, AI_KINDS, AI_SEGMENTS, AI_SLUGS, AI_STATUSES, VOCABULARY } from "./vocab.ts";
 
@@ -204,7 +205,11 @@ function programmeNumbers(p: Project): number[] {
     for (const n of [t.surfaceMin, t.surfaceMax, t.bedrooms, t.price.amount]) if (n > 0) out.add(n);
   }
   const prose = [p.name.fr, p.name.ar, p.neighbourhood.fr, p.neighbourhood.ar, p.summary.fr, p.summary.ar, p.floors ?? ""];
-  for (const text of prose) for (const found of numbersIn(text)) for (const v of found.values) out.add(v);
+  // Digits AND number words: fiches write "à dix minutes des plages", and the model may
+  // restate it as "10 minutes" — both are the fiche's own figure.
+  for (const text of prose) for (const found of figuresIn(text)) for (const v of found.values) out.add(v);
+  // The sourced travel times on the programme page ("Rabat 5 min").
+  for (const place of p.nearby) out.add(place.minutes);
   return [...out];
 }
 
@@ -233,6 +238,19 @@ function nameForms(p: Project): string[][] {
   return [...out.values()];
 }
 
+/** What the programme's own fiche text names — read by the same parser as the visitor's query. */
+function ficheMentions(p: Project): ProgrammeFacts["mentions"] {
+  const read = [p.summary.fr, p.summary.ar].map((text) => parseQuery(text));
+  const all = <T,>(pick: (q: ReturnType<typeof parseQuery>) => T[]) => [...new Set(read.flatMap(pick))];
+  return {
+    cities: all((q) => q.cities),
+    amenities: all((q) => q.amenities),
+    statuses: all((q) => q.statuses),
+    kinds: all((q) => q.kinds),
+    segments: all((q) => q.segments),
+  };
+}
+
 let facts: Map<string, ProgrammeFacts> | null = null;
 
 export function programmeFacts(): Map<string, ProgrammeFacts> {
@@ -250,6 +268,7 @@ export function programmeFacts(): Map<string, ProgrammeFacts> {
         amenities: p.amenities,
         numbers: programmeNumbers(p),
         names: nameForms(p),
+        mentions: ficheMentions(p),
       },
     ]),
   );

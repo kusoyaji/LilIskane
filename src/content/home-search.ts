@@ -33,7 +33,7 @@ type HomeSearchCopy = {
   countWords: (n: number) => string;
   cities: (n: number, formatted: string) => string;
   /** Under the count when nothing matched everything: these are the closest. */
-  closest: string;
+  closest: (n: number) => string;
   /** Announced (polite) after typing settles. */
   announce: (n: number, formatted: string) => string;
   relaxedShort: string;
@@ -86,7 +86,7 @@ export const homeSearchCopy: Copy<HomeSearchCopy> = {
     announce: (n, formatted) =>
       n === 0 ? "Aucun programme" : n === 1 ? "1 programme correspond" : `${formatted} programmes correspondent`,
     relaxedShort: "Rien ne réunit tout cela : voici les plus proches.",
-    closest: "les plus proches",
+    closest: (n) => (n === 1 ? "le plus proche" : "les plus proches"),
     ctaResults: (n, formatted) => (n === 1 ? "Voir le programme" : `Voir les ${formatted} programmes`),
     ctaMap: "Sur la carte",
     resultsEyebrow: "Résultats",
@@ -139,7 +139,7 @@ export const homeSearchCopy: Copy<HomeSearchCopy> = {
               ? `${formatted} مشاريع تطابق بحثكم`
               : `${formatted} مشروعاً يطابق بحثكم`,
     relaxedShort: "لا شيء يجمع كل ذلك: إليكم الأقرب.",
-    closest: "الأقرب إلى بحثكم",
+    closest: () => "الأقرب إلى بحثكم",
     ctaResults: (n, formatted) =>
       n === 1 ? "عرض المشروع" : n === 2 ? "عرض المشروعين" : n <= 10 ? `عرض المشاريع الـ${formatted}` : `عرض الـ${formatted} مشروعاً`,
     ctaMap: "على الخريطة",

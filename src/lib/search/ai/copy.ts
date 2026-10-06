@@ -26,6 +26,8 @@ export type AiCopy = {
   /** "+5 %" — the caller isolates the run for Arabic. */
   over: (pct: number) => string;
   place: string;
+  /** In the summary's place when the concierge answered with suggestions only. */
+  suggestOnly: string;
   /** The /projets submit while the concierge reads the sentence. */
   submitting: string;
 };
@@ -47,6 +49,7 @@ export const aiCopy: Record<Locale, AiCopy> = {
     over: (pct) => `+${pct} %`,
     place: "Lieu",
     submitting: "Lecture de votre demande…",
+    suggestOnly: "À explorer aussi :",
   },
   ar: {
     concierge: "المساعد",
@@ -64,5 +67,6 @@ export const aiCopy: Record<Locale, AiCopy> = {
     over: (pct) => `+${pct}٪`,
     place: "المكان",
     submitting: "قراءة طلبكم…",
+    suggestOnly: "للاستكشاف أيضاً:",
   },
 };

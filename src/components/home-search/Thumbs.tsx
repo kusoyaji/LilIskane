@@ -11,9 +11,13 @@ const SLOTS = 6;
 /** Incoming pictures fade in one after another, this far apart. */
 const STAGGER_MS = 40;
 const IN_MS = 240;
+const OUT_MS = 180;
 
 /**
- * The current top matches as a strip of small pictures. When the programme
+ * The current top matches as a strip of small pictures — only as many as
+ * there are (at most six): never an empty slot, and no strip at all when
+ * nothing matches. A slot that is no longer needed lets its picture fade out
+ * before it goes. When the programme
  * in a slot changes, the old picture fades and shrinks a little (faster)
  * while the new one fades in over it — the slots one after another, 40 ms
  * apart — so the strip visibly answers each change of the answer without
@@ -26,9 +30,24 @@ const IN_MS = 240;
  * hover-only.
  */
 export function Thumbs({ docs, locale, plot, sqm }: { docs: SearchDoc[]; locale: Locale; plot: string; sqm: string }) {
+  const count = Math.min(docs.length, SLOTS);
+  // Slots beyond the new count stay until their picture has faded out.
+  const [kept, setKept] = useState(count);
+  useEffect(() => {
+    if (count >= kept) {
+      setKept(count);
+      return;
+    }
+    const timer = window.setTimeout(() => setKept(count), OUT_MS + (kept - 1) * STAGGER_MS + 20);
+    return () => window.clearTimeout(timer);
+    // `kept` is read, not followed: only a new count restarts the wait.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [count]);
+  const slots = Math.max(count, kept);
+  if (slots === 0) return null;
   return (
     <ul className={s.thumbs}>
-      {Array.from({ length: SLOTS }, (_, i) => (
+      {Array.from({ length: slots }, (_, i) => (
         <Slot key={i} doc={docs[i] ?? null} locale={locale} plot={plot} sqm={sqm} index={i} />
       ))}
     </ul>

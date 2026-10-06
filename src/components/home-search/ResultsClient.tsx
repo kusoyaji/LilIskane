@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { CriteriaTicks } from "@/components/search-concierge/CriteriaTicks";
+import { BusyDots } from "@/components/search-concierge/parts/BusyDots";
 import { ChipList, useChipListShown } from "@/components/search-concierge/parts/ChipList";
 import { relaxedSentence } from "@/components/search-concierge/parts/model";
 import { Arrow } from "@/components/v2/LinkButton";
@@ -30,6 +31,7 @@ export function ResultsClient({ locale, cards }: { locale: Locale; cards: Record
   const c = searchCopy[locale];
   const search = useHomeSearch();
   const { rows, chips, active, outcome } = search;
+  const refining = active && search.ai.state === "thinking";
   const uid = useId();
   const [sort, setSort] = useState<Sort>("relevance");
   const [expanded, setExpanded] = useState(false);
@@ -209,7 +211,15 @@ export function ResultsClient({ locale, cards }: { locale: Locale; cards: Record
       <div className={s.bar}>
         <div className={`u-shell ${s.barInner}`}>
           <div className={s.headline}>
-            <p className={`u-eyebrow ${s.eyebrow}`}>{t.resultsEyebrow}</p>
+            {/* While the concierge still reads the sentence, the eyebrow says the list may change —
+                in its own line's place (the two cross in one grid cell), so nothing reflows. */}
+            <p className={`u-eyebrow ${s.eyebrow}`} data-refining={refining || undefined}>
+              <span className={s.eyebrowText}>{t.resultsEyebrow}</span>
+              <span className={s.refining} aria-hidden>
+                <BusyDots />
+                {c.aiRefining}
+              </span>
+            </p>
             <h2 id={`${uid}-h`} className={`u-display ${s.title}`} tabIndex={-1} data-results-heading="">
               {active ? (
                 titleParts.length === 2 ? (

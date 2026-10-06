@@ -12,7 +12,8 @@ import { namedProgramme } from "@/lib/search/rank";
 import { answerProgramme, projetsQuery } from "@/lib/search/ai/apply";
 import { aiCopy } from "@/lib/search/ai/copy";
 import { isAiWorthy } from "@/lib/search/ai/worthy";
-import { AiAnswerCard } from "@/components/search-concierge/AiAnswerCard";
+import { AiSlot } from "@/components/search-concierge/AiSlot";
+import { BusyDots } from "@/components/search-concierge/parts/BusyDots";
 import { loadIndex } from "@/components/search-concierge/index-cache";
 import { fetchAiAnswer, useAiSearch } from "@/components/search-concierge/useAiSearch";
 import {
@@ -240,11 +241,9 @@ export function SmartQuery({ locale }: { locale: Locale }) {
         />
         <button type="submit" className={`u-press ${s.smartSubmit}`} disabled={pending || asking}>
           <span className={s.smartSubmitText}>{opens ? c.smartOpen(opens.name[locale]) : c.smartSubmit}</span>
+          {/* While the concierge is consulted before leaving: three breathing dots, like the home's arrow. */}
           {asking ? (
-            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden className={s.smartSpinner}>
-              <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeOpacity="0.28" />
-              <path d="M12 3.5a8.5 8.5 0 0 1 8.5 8.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-            </svg>
+            <BusyDots />
           ) : (
             <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden className={s.smartArrow}>
               <path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -315,19 +314,19 @@ export function SmartQuery({ locale }: { locale: Locale }) {
           {status}
         </p>
 
-        {raw.trim() !== "" && ai.state !== "idle" && (
-          <AiAnswerCard
-            locale={locale}
-            state={ai.state}
-            answer={answer}
-            compact
-            onQuery={(text) => {
-              setRaw(text);
-              warm();
-              inputRef.current?.focus();
-            }}
-          />
-        )}
+        {/* The concierge's wait (from the pause, or at once on submit) and then its answer, in one place. */}
+        <AiSlot
+          locale={locale}
+          state={raw.trim() === "" ? "idle" : asking ? "thinking" : ai.state}
+          answer={answer}
+          compact
+          total={docs?.length ?? null}
+          onQuery={(text) => {
+            setRaw(text);
+            warm();
+            inputRef.current?.focus();
+          }}
+        />
       </div>
     </form>
   );

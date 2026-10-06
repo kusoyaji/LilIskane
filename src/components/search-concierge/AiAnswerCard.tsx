@@ -3,70 +3,67 @@
 import type { Locale } from "@/i18n/config";
 import { aiCopy } from "@/lib/search/ai/copy";
 import { bindFigures, isolateFigures } from "@/lib/search/ai/numbers";
-import type { AiAnswer, AiState } from "@/lib/search/ai/types";
+import type { AiAnswer } from "@/lib/search/ai/types";
 import s from "./AiAnswerCard.module.css";
 
 /**
- * The concierge's answer, above the results (header overlay, home hero,
- * /projets hero). Presentational: the state comes from `useAiSearch`.
+ * The concierge's answer (header overlay, home hero, /projets hero), once it
+ * has come — presentational; the wait before it and the landing are AiSlot's.
  *
- * - "thinking": one quiet line, "Le concierge affine votre recherche…" — the
- *   instant results below stay usable.
- * - "ready": a spark + "Concierge", the one-sentence summary (already
- *   validated on the server: no figure the data does not contain), the
- *   clarifying question and the follow-up suggestions as chips that fill the
- *   field (`onQuery`), and the AI disclosure.
- * - "idle" / "unavailable", or nothing worth showing: renders nothing — the
- *   instant results are the answer.
+ * A spark + "Concierge", the one-sentence summary (already validated on the
+ * server: no figure the data does not contain), the clarifying question and
+ * the follow-up suggestions as chips that fill the field (`onQuery`), and the
+ * AI disclosure. Renders nothing when the answer holds nothing worth showing:
+ * the instant results are then the answer.
+ *
+ * - "card": a softly boxed panel (overlay, /projets).
+ * - "plain": no box — the home hero, where the answer sits under the
+ *   question it answers and must stay light.
  *
  * The summary carries the answer's own language (an Arabic question on the
- * French page is answered in Arabic), so it sets its own lang/dir.
+ * French page is answered in Arabic), so it sets its own lang/dir. It is
+ * announced by AiSlot's live region, not here.
  */
 export type AiAnswerCardProps = {
   locale: Locale;
-  state: AiState;
-  /** Only an answer for the text currently in the field (see useAiSearch's forQuery). */
-  answer: AiAnswer | null;
+  answer: AiAnswer;
   /** Put this text in the field (a suggestion, or the clarifying question). */
   onQuery: (text: string) => void;
   tone?: "ink" | "paper";
-  /** Tighter spacing, no disclosure line break — for narrow columns. */
+  variant?: "card" | "plain";
+  /** Tighter spacing — for narrow columns. */
   compact?: boolean;
-  /** "thinking" only: render as a span inside an existing line (no box of its own). */
-  inline?: boolean;
+  /** At most this many chips (the clarifying question first). */
+  maxChips?: number;
   className?: string;
 };
 
-export function AiAnswerCard({ locale, state, answer, onQuery, tone = "ink", compact = false, inline = false, className }: AiAnswerCardProps) {
+export function hasAnswerContent(answer: AiAnswer | null): answer is AiAnswer {
+  return Boolean(answer && (answer.summary || answer.clarify || answer.suggestions.length > 0));
+}
+
+export function AiAnswerCard({
+  locale,
+  answer,
+  onQuery,
+  tone = "ink",
+  variant = "card",
+  compact = false,
+  maxChips = 4,
+  className,
+}: AiAnswerCardProps) {
   const c = aiCopy[locale];
-
-  if (state === "thinking") {
-    // `inline`: set inside a line that already exists (the home hero's count), so it takes no height.
-    const Line = inline ? "span" : "p";
-    return (
-      <Line className={`${s.thinking} ${className ?? ""}`} data-tone={tone} data-inline={inline || undefined} role="status">
-        <Spark className={s.thinkingSpark} />
-        <span className={s.thinkingText}>
-          {c.thinking}
-          {/* The light that crosses the line: a bright copy of the words, seen through a moving window. */}
-          <span className={s.sweep} aria-hidden>
-            <span className={s.sweepText}>{c.thinking}</span>
-          </span>
-        </span>
-      </Line>
-    );
-  }
-
-  if (state !== "ready" || !answer) return null;
-  const { summary, clarify, suggestions } = answer;
-  if (!summary && !clarify && suggestions.length === 0) return null;
+  if (!hasAnswerContent(answer)) return null;
+  const { summary, clarify } = answer;
   const lang = answer.language;
   const dir = lang === "ar" ? "rtl" : "ltr";
+  const suggestions = answer.suggestions.slice(0, Math.max(0, maxChips - (clarify ? 1 : 0)));
 
   return (
     <section
       className={`${s.card} ${className ?? ""}`}
-      data-tone={tone}
+      data-ai-tone={tone}
+      data-variant={variant}
       data-compact={compact ? "" : undefined}
       aria-label={c.concierge}
     >
@@ -75,25 +72,28 @@ export function AiAnswerCard({ locale, state, answer, onQuery, tone = "ink", com
         <span className={`u-eyebrow ${s.label}`}>{c.concierge}</span>
       </p>
 
-      {summary && (
-        // Only the sentence is announced, not the chips and the disclosure.
-        <p className={s.summary} lang={lang} dir={dir} aria-live="polite">
+      {summary ? (
+        <p className={s.summary} lang={lang} dir={dir}>
           {display(summary)}
         </p>
+      ) : (
+        // No sentence (the server withheld one it could not verify): the chips are still a reply
+        // to the question above — a quiet lead line says so, so they never read as stray buttons.
+        !clarify && suggestions.length > 0 && <p className={s.lead}>{c.suggestOnly}</p>
       )}
 
       {(clarify || suggestions.length > 0) && (
         <ul className={s.chips} aria-label={c.suggestionsLabel}>
           {clarify && (
-            <li>
+            <li style={{ ["--i" as string]: 0 }}>
               <button type="button" className={`${s.chip} ${s.clarify}`} onClick={() => onQuery(clarify)}>
                 <span className="u-visually-hidden">{c.clarifyLabel} : </span>
                 <bdi lang={lang}>{display(clarify)}</bdi>
               </button>
             </li>
           )}
-          {suggestions.map((text) => (
-            <li key={text}>
+          {suggestions.map((text, i) => (
+            <li key={text} style={{ ["--i" as string]: i + (clarify ? 1 : 0) }}>
               <button type="button" className={s.chip} onClick={() => onQuery(text)}>
                 <bdi lang={lang}>{display(text)}</bdi>
               </button>
@@ -113,7 +113,7 @@ function display(text: string): string {
 }
 
 /** The concierge's mark: a four-point spark. */
-function Spark({ className }: { className?: string }) {
+export function Spark({ className }: { className?: string }) {
   return (
     <svg className={className} width="16" height="16" viewBox="0 0 24 24" aria-hidden focusable="false">
       <path

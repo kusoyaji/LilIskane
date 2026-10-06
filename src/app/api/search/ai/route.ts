@@ -19,7 +19,9 @@ import { validateAnswer } from "@/lib/search/ai/validate";
  *
  * DEV ONLY: outside production, a request with `x-search-mock: 1` gets a
  * canned answer derived from the instant engine after ~1 s (for building the
- * UI without a key); production ignores the header.
+ * UI without a key); `x-search-mock-delay: <ms>` (0–10 000) changes that wait,
+ * to see and capture the loading states; `x-search-mock: fail` answers a
+ * timeout instead. Production ignores these headers.
  */
 
 export const runtime = "nodejs";
@@ -53,6 +55,13 @@ function fail(reason: AiError["reason"], status: number): Response {
     status: http,
     headers: { ...NO_STORE, "x-search-status": String(status) },
   });
+}
+
+/** DEV ONLY: the mock's wait — `x-search-mock-delay` in ms, clamped to 0–10 000; 1 s by default. */
+function mockDelayMs(request: Request): number {
+  const asked = Number(request.headers.get("x-search-mock-delay"));
+  if (!request.headers.has("x-search-mock-delay") || !Number.isFinite(asked)) return 1000;
+  return Math.min(10_000, Math.max(0, Math.round(asked)));
 }
 
 function clientIp(request: Request): string {
@@ -98,21 +107,24 @@ export async function POST(request: Request): Promise<Response> {
   if (!q) return fail("invalid", 400);
   if (q.length > MAX_Q) return fail("too-long", 413);
 
-  const mock = DEV && request.headers.get("x-search-mock") === "1";
-  const key = `${mock ? "mock|" : ""}${locale}|${normalize(q)}`;
+  const mockMode = DEV ? request.headers.get("x-search-mock") : null;
+  // "fail": the answer never comes (a timeout), to see the page let the wait go quietly.
+  const mock = mockMode === "1" || mockMode === "fail";
+  const key = `${locale}|${normalize(q)}`;
+
+  if (mock) {
+    // Not cached: every mock request takes its (requested) time, so a loading state can be captured again.
+    await new Promise((resolve) => setTimeout(resolve, mockDelayMs(request)));
+    if (mockMode === "fail") return fail("timeout", 503);
+    const answer = validateAnswer(mockAnswer(q, locale), { q, locale, parsed: parseQuery(q) }, validationContext());
+    if (!answer) return fail("invalid", 503);
+    return NextResponse.json(answer, { headers: { ...NO_STORE, "x-search-source": "mock" } });
+  }
 
   const hit = cache.get(key);
   if (hit) {
     counts.cached += 1;
     return NextResponse.json(hit, { headers: { ...NO_STORE, "x-search-source": "cache" } });
-  }
-
-  if (mock) {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    const answer = validateAnswer(mockAnswer(q, locale), { q, locale, parsed: parseQuery(q) }, validationContext());
-    if (!answer) return fail("invalid", 503);
-    cache.set(key, answer);
-    return NextResponse.json(answer, { headers: { ...NO_STORE, "x-search-source": "mock" } });
   }
 
   if (!hasKey()) return fail("no-key", 503);

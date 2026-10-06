@@ -78,6 +78,20 @@ type SearchCopy = {
   failed: string;
   retry: string;
   pending: string;
+  /** Announced once (polite) when the concierge starts reading — not at every stage. */
+  aiBusy: string;
+  /**
+   * The wait, in the request's real order: the sentence is read, the
+   * catalogue compared, the answer checked against the fiches (the server's
+   * validator). n = the number of programmes in the catalogue, when known.
+   */
+  aiStages: (n: number | null, formatted: string) => [string, string, string];
+  /** The home hero, under the pickers, when the results had to be widened (no AI sentence). */
+  heroWidened: (fields: string | null) => string;
+  /** The home results' eyebrow while the concierge is still reading (the list may still change). */
+  aiRefining: string;
+  /** The home hero's way to the results ("programmes" is already said by the count). */
+  heroCta: (n: number) => string;
 };
 
 export const searchCopy: Copy<SearchCopy> = {
@@ -174,6 +188,15 @@ export const searchCopy: Copy<SearchCopy> = {
     failed: "La recherche n'a pas pu se charger.",
     retry: "Réessayer",
     pending: "Ouverture…",
+    aiBusy: "Le concierge cherche…",
+    aiStages: (n, formatted) => [
+      "Lecture de votre demande…",
+      n ? `Comparaison des ${formatted} programmes…` : "Comparaison de nos programmes…",
+      "Vérification des prix et des fiches…",
+    ],
+    heroWidened: (fields) => (fields ? `Recherche élargie : ${fields}.` : "Recherche élargie."),
+    heroCta: (n) => (n === 1 ? "Voir le programme" : "Voir la liste"),
+    aiRefining: "Le concierge affine la liste…",
   },
   ar: {
     trigger: "بحث",
@@ -283,6 +306,15 @@ export const searchCopy: Copy<SearchCopy> = {
     failed: "تعذر تحميل البحث.",
     retry: "إعادة المحاولة",
     pending: "جارٍ الفتح…",
+    aiBusy: "المساعد يبحث…",
+    aiStages: (n, formatted) => [
+      "قراءة طلبكم…",
+      n ? (n <= 10 ? `مقارنة ${formatted} مشاريع…` : `مقارنة ${formatted} مشروعاً…`) : "مقارنة مشاريعنا…",
+      "التحقق من الأسعار والبطاقات…",
+    ],
+    heroWidened: (fields) => (fields ? `بحث موسَّع: ${fields}.` : "بحث موسَّع."),
+    heroCta: (n) => (n === 1 ? "عرض المشروع" : "عرض القائمة"),
+    aiRefining: "المساعد يحسّن القائمة…",
   },
 };
 

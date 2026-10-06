@@ -363,7 +363,6 @@
 /* The AI layer: its answer card above the results, its ticks on a row. The
    global grounds rule paints anything carrying data-tone; these sit on the
    overlay's own ground, so they paint none. */
-.aiSlot > p,
 .ticks {
   background: none;
 }
@@ -426,31 +425,6 @@
 .listbox > .groupHead:first-child,
 .listbox > .indicator + .groupHead {
   margin-block-start: 0;
-}
-/* The heading, or the concierge's thinking line over it (one cell, no
-   height added: the rows below never move when it comes and goes). */
-.groupHead {
-  display: grid;
-  /* One line of the heading's own size, whatever is shown in it. */
-  grid-template-rows: 1em;
-}
-.groupHead > * {
-  grid-area: 1 / 1;
-  min-inline-size: 0;
-}
-.groupTitle {
-  transition: opacity 140ms var(--ease-ui);
-}
-.groupHead[data-thinking] > .groupTitle {
-  opacity: 0;
-}
-.groupThinking {
-  align-self: center;
-  font-size: var(--text-small);
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
-  line-height: 1;
 }
 :global([lang="ar"]) .groupHead {
   text-transform: none;

@@ -1,0 +1,242 @@
+/* The concierge's place: the wait (a skeleton of the answer) and the answer
+   share one grid cell, so the answer lands where the wait stood and the two
+   cross for 150 ms. Motion: transform/opacity only; the bars' light is a
+   translated gradient, the spark breathes with scale + opacity. Under reduced
+   motion nothing travels: the bars and the spark keep a gentle opacity pulse,
+   the status line changes in place. */
+
+.slot {
+  display: grid;
+  min-inline-size: 0;
+}
+.slot > * {
+  grid-area: 1 / 1;
+  min-inline-size: 0;
+}
+/* Nothing to show: out of the flow (no gap in a grid or flex parent), its
+   live region still in the page for the answer to come. */
+.slot[data-state="empty"] {
+  position: absolute;
+  display: block;
+}
+
+/* ------------------------------------------------------------- the wait -- */
+.pending {
+  --ai-mute: color-mix(in oklab, var(--color-paper) 58%, transparent);
+  --ai-bar: color-mix(in oklab, var(--color-paper) 9%, transparent);
+  --ai-glint: color-mix(in oklab, var(--color-paper) 15%, transparent);
+  display: grid;
+  align-content: start;
+  gap: 0.6rem;
+  /* Arrives at once: a quick fade, no movement. */
+  animation: wait-in 160ms var(--ease-reveal) backwards;
+}
+/* The overlay's and /projets' card: boxed like the answer it stands for. */
+.slot[data-variant="card"] .pending {
+  padding: 0.9rem 1.05rem 0.85rem;
+  border-radius: 0.85rem;
+  background: color-mix(in oklab, var(--color-paper) 4%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--color-paper) 12%, transparent);
+}
+.slot[data-variant="plain"] .pending {
+  gap: 0.55rem;
+}
+/* Over: it leaves faster than it came, under the answer coming into focus.
+   Its bars and its status line go first (80 ms), so the sentence resolves
+   over a clean ground rather than through grey streaks. */
+.pending[data-leaving] {
+  pointer-events: none;
+  animation: wait-out 150ms var(--ease-ui) forwards;
+}
+.pending[data-leaving] .bars,
+.pending[data-leaving] .stage {
+  opacity: 0;
+  transition: opacity 80ms var(--ease-ui);
+}
+@keyframes wait-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes wait-out {
+  to {
+    opacity: 0;
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  color: var(--color-ochre-bright);
+}
+.label {
+  color: var(--color-ochre-bright);
+}
+/* The spark breathes (1.6 s): the concierge is at work. */
+.spark {
+  flex: none;
+  animation: spark-breathe 1.6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+@keyframes spark-breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.82);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Three lines of text to come, at the summary's own size and leading. */
+.bars {
+  display: grid;
+  font-size: clamp(1rem, 1.25vw, 1.125rem);
+}
+.slot[data-variant="plain"] .bars {
+  font-size: clamp(1.0625rem, 1.3vw, 1.25rem);
+}
+.line {
+  display: flex;
+  align-items: center;
+  block-size: 1.45em;
+}
+:global([lang="ar"]) .line {
+  block-size: 1.7em;
+}
+.bar {
+  position: relative;
+  overflow: hidden;
+  inline-size: 100%;
+  block-size: 0.6em;
+  border-radius: 999px;
+  background: var(--ai-bar);
+}
+.line:nth-child(2) .bar {
+  inline-size: 86%;
+}
+.line:nth-child(3) .bar {
+  inline-size: 52%;
+}
+/* The light: a soft band crossing each bar in the reading direction, a line
+   after the other (1.4 s loop, 120 ms apart) — as if read. */
+.bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, var(--ai-glint) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: bar-sweep 1.4s cubic-bezier(0.45, 0, 0.55, 1) calc(var(--i, 0) * 120ms) infinite;
+}
+:global([dir="rtl"]) .bar::after {
+  animation-name: bar-sweep-rtl;
+}
+@keyframes bar-sweep {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes bar-sweep-rtl {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* The suggestions' row, as two empty pills — only where the answer is much
+   taller than three lines of text (the overlay's card on phones), so it
+   lands in a place of its own size instead of pushing the list down. */
+.pills {
+  display: none;
+  gap: 0.4rem;
+}
+.pills > span {
+  inline-size: 7.5rem;
+  block-size: 2.25rem;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--ai-bar);
+}
+.pills > span + span {
+  inline-size: 9.5rem;
+}
+@media (max-width: 40rem) {
+  .slot[data-variant="card"] .pills {
+    display: flex;
+  }
+  .slot[data-variant="card"] .pending {
+    padding-block-end: 1.6rem;
+  }
+}
+.pending[data-leaving] .pills {
+  opacity: 0;
+  transition: opacity 80ms var(--ease-ui);
+}
+
+/* What the concierge is doing, honestly: one short line, each stage rising
+   into place (4px, 200 ms) as the request moves on. */
+.stage {
+  display: grid;
+  margin: 0;
+  font-size: var(--text-small);
+  line-height: 1.35;
+  color: var(--ai-mute);
+}
+.stageText {
+  min-inline-size: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  animation: stage-in 200ms var(--ease-reveal) backwards;
+}
+@keyframes stage-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+/* --------------------------------------------------------- the answer -- */
+/* On top of the fading wait while they cross. */
+.answer {
+  position: relative;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar::after {
+    display: none;
+  }
+  /* Nothing travels; the work still shows, as a slow pulse. The !important
+     beats the site-wide reduced-motion rule (globals.css), which would
+     otherwise cut every animation to one 0.01 ms run — essential feedback
+     stays, as an opacity change only. */
+  .bar {
+    animation: wait-pulse 1.6s ease-in-out calc(var(--i, 0) * 120ms) infinite;
+    animation-duration: 1.6s !important;
+    animation-iteration-count: infinite !important;
+  }
+  .spark {
+    animation: wait-pulse 1.6s ease-in-out infinite;
+    animation-duration: 1.6s !important;
+    animation-iteration-count: infinite !important;
+  }
+  .stageText {
+    animation: none;
+  }
+}
+@keyframes wait-pulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}

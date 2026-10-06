@@ -39,7 +39,30 @@
   gap: 0.8rem;
 }
 .eyebrow {
+  display: grid;
   color: var(--color-ochre-deep);
+}
+.eyebrowText,
+.refining {
+  grid-area: 1 / 1;
+  transition: opacity 150ms var(--ease-ui);
+}
+.refining {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  opacity: 0;
+  color: var(--color-ink-mute);
+}
+.eyebrow[data-refining] .eyebrowText {
+  opacity: 0;
+}
+.eyebrow[data-refining] .refining {
+  opacity: 1;
+  transition: opacity 160ms var(--ease-reveal);
+}
+.eyebrow:not([data-refining]) .refining > span > span {
+  animation: none;
 }
 .title {
   display: flex;

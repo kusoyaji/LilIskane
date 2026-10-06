@@ -23,7 +23,7 @@ import { formatRange } from "@/lib/format";
 import { parseQuery, searchDocs, toProjetsHref, type ParsedQuery, type SearchDoc, type SearchOutcome } from "@/lib/search";
 import type { AiResult } from "@/lib/search/ai/types";
 import { reducedMotion, slideIndicator } from "@/components/home-search/motion";
-import { AiAnswerCard } from "./AiAnswerCard";
+import { AiSlot } from "./AiSlot";
 import { aiCopy } from "@/lib/search/ai/copy";
 import { CriteriaTicks } from "./CriteriaTicks";
 import { loadIndex } from "./index-cache";
@@ -591,17 +591,9 @@ export function ConciergeOverlay({
   );
   const docGroup = docOptions.length > 0 && (
     <Fragment key="docs">
-      {/* While the concierge reads the sentence, its quiet line takes the place of this heading —
-          in a line that is already there, so the rows below never move when it comes and goes. */}
-      {/* Decoration inside the listbox (which may hold only options and groups): hidden from
-          assistive tech; the thinking line is announced through the overlay's live region. */}
-      <p className={s.groupHead} aria-hidden data-thinking={(hasQuery && ai.state === "thinking") || undefined}>
-        <span className={s.groupTitle} aria-hidden>
-          {docGroupTitle}
-        </span>
-        {hasQuery && ai.state === "thinking" && (
-          <AiAnswerCard locale={locale} state="thinking" answer={null} onQuery={() => {}} inline className={s.groupThinking} />
-        )}
+      {/* Decoration inside the listbox (which may hold only options and groups): the group's own label names it. */}
+      <p className={s.groupHead} aria-hidden>
+        {docGroupTitle}
       </p>
       <ul role="group" aria-label={docGroupTitle} className={s.options}>
         {docOptions.map(([o, i]) => renderOption(o, i))}
@@ -754,19 +746,21 @@ export function ConciergeOverlay({
               </section>
             )}
 
-            {hasQuery && ai.state === "ready" && answer && (
-              <div className={s.aiSlot}>
-                <AiAnswerCard
-                  locale={locale}
-                  state={ai.state}
-                  answer={answer}
-                  onQuery={(text) => applyAndRefocus({ raw: text, extra })}
-                />
-              </div>
-            )}
+            {/* The concierge's place above the results: its wait (a skeleton of the answer, with
+                the request's stages), then its answer in the same place. The overlay's own live
+                region already says it is reading, so the slot only announces the answer. */}
+            <AiSlot
+              locale={locale}
+              state={hasQuery ? ai.state : "idle"}
+              answer={answer}
+              onQuery={(text) => applyAndRefocus({ raw: text, extra })}
+              total={docs?.length ?? null}
+              announceBusy={false}
+            />
 
-            {/* Said once: when the concierge has answered, its sentence says what was widened. */}
-            {relaxedText && !(ai.state === "ready" && answer?.summary) && (
+            {/* What had to be widened: there for as long as it is true — through the wait and the
+                answer — so the list under it moves once at most (the wait arriving), never back and forth. */}
+            {relaxedText && (
               <div className={s.relaxed} role="note">
                 <p className={s.relaxedLead}>{c.relaxedLead}</p>
                 <p>{relaxedText}</p>

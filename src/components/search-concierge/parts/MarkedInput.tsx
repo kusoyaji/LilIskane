@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type InputHTMLAttributes, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type InputHTMLAttributes, type RefObject } from "react";
 import type { QuerySpan } from "@/lib/search";
 import { markParts } from "./model";
 import p from "./parts.module.css";
@@ -16,6 +16,12 @@ import p from "./parts.module.css";
  *
  * The surface gives the type (`className` sets font and size on all three
  * layers); the layering itself lives here, so both search surfaces share it.
+ *
+ * `multiline` (the home hero): a one-row textarea that grows to show the
+ * whole sentence — up to `maxLines`, then it scrolls — so a long question is
+ * read in full, not cut at the field's end. It is still one logical line:
+ * line breaks typed or pasted become spaces, and Enter is the surface's
+ * (submit). The underline layer wraps exactly like the text above it.
  */
 export function MarkedInput({
   inputRef,
@@ -25,10 +31,12 @@ export function MarkedInput({
   spansFor,
   placeholders,
   cycle = true,
+  multiline = false,
+  maxLines = 3,
   className,
   ...rest
 }: {
-  inputRef: RefObject<HTMLInputElement | null>;
+  inputRef: RefObject<HTMLInputElement | HTMLTextAreaElement | null>;
   value: string;
   onValue: (value: string) => void;
   spans: QuerySpan[];
@@ -37,8 +45,15 @@ export function MarkedInput({
   placeholders: string[];
   /** Cycle the examples while the field is empty (e.g. only while it is open / on screen). */
   cycle?: boolean;
+  /** A textarea that grows with the text (see above). */
+  multiline?: boolean;
+  maxLines?: number;
   className?: string;
-} & Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "placeholder" | "className">) {
+} & Omit<InputHTMLAttributes<HTMLInputElement>, "value" | "onChange" | "placeholder" | "className" | "onKeyDown" | "onBlur"> & {
+  // Method syntax: a surface with a plain input may pass a handler typed for HTMLInputElement only.
+  onKeyDown?(event: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>): void;
+  onBlur?(event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>): void;
+}) {
   const mirrorRef = useRef<HTMLDivElement>(null);
   const [animated, setAnimated] = useState(false);
   const [index, setIndex] = useState(0);
@@ -58,16 +73,48 @@ export function MarkedInput({
   const hasMarks = parts.some((part) => part.mark);
   const stale = spansFor !== value;
 
-  // The input's own horizontal scroll (long queries) is mirrored by the underline layer.
+  // The input's own scroll (a long query) is mirrored by the underline layer.
   const sync = () => {
-    if (mirrorRef.current && inputRef.current) mirrorRef.current.scrollLeft = inputRef.current.scrollLeft;
+    if (mirrorRef.current && inputRef.current) {
+      mirrorRef.current.scrollLeft = inputRef.current.scrollLeft;
+      mirrorRef.current.scrollTop = inputRef.current.scrollTop;
+    }
   };
   useEffect(sync);
+
+  // Multiline: as tall as its text, up to maxLines (then it scrolls). Measured
+  // before paint on every change of the text — and of the type, which the
+  // surface may step down for a long sentence — and again when the width changes.
+  const fit = () => {
+    const el = inputRef.current;
+    if (!multiline || !el) return;
+    const line = parseFloat(getComputedStyle(el).lineHeight) || 0;
+    el.style.blockSize = "auto";
+    const full = el.scrollHeight;
+    const max = line ? Math.ceil(line * maxLines) : full;
+    el.style.blockSize = `${Math.min(full, max)}px`;
+    el.style.overflowY = full > max + 1 ? "auto" : "hidden";
+    sync();
+  };
+  useLayoutEffect(fit);
+  useEffect(() => {
+    if (!multiline || !inputRef.current) return;
+    let width = inputRef.current.clientWidth;
+    const ro = new ResizeObserver(([entry]) => {
+      const w = entry?.contentRect.width ?? 0;
+      if (Math.abs(w - width) < 0.5) return;
+      width = w;
+      fit();
+    });
+    ro.observe(inputRef.current);
+    return () => ro.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [multiline]);
 
   const cycling = animated && cycle && !value && placeholders.length > 1;
 
   return (
-    <div className={p.inputWrap}>
+    <div className={p.inputWrap} data-multi={multiline || undefined}>
       {hasMarks && (
         <div
           ref={mirrorRef}
@@ -87,24 +134,46 @@ export function MarkedInput({
           )}
         </div>
       )}
-      <input
-        ref={inputRef}
-        className={`${p.input} ${className ?? ""}`}
-        data-ph={cycling ? "" : undefined}
-        type="text"
-        dir="auto"
-        autoComplete="off"
-        autoCorrect="off"
-        autoCapitalize="off"
-        spellCheck={false}
-        enterKeyHint="search"
-        {...rest}
-        placeholder={placeholders[0]}
-        value={value}
-        onChange={(event) => onValue(event.target.value)}
-        onScroll={sync}
-        onSelect={sync}
-      />
+      {multiline ? (
+        <textarea
+          ref={inputRef as RefObject<HTMLTextAreaElement | null>}
+          className={`${p.input} ${className ?? ""}`}
+          data-ph={cycling ? "" : undefined}
+          rows={1}
+          dir="auto"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          enterKeyHint="search"
+          {...(rest as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
+          placeholder={placeholders[0]}
+          value={value}
+          // One logical line: a pasted line break is a space.
+          onChange={(event) => onValue(event.target.value.replace(/[\r\n]+/g, " "))}
+          onScroll={sync}
+          onSelect={sync}
+        />
+      ) : (
+        <input
+          ref={inputRef as RefObject<HTMLInputElement | null>}
+          className={`${p.input} ${className ?? ""}`}
+          data-ph={cycling ? "" : undefined}
+          type="text"
+          dir="auto"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
+          enterKeyHint="search"
+          {...rest}
+          placeholder={placeholders[0]}
+          value={value}
+          onChange={(event) => onValue(event.target.value)}
+          onScroll={sync}
+          onSelect={sync}
+        />
+      )}
       {cycling && (
         <span key={index} className={`${p.layer} ${p.ph} ${className ?? ""}`} aria-hidden>
           {placeholders[index]}
