@@ -9,3 +9,5 @@ next-env.d.ts
 
 # local dev server log (detached-launch workaround)
 dev.log
+
+.env*
