@@ -1,0 +1,160 @@
+/* The concierge's answer card. Ink ground by default (overlay, home hero,
+   /projets hero); a paper tone for light surfaces. Motion per the site's
+   rules: transform/opacity only, ≤ 300 ms, nothing under reduced motion. */
+
+.card {
+  --ai-fg: var(--color-paper);
+  --ai-mute: color-mix(in oklab, var(--color-paper) 58%, transparent);
+  --ai-accent: var(--color-ochre-bright);
+  --ai-line: color-mix(in oklab, var(--color-paper) 16%, transparent);
+  --ai-wash: color-mix(in oklab, var(--color-paper) 5%, transparent);
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.9rem 1.05rem 0.85rem;
+  border-radius: 0.85rem;
+  background: var(--ai-wash);
+  box-shadow: inset 0 0 0 1px var(--ai-line);
+  color: var(--ai-fg);
+  animation: ai-card-in 240ms var(--ease-ui) both;
+}
+.card[data-tone="paper"] {
+  --ai-fg: var(--color-ink);
+  --ai-mute: var(--color-ink-mute);
+  --ai-accent: var(--color-ochre-deep);
+  --ai-line: color-mix(in oklab, var(--color-ink) 14%, transparent);
+  --ai-wash: color-mix(in oklab, var(--color-paper-warm) 70%, transparent);
+}
+.card[data-compact] {
+  gap: 0.45rem;
+  padding: 0.7rem 0.85rem;
+}
+
+@keyframes ai-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  color: var(--ai-accent);
+}
+.spark {
+  flex: none;
+}
+.label {
+  color: var(--ai-accent);
+}
+
+.summary {
+  margin: 0;
+  font-size: clamp(1rem, 1.25vw, 1.125rem);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+.summary[lang="ar"] {
+  line-height: 1.7;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 2.25rem;
+  max-inline-size: 100%;
+  padding: 0.3rem 0.85rem;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--ai-line);
+  color: var(--ai-fg);
+  font: inherit;
+  font-size: var(--text-small);
+  line-height: 1.25;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    box-shadow var(--dur-ui) var(--ease-ui),
+    transform var(--dur-press) var(--ease-ui);
+}
+.chip:active {
+  transform: scale(0.97);
+}
+.chip:focus-visible {
+  outline: 2px solid var(--ai-accent);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .chip:hover {
+    box-shadow: inset 0 0 0 1px var(--ai-accent);
+  }
+}
+.clarify {
+  box-shadow: inset 0 0 0 1px var(--ai-accent);
+  color: var(--ai-accent);
+}
+
+.disclosure {
+  margin: 0;
+  font-size: var(--text-label);
+  line-height: 1.4;
+  color: var(--ai-mute);
+}
+
+/* ------------------------------------------------------------ thinking -- */
+.thinking {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  min-block-size: 2.25rem;
+  font-size: var(--text-small);
+  color: color-mix(in oklab, var(--color-paper) 72%, transparent);
+}
+.thinking[data-tone="paper"] {
+  color: var(--color-ink-mute);
+}
+.thinkingSpark {
+  flex: none;
+  color: var(--color-ochre-bright);
+  animation: ai-spark 1.6s linear infinite;
+}
+.thinking[data-tone="paper"] .thinkingSpark {
+  color: var(--color-ochre-deep);
+}
+.thinkingText {
+  animation: ai-breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes ai-spark {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes ai-breathe {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .thinkingSpark,
+  .thinkingText {
+    animation: none;
+  }
+  .chip {
+    transition: none;
+  }
+}

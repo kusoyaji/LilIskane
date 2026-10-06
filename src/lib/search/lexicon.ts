@@ -106,6 +106,53 @@ export const REGION_ALIASES: Record<RegionId, string[]> = {
   ],
 };
 
+/**
+ * Towns next to the client's cities, with no programme of their own: they
+ * name their administrative region, so "Inezgane" reads as Souss-Massa
+ * (Agadir) and "Tamesna" as Rabat-Salé-Kénitra (Témara, Sala Al Jadida).
+ * Exact spellings only — no typo tolerance on these.
+ */
+export const NEARBY_PLACES: Record<RegionId, string[]> = {
+  "casablanca-settat": ["bouskoura", "dar bouazza", "bouznika", "بوسكورة", "دار بوعزة", "بوزنيقة"],
+  "rabat-sale-kenitra": ["tamesna", "harhoura", "skhirat", "تامسنا", "الهرهورة", "الصخيرات"],
+  "marrakech-safi": [],
+  "souss-massa": ["inezgane", "ait melloul", "taroudant", "tiznit", "إنزكان", "انزكان", "أيت ملول", "تارودانت", "تزنيت"],
+  "tanger-tetouan": ["martil", "asilah", "assilah", "larache", "mdiq", "fnideq", "مرتيل", "أصيلة", "العرائش", "المضيق", "الفنيدق"],
+};
+
+/**
+ * Moroccan cities in regions where the client has no programme. They are read
+ * as a city with no programme, so the ranker has to widen the place and the
+ * UI says so ("appartement à Fès" must never look like an exact answer).
+ * Exact spellings only. Their chip labels live here because only Nador is in
+ * src/data/cities.ts (it keeps that id).
+ */
+export const UNSERVED_CITIES: Record<string, { fr: string; ar: string; aliases: string[] }> = {
+  fes: { fr: "Fès", ar: "فاس", aliases: ["fes", "fez", "فاس"] },
+  meknes: { fr: "Meknès", ar: "مكناس", aliases: ["meknes", "meknas", "مكناس"] },
+  ifrane: { fr: "Ifrane", ar: "إفران", aliases: ["ifrane", "إفران", "افران"] },
+  oujda: { fr: "Oujda", ar: "وجدة", aliases: ["oujda", "وجدة"] },
+  nador: { fr: "Nador", ar: "الناظور", aliases: ["nador", "الناظور", "ناظور"] },
+  saidia: { fr: "Saïdia", ar: "السعيدية", aliases: ["saidia", "السعيدية"] },
+  laayoune: { fr: "Laâyoune", ar: "العيون", aliases: ["laayoune", "layoune", "laayoun", "العيون"] },
+  dakhla: { fr: "Dakhla", ar: "الداخلة", aliases: ["dakhla", "الداخلة"] },
+  "beni-mellal": { fr: "Béni Mellal", ar: "بني ملال", aliases: ["beni mellal", "bni mellal", "بني ملال"] },
+  errachidia: { fr: "Errachidia", ar: "الرشيدية", aliases: ["errachidia", "الرشيدية"] },
+  ouarzazate: { fr: "Ouarzazate", ar: "ورزازات", aliases: ["ouarzazate", "ورزازات"] },
+  khouribga: { fr: "Khouribga", ar: "خريبكة", aliases: ["khouribga", "خريبكة"] },
+  taza: { fr: "Taza", ar: "تازة", aliases: ["taza", "تازة"] },
+  guelmim: { fr: "Guelmim", ar: "كلميم", aliases: ["guelmim", "كلميم"] },
+  chefchaouen: { fr: "Chefchaouen", ar: "شفشاون", aliases: ["chefchaouen", "chaouen", "شفشاون"] },
+};
+
+/** The city ids that have programmes — the only ones a /projets link may carry. */
+export const SERVED_CITY_IDS: ReadonlySet<string> = new Set(Object.keys(CITY_REGION));
+
+/** Street words: "Avenue Laayoune" is an address, not the city of Laâyoune. */
+export const STREET_WORDS = new Set(
+  ["avenue", "av", "bd", "boulevard", "rue", "route", "شارع", "زنقة", "طريق"].flatMap((w) => words(w)),
+);
+
 /** Words that, before a city, ask for its region: "région de Marrakech", "جهة مراكش". */
 export const REGION_MARKERS = new Set(["region", "jiha", "جهه"].map((w) => words(w)[0]));
 
@@ -147,6 +194,8 @@ export const PLACE_LEAD_WORDS = new Set(
     "من",
     "جهة",
     "مدينة",
+    "f",
+    "fi",
   ].flatMap((w) => words(w)),
 );
 
@@ -240,6 +289,13 @@ export const STATUS_ALIASES: Partial<Record<StatusFacet, string[]>> = {
     "جاهزة للسكن",
     "واجد",
     "واجدة",
+    "wajed",
+    "wajda",
+    "wajdin",
+    "jahz",
+    "jahza",
+    "jahzin",
+    "jahzine",
   ],
   imminente: [
     "livraison imminente",
@@ -374,7 +430,7 @@ export const AMENITY_ALIASES: Partial<Record<Amenity, string[]>> = {
 
 /** Words that count bedrooms after a number: "3 chambres", "3ch", "3 غرف", "3 بيوت". */
 export const BEDROOM_WORDS = new Set(
-  ["chambre", "chambres", "ch", "chb", "chbr", "chbre", "chbres", "chamb", "bedroom", "bedrooms", "غرف", "غرفة", "غرفات", "بيوت", "بيت"].flatMap(
+  ["chambre", "chambres", "ch", "chb", "chbr", "chbre", "chbres", "chamb", "bedroom", "bedrooms", "غرف", "غرفة", "غرفات", "بيوت", "بيت", "byout", "biout", "byut", "bit", "bayt", "beit"].flatMap(
     (w) => words(w),
   ),
 );
@@ -410,6 +466,19 @@ export const NUMBER_WORDS: Map<string, number> = new Map(
       ["ربعة", 4],
       ["خمس", 5],
       ["خمسة", 5],
+      // Darija in Latin letters
+      ["wahed", 1],
+      ["wahda", 1],
+      ["jouj", 2],
+      ["zouj", 2],
+      ["joj", 2],
+      ["tlata", 3],
+      ["tlat", 3],
+      ["tleta", 3],
+      ["arba", 4],
+      ["reba", 4],
+      ["khamsa", 5],
+      ["khmsa", 5],
     ] as Array<[string, number]>
   ).map(([w, n]) => [words(w)[0], n] as [string, number]),
 );
@@ -417,12 +486,18 @@ export const NUMBER_WORDS: Map<string, number> = new Map(
 const fold = (list: string[]) => new Set(list.flatMap((w) => words(w)));
 
 /** ×1 000 000 (or ×10 000 from ten up: Moroccan centimes). */
-export const MILLION_WORDS = fold(["million", "millions", "mio", "mln", "مليون", "ملايين", "ملاين"]);
+export const MILLION_WORDS = fold([
+  "million", "millions", "mio", "mln", "مليون", "ملايين", "ملاين",
+  // Darija in Latin letters: "80 mlyoun" (centimes, like مليون)
+  "mlyoun", "mlyon", "mlyun", "melyoun", "mliyoun", "mlayn", "mlayen", "malyoun",
+]);
 /** "مليونين" — two million, one word. */
 export const TWO_MILLION_WORDS = fold(["مليونين"]);
 export const THOUSAND_WORDS = fold(["mille", "mil", "k", "alf", "ألف", "الف", "آلاف", "الاف"]);
 /** "et demi", "ونص", "و نصف". */
 export const HALF_WORDS = fold(["demi", "demie", "نص", "نصف", "ونص", "ونصف"]);
+/** "مليون وربع", "un million et quart". */
+export const QUARTER_WORDS = fold(["quart", "ربع", "وربع"]);
 export const CURRENCY_WORDS = fold(["dh", "dhs", "mad", "dirham", "dirhams", "drh", "درهم", "دراهم", "الدرهم"]);
 export const CENTIME_WORDS = fold(["centimes", "centime", "cts", "سنتيم", "سنتيمات", "ريال"]);
 /** After a sum: "/mois", "par mois", "شهريا", "في الشهر", "فالشهر". */
@@ -469,6 +544,8 @@ export const CEILING_PHRASES: string[][] = [
   "حد أقصى",
   "ماكس",
   "ب",
+  "b",
+  "bi",
   "بثمن",
   "ثمن",
 ].map((p) => words(p));
@@ -494,6 +571,47 @@ export const RANGE_LINKS = fold(["et", "a", "au", "و", "الى", "إلى", "ح�
 /** Units that make a number a surface, never a price: "90 m²", "90 م²", "120 mètres carrés". */
 export const SURFACE_WORDS = fold(["m²", "m2", "mq", "sqm", "metre", "metres", "metre carre", "metres carres", "م²", "متر", "امتار", "مربع"]);
 
+/**
+ * A sum the visitor already has or earns is not a ceiling on the price: "un
+ * apport de 200 000 DH", "تسبيق 10 مليون", "je gagne 10 000 DH par mois". Such
+ * sums are read and set aside, like surfaces (the site's own budget finder has
+ * an "Apport personnel" field, so buyers do type it).
+ */
+export const DEPOSIT_WORDS = fold(["apport", "apports", "avance", "acompte", "تسبيق", "التسبيق", "دفعة", "tasbiq"]);
+export const INCOME_WORDS = fold([
+  "salaire", "salaires", "revenu", "revenus", "gagne", "gagnons", "gagnent", "touche", "salary", "income", "earn",
+  "راتب", "راتبي", "مدخول", "مدخولي", "دخل", "دخلي", "خلصة", "خلصتي", "كنربح", "كنشد", "kanchedd", "kanched",
+  "khlass", "khlassi",
+]);
+/** Words between such a sum and a deposit word after it: "300 000 DH d'apport", "comme apport". */
+export const DEPOSIT_LINKS = fold(["d", "de", "l", "comme", "en", "pour", "ك", "ل"]);
+
+/**
+ * A question about time ("quand sera livré…", "متى…"): "livré" then asks for a
+ * date, it is not the status filter "Livraison immédiate".
+ */
+export const TIME_QUESTION_WORDS = fold([
+  "quand", "date", "dates", "sera", "seront", "prevu", "prevue", "prevus", "prevues", "delai", "delais", "when",
+  "متى", "ايمتى", "امتى", "فوقاش", "وقتاش", "imta", "emta", "wqtach", "waqtach", "foqach", "fogach",
+]);
+/** The words that make a status phrase about delivery. */
+export const DELIVERY_WORDS = fold(["livre", "livree", "livres", "livrees", "livraison", "livrable", "bientot", "تسليم", "التسليم"]);
+
+/** "السلام عليكم", "salam", "bonjour": politeness, never the programme Assalam TG. */
+export const GREETING_TAILS = fold([
+  "عليكم", "عليكوم", "alaikoum", "alikoum", "alaykoum", "alaykum", "aleikoum", "alikom", "alaikom", "alaikum",
+]);
+export const GREETING_HEADS = fold(["السلام", "assalam", "salam", "assalamou", "assalamu", "salamou"]);
+
+/** "2ème étage": an ordinal, not a programme number. */
+export const ORDINAL_SUFFIXES = new Set(["eme", "e", "er", "ere", "ieme", "em", "nd", "th"]);
+
+/** Never read as vocabulary by typo tolerance: "Mohammed" is not Mohammedia, "instructions" not "construction". */
+export const NEVER_FUZZY = fold([
+  "mohammed", "mohamed", "mohammad", "mohamad", "mhammed", "muhammad", "محمد",
+  "instruction", "instructions", "apport", "apporte", "avance", "personnel",
+]);
+
 /* ------------------------------------------------------------------ */
 /* Stop words, protected names                                         */
 /* ------------------------------------------------------------------ */
@@ -513,6 +631,15 @@ export const STOP_WORDS = fold([
   "chambre", "chambres", "ch", "piece", "pieces", "famille", "s", "t", "n", "ce", "cette", "ces",
   "tres", "bon", "bonne", "pas", "ne", "sous", "dessous", "dessus", "superieur", "inferieur", "the",
   "in", "with", "near", "for",
+  // deposit, income and questions about time (read with their sums or set aside)
+  "apport", "apports", "avance", "acompte", "personnel", "salaire", "revenu", "revenus", "gagne", "quand", "sera",
+  "seront", "date", "prevu", "prevue", "delai", "delais", "etage", "etages",
+  // greetings
+  "salam", "slm", "salut", "bonjour", "bonsoir", "hello", "merci", "assalamou", "assalamu", "assalamo", "salamou",
+  "alaikoum", "alikoum", "alaykoum", "alaykum", "aleikoum", "alikom", "alaikom", "alaikum",
+  // Darija in Latin letters
+  "bghit", "bghina", "nbghi", "chi", "fiha", "fih", "ola", "wla", "w", "o", "dial", "dyal", "f", "fi", "b", "bi",
+  "daba", "mzyan", "kayn", "wach",
   // Arabic, Darija
   "في", "من", "مع", "و", "ب", "ف", "ل", "على", "عن", "إلى", "الى", "قرب", "بالقرب", "أبحث", "ابحث",
   "نبحث", "بغيت", "بغينا", "نبغي", "كنقلب", "كنبحث", "نقلب", "شي", "ديال", "د", "او", "أو", "أريد",
@@ -521,6 +648,8 @@ export const STOP_WORDS = fold([
   "حدا", "منطقة", "مدينة", "حي", "دار", "منزل", "سكن", "مسكن", "أقل", "اقل", "أكثر", "اكثر", "حتى",
   "درهم", "دراهم", "غرف", "غرفة", "بيوت", "بيت", "شهر", "الشهر", "مراكز", "ميزانية", "ميزانيتي",
   "جهة", "نواحي", "حاجة", "كاين", "واش", "كل",
+  "سلام", "عليكم", "عليكوم", "شكرا", "مرحبا", "متى", "ايمتى", "امتى", "فوقاش", "وقتاش", "تسبيق", "التسبيق",
+  "راتب", "راتبي", "مدخول", "مدخولي", "دخلي", "كنربح", "طابق", "ولا",
 ]);
 
 /**
@@ -560,11 +689,14 @@ export type LexEntry = {
   /** Folded words, fillers excluded except where the phrase starts with one ("en construction"). */
   phrase: string[];
   value: LexValue;
+  /** Never matched within typo tolerance (towns without a programme). */
+  exactOnly?: boolean;
 };
 
 function entries<F extends LexValue["field"]>(
   field: F,
   table: Partial<Record<string, string[]>>,
+  exactOnly = false,
 ): LexEntry[] {
   const out: LexEntry[] = [];
   for (const [value, phrases] of Object.entries(table)) {
@@ -573,7 +705,7 @@ function entries<F extends LexValue["field"]>(
       if (ws.length === 0) continue;
       // Fillers inside a phrase are optional at match time, so they are not stored.
       const phrase = [ws[0], ...ws.slice(1).filter((w) => !PHRASE_FILLERS.has(w))];
-      out.push({ phrase, value: { field, value } as LexValue });
+      out.push({ phrase, value: { field, value } as LexValue, ...(exactOnly ? { exactOnly } : {}) });
     }
   }
   return out;
@@ -582,6 +714,12 @@ function entries<F extends LexValue["field"]>(
 export const LEXICON: LexEntry[] = [
   ...entries("cities", CITY_ALIASES),
   ...entries("region", REGION_ALIASES),
+  ...entries("region", NEARBY_PLACES, true),
+  ...entries(
+    "cities",
+    Object.fromEntries(Object.entries(UNSERVED_CITIES).map(([id, city]) => [id, city.aliases])),
+    true,
+  ),
   ...entries("segments", SEGMENT_ALIASES),
   ...entries("kinds", KIND_ALIASES),
   ...entries("statuses", STATUS_ALIASES),

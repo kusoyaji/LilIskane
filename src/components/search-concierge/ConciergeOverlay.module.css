@@ -170,10 +170,6 @@
   color: var(--color-ochre-bright);
 }
 
-.inputWrap {
-  position: relative;
-  min-inline-size: 0;
-}
 .input {
   display: block;
   inline-size: 100%;
@@ -203,52 +199,6 @@
   color: color-mix(in oklab, var(--color-paper) 36%, transparent);
   opacity: 1;
 }
-.input[data-ph]::placeholder {
-  color: transparent;
-}
-/* The highlight layer: same box, same type, transparent text; only the
-   understood words show, as ochre under-strokes behind the real field. */
-.mirror {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  white-space: pre;
-  color: transparent;
-  pointer-events: none;
-}
-.mark {
-  color: transparent;
-  background: color-mix(in oklab, var(--color-ochre-bright) 14%, transparent);
-  box-shadow: inset 0 -0.08em 0 var(--color-ochre-bright);
-  border-radius: 2px;
-}
-/* The cycling example under an empty field. */
-.ph {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  color: color-mix(in oklab, var(--color-paper) 36%, transparent);
-  pointer-events: none;
-  animation: ph-cycle 3200ms var(--ease-ui) both;
-}
-@keyframes ph-cycle {
-  0% {
-    opacity: 0;
-    transform: translateY(0.18em);
-  }
-  9%,
-  90% {
-    opacity: 1;
-    transform: none;
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-0.12em);
-  }
-}
-
 .clear {
   display: grid;
   place-items: center;
@@ -281,45 +231,6 @@
   padding: 0;
   list-style: none;
 }
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.15rem;
-  min-block-size: 2rem;
-  padding-inline: 0.85rem 0.2rem;
-  border-radius: 999px;
-  background: var(--color-ochre-bright);
-  color: var(--color-ink);
-  font-size: var(--text-small);
-  font-weight: 600;
-  line-height: 1.2;
-  white-space: nowrap;
-  animation: chip-in 180ms var(--ease-ui) both;
-}
-@keyframes chip-in {
-  from {
-    opacity: 0;
-    transform: scale(0.94);
-  }
-}
-.chipX {
-  display: grid;
-  place-items: center;
-  inline-size: 1.75rem;
-  block-size: 1.75rem;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: none;
-  color: inherit;
-  cursor: pointer;
-  transition: background-color var(--dur-ui) var(--ease-ui);
-}
-.chipX:focus-visible {
-  outline: 2px solid var(--color-ink);
-  outline-offset: -2px;
-}
-
 /* ----------------------------------------------------- mobile filter bar ---- */
 .mobileFilters {
   display: none;
@@ -443,6 +354,14 @@
   50% {
     opacity: 0.45;
   }
+}
+
+/* The AI layer: its answer card above the results, its ticks on a row. The
+   global grounds rule paints anything carrying data-tone; these sit on the
+   overlay's own ground, so they paint none. */
+.aiSlot > p,
+.ticks {
+  background: none;
 }
 
 /* ------------------------------------------------------------ listbox ---- */
@@ -712,37 +631,6 @@
   flex-wrap: wrap;
   gap: 0.35rem;
 }
-.fchip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  min-block-size: 2.25rem;
-  padding-inline: 0.75rem;
-  border: 1px solid color-mix(in oklab, var(--color-paper) 22%, transparent);
-  border-radius: 999px;
-  background: none;
-  color: var(--color-paper);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  white-space: nowrap;
-  cursor: pointer;
-}
-.fcount {
-  font-size: var(--text-label);
-  color: color-mix(in oklab, var(--color-paper) 55%, transparent);
-}
-.fchip[aria-pressed="true"] {
-  border-color: var(--color-ochre-bright);
-  background: var(--color-ochre-bright);
-  color: var(--color-ink);
-}
-.fchip[aria-pressed="true"] .fcount {
-  color: color-mix(in oklab, var(--color-ink) 70%, transparent);
-}
-.fchip[data-empty] {
-  opacity: 0.4;
-}
-
 /* --------------------------------------------------------------- foot ---- */
 .foot {
   display: flex;
@@ -790,7 +678,6 @@
 .close:focus-visible,
 .clear:focus-visible,
 .idea:focus-visible,
-.fchip:focus-visible,
 .cat:focus-visible,
 .retry:focus-visible,
 .map:focus-visible {
@@ -808,16 +695,6 @@
   .idea:hover {
     border-color: color-mix(in oklab, var(--color-paper) 50%, transparent);
     opacity: 1;
-  }
-  .fchip:hover {
-    border-color: color-mix(in oklab, var(--color-paper) 60%, transparent);
-    opacity: 1;
-  }
-  .fchip[aria-pressed="true"]:hover {
-    border-color: var(--color-ochre-bright);
-  }
-  .chipX:hover {
-    background: color-mix(in oklab, var(--color-ink) 14%, transparent);
   }
 }
 
@@ -900,7 +777,7 @@
   .cat[aria-expanded="true"] .catChevron {
     transform: rotate(180deg);
   }
-  .mobileChips .fchip {
+  .mobileChips > * {
     flex: none;
   }
 }
@@ -995,9 +872,7 @@
   .dialog[open] .shell {
     transform: none;
   }
-  .chip,
-  .skeleton,
-  .ph {
+  .skeleton {
     animation: none;
   }
   .option[aria-selected="true"] .thumbImg {

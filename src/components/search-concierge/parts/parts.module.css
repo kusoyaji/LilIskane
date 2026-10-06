@@ -1,0 +1,219 @@
+/* Shared concierge parts: the field's layering, the chips, the filter chips.
+   Tokens only. Motion: transform/opacity, ≤300ms; nothing animates per
+   keystroke except a new chip's 180ms arrival. */
+
+/* -------------------------------------------------------------- field ---- */
+.inputWrap {
+  position: relative;
+  min-inline-size: 0;
+}
+/* The three layers share one box and one type: the surface's className sets
+   font and size on each, these rules set only what makes them line up. */
+.input,
+.layer {
+  display: block;
+  inline-size: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: 1.3em;
+  block-size: 1.3em;
+  text-align: start;
+}
+.input {
+  position: relative;
+  color: inherit;
+  caret-color: var(--color-ochre-bright);
+}
+.input:focus,
+.input:focus-visible {
+  outline: none;
+}
+.input::placeholder {
+  color: color-mix(in oklab, currentColor 40%, transparent);
+  opacity: 1;
+}
+.input[data-ph]::placeholder {
+  color: transparent;
+}
+.layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* The understood words, as ochre under-strokes behind the real text. */
+.layer.mirror {
+  white-space: pre;
+  color: transparent;
+}
+.mark {
+  color: transparent;
+  background: color-mix(in oklab, var(--color-ochre-bright) 14%, transparent);
+  box-shadow: inset 0 -0.08em 0 var(--color-ochre-bright);
+  border-radius: 2px;
+}
+/* The cycling example under an empty field. */
+.layer.ph {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: color-mix(in oklab, currentColor 40%, transparent);
+  animation: ph-cycle 3200ms var(--ease-ui) both;
+}
+@keyframes ph-cycle {
+  0% {
+    opacity: 0;
+    transform: translateY(0.18em);
+  }
+  9%,
+  90% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-0.12em);
+  }
+}
+
+/* -------------------------------------------------------------- chips ---- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  min-block-size: 2rem;
+  padding-inline: 0.85rem 0.2rem;
+  border-radius: 999px;
+  background: var(--color-ochre-bright);
+  color: var(--color-ink);
+  font-size: var(--text-small);
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  animation: chip-in 180ms var(--ease-ui) both;
+}
+.chips[data-chip-tone="paper"] .chip {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+/* A value the AI read in: outlined rather than filled, so the visitor's own
+   words stay the solid ones. */
+.chip[data-ai] {
+  background: color-mix(in oklab, var(--color-ochre-bright) 16%, transparent);
+  box-shadow: inset 0 0 0 1px var(--color-ochre-bright);
+  color: var(--color-paper);
+}
+.chips[data-chip-tone="paper"] .chip[data-ai] {
+  background: color-mix(in oklab, var(--color-ochre-deep) 9%, transparent);
+  box-shadow: inset 0 0 0 1px var(--color-ochre-deep);
+  color: var(--color-ink);
+}
+.aiMark {
+  margin-inline-start: 0.35rem;
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  background: var(--color-ochre-bright);
+  color: var(--color-ink);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+}
+.chips[data-chip-tone="paper"] .aiMark {
+  background: var(--color-ochre-deep);
+  color: var(--color-paper);
+}
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+.chipX {
+  display: grid;
+  place-items: center;
+  inline-size: 1.75rem;
+  block-size: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background-color var(--dur-ui) var(--ease-ui);
+}
+.chipX:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+@media (hover: hover) {
+  .chipX:hover {
+    background: color-mix(in oklab, currentColor 14%, transparent);
+  }
+}
+
+/* ------------------------------------------------- filter chips (ink) ---- */
+.fchips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.fchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-block-size: 2.25rem;
+  padding-inline: 0.75rem;
+  border: 1px solid color-mix(in oklab, var(--color-paper) 22%, transparent);
+  border-radius: 999px;
+  background: none;
+  color: var(--color-paper);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.fcount {
+  font-size: var(--text-label);
+  color: color-mix(in oklab, var(--color-paper) 55%, transparent);
+}
+.fchip[aria-pressed="true"] {
+  border-color: var(--color-ochre-bright);
+  background: var(--color-ochre-bright);
+  color: var(--color-ink);
+}
+.fchip[aria-pressed="true"] .fcount {
+  color: color-mix(in oklab, var(--color-ink) 70%, transparent);
+}
+.fchip[data-empty] {
+  opacity: 0.4;
+}
+.fchip:focus-visible {
+  outline: 2px solid var(--color-ochre-bright);
+  outline-offset: 2px;
+}
+@media (hover: hover) {
+  .fchip:hover {
+    border-color: color-mix(in oklab, var(--color-paper) 60%, transparent);
+    opacity: 1;
+  }
+  .fchip[aria-pressed="true"]:hover {
+    border-color: var(--color-ochre-bright);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .ph {
+    animation: none;
+  }
+}

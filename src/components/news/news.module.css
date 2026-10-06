@@ -201,73 +201,6 @@
   inset-block-end: auto;
   inset-block-start: clamp(1rem, 2vw, 1.5rem);
 }
-.previous {
-  position: absolute;
-  inset-block-end: clamp(0.75rem, 2vw, 1.5rem);
-  inset-inline-start: clamp(0.75rem, 2vw, 1.5rem);
-  inline-size: min(25rem, calc(100% - 1.5rem));
-  display: grid;
-  grid-template-columns: 6.5rem minmax(0, 1fr);
-  gap: 1rem;
-  align-items: center;
-  padding: 0.7rem;
-  background: var(--color-paper);
-  box-shadow: 0 18px 40px -24px rgb(28 30 20 / 0.55);
-}
-@media (max-width: 39.99rem) {
-  .previous {
-    grid-template-columns: 5rem minmax(0, 1fr);
-    gap: 0.8rem;
-  }
-}
-.prevThumb {
-  position: relative;
-  overflow: hidden;
-  aspect-ratio: 4 / 3;
-}
-.prevThumb img {
-  inline-size: 100%;
-  block-size: 100%;
-  object-fit: cover;
-}
-.prevText {
-  font-size: var(--text-small);
-  line-height: 1.45;
-  color: var(--color-ink-soft);
-}
-.prevLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  margin-block-start: 0.35rem;
-  color: var(--color-ochre-deep);
-  font-weight: 600;
-  text-decoration: none;
-}
-.prevLink::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-}
-.prevTag {
-  display: block;
-  color: var(--color-olive-deep);
-  margin-block-end: 0.35rem;
-}
-@media (hover: hover) {
-  .previous:hover .prevLink {
-    text-decoration: underline;
-    text-underline-offset: 0.25em;
-  }
-}
-.previous:has(a:focus-visible) {
-  outline: 2px solid var(--color-ochre);
-  outline-offset: 3px;
-}
-.previous a:focus-visible {
-  outline: none;
-}
-
 /* ---------------------------------------------------------------- list ---- */
 .list {
   padding-block: 0 clamp(5rem, 12vh, 9rem);
@@ -615,7 +548,6 @@
 :global([lang="ar"]) .featPrice > span:first-child,
 :global([lang="ar"]) .featEyebrow,
 :global([lang="ar"]) .panelTop,
-:global([lang="ar"]) .prevTag,
 :global([lang="ar"]) .crumbs {
   font-size: var(--text-small);
 }

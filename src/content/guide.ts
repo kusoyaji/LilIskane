@@ -37,7 +37,7 @@ type GuideCopy = {
   phases: [string, string, string];
   stepWord: string;
   steps: GuideStep[];
-  stepLinks: { projects: string; simulate: string; guarantees: string };
+  stepLinks: { projects: string };
   captions: { pool: string; bedroom: string; garden: string };
   sim: { eyebrow: string; title: string; lead: string };
   finance: {
@@ -222,8 +222,6 @@ export const guide: Copy<GuideCopy> = {
     ],
     stepLinks: {
       projects: "Explorer nos projets",
-      simulate: "Simuler ma mensualité",
-      guarantees: "Voir les garanties",
     },
     captions: {
       pool: "Piscine de Riad Garden I, Marrakech — photographiée après livraison.",
@@ -433,8 +431,6 @@ export const guide: Copy<GuideCopy> = {
     ],
     stepLinks: {
       projects: "استكشفوا مشاريعنا",
-      simulate: "احسبوا قسطكم الشهري",
-      guarantees: "اطّلعوا على الضمانات",
     },
     captions: {
       pool: "مسبح رياض غاردن 1، مراكش — صورة بعد التسليم.",

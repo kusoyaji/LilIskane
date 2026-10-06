@@ -4,7 +4,9 @@
   padding-block: clamp(5rem, 12vh, 9rem);
 }
 
+/* The full content column, edge to edge like the gallery above it and the
+   cards below — a player a few centimetres short of the column read as a
+   misalignment, not as a choice. */
 .player {
   inline-size: 100%;
-  max-inline-size: 72rem;
 }

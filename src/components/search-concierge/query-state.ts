@@ -1,4 +1,5 @@
 import { normalize, parseQuery, words, type ParsedQuery, type QuerySpan } from "@/lib/search";
+import { wordForms } from "@/lib/search/normalize";
 import type { Amenity, Kind, Segment } from "@/data/types";
 import type { StatusFacet } from "@/lib/status-facets";
 import { SEARCH_PAGES } from "@/content/search";
@@ -240,7 +241,8 @@ export function matchPages(raw: string): { ids: string[]; words: Set<string> } {
     // Phrases ("rendez vous", "qui sommes nous") match whole and take all
     // their words with them; single keywords match by word or prefix.
     const phrases = page.keys.filter((k) => k.includes(" ") && folded.includes(` ${k} `));
-    const hit = ws.filter((w) => page.keys.some((k) => !k.includes(" ") && matchesKey(w, k)));
+    // Through the parser's word forms: "القرض" is "قرض", "والشراء" is "شراء".
+    const hit = ws.filter((w) => wordForms(w).some((f) => page.keys.some((k) => !k.includes(" ") && matchesKey(f, k))));
     if (hit.length || phrases.length) {
       ids.push(page.id);
       hit.forEach((w) => used.add(w));

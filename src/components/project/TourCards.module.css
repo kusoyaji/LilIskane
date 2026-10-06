@@ -1,3 +1,11 @@
+/* The stage is a flex column, where `margin-inline: auto` (from .u-shell)
+   shrinks an item to its content and centres it: the heading drifted to the
+   middle of the screen instead of the column every other section starts on.
+   A full inline size puts it back on the shell's edge. */
+.head {
+  inline-size: 100%;
+}
+
 /* One tour: no pinned pan, the card is the section's image. */
 .single :global(.tours__stage) {
   block-size: auto;

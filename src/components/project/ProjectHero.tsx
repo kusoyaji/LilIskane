@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Figure } from "@/components/media/Figure";
 import { LinkButton, Lattice } from "@/components/v2";
-import { company } from "@/data/company";
 import { getCity } from "@/data/cities";
 import type { Project } from "@/data/types";
 import { getDictionary } from "@/i18n";
@@ -75,13 +74,12 @@ export function ProjectHero({ locale, project }: { locale: Locale; project: Proj
     </>
   );
 
+  // One action. The phone number is already in the header at every width,
+  // and again in the closing band at the foot of the page.
   const actions = (
     <div className={`u-enter ${s.actions}`}>
       <LinkButton href={`/${locale}/contact?projet=${project.slug}`} variant="light">
         {c.bookVisit}
-      </LinkButton>
-      <LinkButton href={company.phoneHref} variant="outline" arrow={false}>
-        {isolateRun(company.phone, locale)}
       </LinkButton>
     </div>
   );

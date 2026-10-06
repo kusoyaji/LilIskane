@@ -1,0 +1,47 @@
+/* The ✓/✕ line under a result row. Small, quiet, data-driven: met criteria
+   read in the row's secondary tone, a missed one in ochre so the eye finds
+   what does not fit. Wraps on phones; never animates per keystroke. */
+.ticks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.7rem;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-label);
+  line-height: 1.35;
+  color: color-mix(in oklab, var(--color-paper) 66%, transparent);
+}
+.ticks[data-tone="paper"] {
+  color: var(--color-ink-mute);
+}
+
+.tick {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  min-inline-size: 0;
+}
+
+.glyph {
+  flex: none;
+  font-weight: 700;
+  color: var(--color-olive-bright);
+}
+.ticks[data-tone="paper"] .glyph {
+  color: var(--color-olive-deep);
+}
+
+.tick:not([data-ok]) .glyph,
+.tick:not([data-ok]) .label {
+  color: var(--color-ochre-bright);
+}
+.ticks[data-tone="paper"] .tick:not([data-ok]) .glyph,
+.ticks[data-tone="paper"] .tick:not([data-ok]) .label {
+  color: var(--color-ochre-deep);
+}
+
+.label {
+  overflow-wrap: anywhere;
+}

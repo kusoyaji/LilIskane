@@ -56,9 +56,6 @@ export const news: Copy<{
   toursValue: (n: number) => string;
   discover: string;
   renderNote: string;
-  photoNote: string;
-  previousPhase: (name: string) => string;
-  seePrevious: (name: string) => string;
 
   listEyebrow: string;
   listTitle: string;
@@ -98,9 +95,6 @@ export const news: Copy<{
     toursValue: (n) => (n > 1 ? `${n} appartements` : `${n} appartement`),
     discover: "Découvrir le programme",
     renderNote: "Rendu — image non contractuelle",
-    photoNote: "Photographie",
-    previousPhase: (name) => `${name}, la première tranche, est déjà livrée.`,
-    seePrevious: (name) => `Voir ${name}`,
 
     listEyebrow: "Le fil",
     listTitle: "Ce qui se lance, ce qui nous fait avancer.",
@@ -166,9 +160,6 @@ export const news: Copy<{
     toursValue: (n) => (n === 1 ? "شقة واحدة" : n === 2 ? "شقتان" : isolateRun(`${n}`, "ar") + " شقق"),
     discover: "اكتشفوا المشروع",
     renderNote: "تصوّر — صورة غير تعاقدية",
-    photoNote: "صورة فوتوغرافية",
-    previousPhase: (name) => `${name}، الشطر الأول، سُلّم بالفعل.`,
-    seePrevious: (name) => `عرض ${name}`,
 
     listEyebrow: "آخر المستجدات",
     listTitle: "ما يُطلق، وما يدفعنا إلى الأمام.",

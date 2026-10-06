@@ -4,6 +4,7 @@
 
 .grid {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: clamp(3rem, 6vw, 5rem);
 }
 @media (min-width: 64rem) {
@@ -33,10 +34,13 @@
 }
 
 /* --------------------------------------------------------- the sibling -- */
+/* The thumbnail narrows on small phones: at 8.5rem it left the name and the
+   tracked "LA TRANCHE PRÉCÉDENTE" too little room and the card pushed the
+   page 32 px wide at 320 px. */
 .sibling {
   display: grid;
-  grid-template-columns: 8.5rem 1fr auto;
-  gap: 1.25rem;
+  grid-template-columns: clamp(4.5rem, 22vw, 8.5rem) minmax(0, 1fr) auto;
+  gap: clamp(0.85rem, 3vw, 1.25rem);
   align-items: center;
   margin-block-start: 0.75rem;
   max-inline-size: 36rem;

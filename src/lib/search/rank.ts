@@ -1,5 +1,5 @@
 import { DEFAULT_DEPOSIT, maxAffordablePrice } from "../credit.ts";
-import { isTypoOf } from "./fuzzy.ts";
+import { damerau, isTypoOf } from "./fuzzy.ts";
 import { STOP_WORDS } from "./lexicon.ts";
 import { entryForms, wordForms, words } from "./normalize.ts";
 import type { Hit, ParsedQuery, SearchDoc, SearchOutcome } from "./types.ts";
@@ -89,13 +89,23 @@ function indexOf(doc: SearchDoc): DocIndex {
 
 type Level = 3 | 2 | 1 | 0; // exact, prefix, typo, none
 
-function levelIn(word: string, list: WordGroup[]): Level {
+/**
+ * Programme names get one more edit from seven letters ("masilia" for
+ * Massylia, "yasmine" for Yassamine): they are protected words, so the extra
+ * tolerance cannot turn vocabulary into a name.
+ */
+function nameTypo(word: string, target: string): boolean {
+  if (isTypoOf(word, target)) return true;
+  return word.length >= 7 && target.length >= 7 && damerau(word, target, 2) <= 2;
+}
+
+function levelIn(word: string, list: WordGroup[], generous = false): Level {
   const forms = wordForms(word);
   let best: Level = 0;
   for (const group of list) {
     if (forms.some((f) => group.includes(f))) return 3;
     if (best < 2 && forms.some((f) => f.length >= 3 && group.some((g) => g.length > f.length && g.startsWith(f)))) best = 2;
-    if (best < 1 && forms.some((f) => group.some((g) => isTypoOf(f, g)))) best = 1;
+    if (best < 1 && forms.some((f) => group.some((g) => (generous ? nameTypo(f, g) : isTypoOf(f, g))))) best = 1;
   }
   return best;
 }
@@ -120,17 +130,25 @@ function textMatch(doc: SearchDoc, text: string[]): TextMatch {
   let score = 0;
   let coverage = 0;
   let nameOnly = true;
+  const hasWords = text.some((word) => !isModifier(word));
+  let wordHits = 0;
   for (const word of text) {
-    const n = levelIn(word, name);
+    const n = levelIn(word, name, true);
     const best = Math.max(
       NAME_POINTS[n],
       NEIGHBOURHOOD_POINTS[levelIn(word, index.neighbourhood)],
       CITY_POINTS[levelIn(word, index.city)],
     );
-    if (best > 0) coverage += 1;
+    if (best > 0) {
+      coverage += 1;
+      if (!isModifier(word)) wordHits += 1;
+    }
     if (n === 0) nameOnly = false;
     score += best;
   }
+  // A programme that only matches the modifiers ("ii", "2") of a query that has
+  // real words matches nothing: "Riad Garden II" is not "Dyar Al Bahia 2".
+  if (hasWords && wordHits === 0) coverage = 0;
   const fullName = nameCovered(index.nameFr, text) || nameCovered(index.nameAr, text);
   if (fullName) score += FULL_NAME_BONUS;
   return { score, coverage, nameOnly, fullName };
@@ -144,9 +162,20 @@ function isModifier(word: string): boolean {
   return /^\d+$/.test(word) || word.length <= 2;
 }
 
-/** The leftover words that match at least one programme; the rest is noise. */
-function meaningfulText(docs: SearchDoc[], text: string[]): string[] {
-  return text.filter((word) => docs.some((doc) => textMatch(doc, [word]).coverage > 0));
+/**
+ * The leftover words that match at least one programme; the rest is noise.
+ * A place word (a neighbourhood, not a name) only counts in the places asked
+ * for: "Rabat Agdal" is not Agdal in Marrakech.
+ */
+function meaningfulText(docs: SearchDoc[], text: string[], cities: string[] = []): string[] {
+  return text.filter((word) =>
+    docs.some((doc) => {
+      if (textMatch(doc, [word]).coverage === 0) return false;
+      if (cities.length === 0 || cities.includes(doc.cityId)) return true;
+      const index = indexOf(doc);
+      return levelIn(word, [...index.nameFr, ...index.nameAr], true) > 0;
+    }),
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -200,32 +229,48 @@ function nearness(doc: SearchDoc, query: ParsedQuery, field: Exclude<Field, "tex
 /* ------------------------------------------------------------------ */
 
 export function searchDocs(docs: SearchDoc[], query: ParsedQuery): SearchOutcome {
-  const text = meaningfulText(docs, query.text);
+  const text = meaningfulText(docs, query.text, query.cities);
   const monthlyCeiling = query.monthlyMax !== null ? maxAffordablePrice(query.monthlyMax, DEFAULT_DEPOSIT) : Infinity;
   const active = RELAX_ORDER.filter((field) => isActive(query, field, text));
   const matches = new Map(docs.map((doc) => [doc, textMatch(doc, text)]));
+
+  // The best coverage ANY programme reaches: a programme that passes the
+  // filters on a word or two of another's name is not an answer to that name.
+  const most = Math.max(0, ...docs.map((doc) => matches.get(doc)?.coverage ?? 0));
 
   const pick = (ignore: Set<Field>): SearchDoc[] => {
     let found = docs.filter((doc) =>
       active.every((field) => field === "text" || ignore.has(field) || passes(doc, query, field, monthlyCeiling)),
     );
     if (active.includes("text") && !ignore.has("text")) {
-      const most = Math.max(0, ...found.map((doc) => matches.get(doc)?.coverage ?? 0));
-      found = most === 0 ? [] : found.filter((doc) => matches.get(doc)?.coverage === most);
+      // Every programme whose whole name was typed stays too: "Massylia ou Jnane Souss ?".
+      found =
+        most === 0
+          ? []
+          : found.filter((doc) => {
+              const m = matches.get(doc);
+              return m !== undefined && m.coverage > 0 && (m.coverage === most || m.fullName);
+            });
     }
     return found;
   };
 
+  // A query that names one programme keeps it: its other constraints are
+  // widened before its name is ("Riad Garden II 3 chambres moins de 1 million"
+  // shows Riad Garden II, budget widened — not another programme).
+  const named = active.includes("text") ? namedProgramme(docs, query) : null;
+  const order: Field[] = named ? [...active.filter((f) => f !== "text"), "text"] : active;
+
   const ignore = new Set<Field>();
   let found = pick(ignore);
-  for (const field of active) {
+  for (const field of order) {
     if (found.length > 0) break;
     ignore.add(field);
     found = pick(ignore);
   }
   // Put back whatever was dropped but not needed, most important first.
   if (found.length > 0 && ignore.size > 1) {
-    for (const field of [...RELAX_ORDER].reverse()) {
+    for (const field of [...order].reverse()) {
       if (!ignore.has(field)) continue;
       ignore.delete(field);
       const tighter = pick(ignore);
@@ -257,9 +302,17 @@ export function searchDocs(docs: SearchDoc[], query: ParsedQuery): SearchOutcome
  * null). The /projets hero uses it to open the programme directly.
  */
 export function namedProgramme(docs: SearchDoc[], query: ParsedQuery): SearchDoc | null {
-  const text = meaningfulText(docs, query.text);
+  const text = meaningfulText(docs, query.text, query.cities);
   if (!text.some((word) => !isModifier(word))) return null;
-  const named = docs.filter((doc) => text.every((word) => textMatch(doc, [word]).nameOnly));
+  let named = docs.filter((doc) => text.every((word) => textMatch(doc, [word]).nameOnly));
+  // "Odyssée studios", "Océane lots": the kind or standing typed with the name
+  // picks between programmes that share it.
+  const structured = named.filter(
+    (doc) =>
+      (query.kinds.length === 0 || query.kinds.some((k) => doc.kinds.includes(k))) &&
+      (query.segments.length === 0 || query.segments.includes(doc.segment)),
+  );
+  if (structured.length > 0) named = structured;
   if (named.length === 1) return named[0];
   const whole = named.filter((doc) => textMatch(doc, text).fullName);
   return whole.length === 1 ? whole[0] : null;

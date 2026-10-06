@@ -1,31 +1,15 @@
-import { CREDIT_DEFAULTS, maxAffordablePrice } from "@/lib/credit";
 import type { Price } from "@/data/types";
 
 /**
- * The budget facet of `search()` (src/lib/filter.ts), runnable in the browser.
- *
- * `filter.ts` imports the full `projects` dataset at module level, so pulling
- * it into a client component would ship every programme in both languages.
- * The finder only ever sets budget + deposit, and for that input `search()`
- * reduces to exactly this: keep what fits under `maxAffordablePrice`; if
- * nothing does, drop the budget constraint and say so (`relaxed`). The rule —
- * `effectiveTotal(price) <= ceiling` — is the same expression, so the count
- * shown here is the count /projets shows for the same query string.
- */
-
-/** Mirrors `DEFAULT_DEPOSIT` in src/lib/filter.ts — kept equal so the URL omits it the same way. */
-export const DEFAULT_DEPOSIT = 150_000;
-
-/**
- * The finder's monthly slider: range and opening value. Exported so the
- * Services simulator tile shows the same worked example the finder opens on.
+ * The finder's slider range and opening value, and the one price rule it
+ * shares with the search: land is quoted per m², so its entry price is the
+ * smallest lot (the same expression as `effectiveTotal` in lib/format.ts and
+ * `SearchDoc.price` in lib/search/docs.ts — so the ceiling the finder sets on
+ * the results keeps exactly the programmes it counted).
  */
 export const MONTHLY_MIN = 2_000;
 export const MONTHLY_MAX = 20_000;
 export const DEFAULT_MONTHLY = 6_000;
-
-/** The duration /projets assumes (it has no duration parameter). */
-const SEARCH_YEARS = CREDIT_DEFAULTS.years;
 
 /** Same as `effectiveTotal` in src/lib/format.ts (which pulls the dictionaries in with it). */
 export function effectiveTotal(price: Price): number {
@@ -33,30 +17,7 @@ export function effectiveTotal(price: Price): number {
   return price.amount;
 }
 
-export type Matchable = { price: Price };
-
-export function matchBudget<T extends Matchable>(items: T[], ceiling: number): { found: T[]; relaxed: boolean } {
-  const found = items.filter((item) => effectiveTotal(item.price) <= ceiling);
-  if (found.length > 0) return { found, relaxed: false };
-  return { found: items, relaxed: true };
-}
-
-/**
- * The monthly payment that, over the 20 years /projets assumes, buys the same
- * ceiling as `monthly` over `years`. Lets the finder offer 15/20/25 years and
- * still hand /projets a query that returns exactly the programmes it counted.
- */
-export function searchMonthlyFor(monthly: number, deposit: number, years: number): number {
-  if (years === SEARCH_YEARS) return monthly;
-  const ceiling = maxAffordablePrice(monthly, deposit, CREDIT_DEFAULTS.annualRate, years);
-  const perDh = maxAffordablePrice(1, 0, CREDIT_DEFAULTS.annualRate, SEARCH_YEARS);
-  return Math.ceil((ceiling - deposit) / perDh);
-}
-
-/** Same keys and omission rules as `toSearchParams` in src/lib/filter.ts. */
-export function toQuery(monthly: number, deposit: number): string {
-  const params = new URLSearchParams();
-  if (monthly) params.set("mensualite", String(monthly));
-  if (deposit !== DEFAULT_DEPOSIT) params.set("apport", String(deposit));
-  return params.toString();
+/** The ceiling as shown and as applied: whole thousands, rounded down (never above what the payment buys). */
+export function ceilingOf(price: number): number {
+  return Math.floor(price / 1_000) * 1_000;
 }

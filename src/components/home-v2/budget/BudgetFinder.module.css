@@ -328,6 +328,10 @@
 .ladder {
   margin-block: 2.25rem 0;
   padding-block-start: 1.6rem;
+  /* The marker rides a full-width track translated by up to 100%: invisible,
+     but it still counted as scrollable overflow (a 320px page scrolled
+     sideways). Clip that axis only — the label above stays visible. */
+  overflow-x: clip;
 }
 .ladderTrack {
   position: relative;
@@ -577,7 +581,7 @@
   margin-block-start: 2.25rem;
 }
 @media (max-width: 40rem) {
-  .cta > a { inline-size: 100%; justify-content: space-between; }
+  .cta > :is(a, button) { inline-size: 100%; justify-content: space-between; }
 }
 
 /* ------------------------------------------------------------ fine print */

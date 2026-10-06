@@ -7,33 +7,45 @@ import {
   CENTIME_WORDS,
   CITY_REGION,
   CURRENCY_WORDS,
+  DELIVERY_WORDS,
+  DEPOSIT_LINKS,
+  DEPOSIT_WORDS,
   DUAL_BEDROOMS,
   FLOOR_PHRASES,
+  GREETING_HEADS,
+  GREETING_TAILS,
   HALF_WORDS,
+  INCOME_WORDS,
+  KIND_ALIASES,
   LEXICON,
   LEXICON_BY_FIRST,
   MILLION_WORDS,
   MONTHLY_AFTER,
   MONTHLY_BEFORE,
   MONTHLY_LINKS,
+  NEVER_FUZZY,
   NUMBER_WORDS,
+  ORDINAL_SUFFIXES,
   PHRASE_FILLERS,
   PLACE_LEAD_WORDS,
   PROTECTED_NAME_WORDS,
   PROTECTED_PHRASES,
+  QUARTER_WORDS,
   RANGE_LINKS,
   RANGE_OPENERS,
   REGION_CITIES,
   REGION_MARKERS,
   ROOM_WORDS,
   STOP_WORDS,
+  STREET_WORDS,
   SURFACE_WORDS,
   THOUSAND_WORDS,
+  TIME_QUESTION_WORDS,
   TWO_MILLION_WORDS,
   type LexEntry,
   type LexValue,
 } from "./lexicon.ts";
-import { entryForms, tokenize, wordForms, type Token } from "./normalize.ts";
+import { entryForms, tokenize, wordForms, words, type Token } from "./normalize.ts";
 import type { ParsedQuery, QuerySpan, RegionId } from "./types.ts";
 
 /**
@@ -62,6 +74,8 @@ type Ctx = {
   toks: Token[];
   claim: Claim[];
   out: ParsedQuery;
+  /** "quand sera livré…", "متى…": delivery words ask for a date, they are not a status. */
+  timeQuestion: boolean;
 };
 
 /* ------------------------------------------------------------------ */
@@ -79,7 +93,9 @@ function wordMatches(tok: Token, target: string, fuzzy: boolean): boolean {
   const forms = wordForms(tok.norm);
   if (forms.some((f) => targets.includes(f))) return true;
   if (!fuzzy) return false;
-  return forms.some((f) => targets.some((t) => isTypoOf(f, t)));
+  // A word that is the start of the target with two letters or more missing is
+  // another word, not a typo: "mohammed" is not "mohammedia".
+  return forms.some((f) => targets.some((t) => isTypoOf(f, t) && !(t.startsWith(f) && t.length - f.length >= 2)));
 }
 
 function gap(ctx: Ctx, j: number): string {
@@ -105,6 +121,11 @@ function pushUnique<T>(list: T[], value: T) {
 
 function isProtected(norm: string): boolean {
   return PROTECTED_NAME_WORDS.some((p) => p === norm || isTypoOf(norm, p));
+}
+
+/** Words that typo tolerance must leave alone. */
+function noFuzzy(norm: string): boolean {
+  return STOP_WORDS.has(norm) || NEVER_FUZZY.has(norm) || isProtected(norm);
 }
 
 /**
@@ -140,14 +161,24 @@ function isBedroomWord(tok: Token | undefined): boolean {
   return tok.norm.length >= 5 && BEDROOM_TYPO_TARGETS.some((t) => isTypoOf(tok.norm, t));
 }
 
-function smallCount(tok: Token | undefined): number | null {
+function smallCount(tok: Token | undefined, max = 9): number | null {
   if (!tok) return null;
   if (tok.num) {
     const n = Number(tok.norm);
-    return Number.isInteger(n) && n >= 1 && n <= 9 ? n : null;
+    return Number.isInteger(n) && n >= 1 && n <= max ? n : null;
   }
-  return NUMBER_WORDS.get(tok.norm) ?? null;
+  // "بثلاث غرف": the preposition is glued to the number word.
+  for (const form of wordForms(tok.norm)) {
+    const n = NUMBER_WORDS.get(form);
+    if (n !== undefined) return n;
+  }
+  return null;
 }
+
+/** "2 ou 3", "2 à 3", "2-3", "2 و 3", "2 ola 3": a range of counts — the buyer accepts the smaller. */
+const COUNT_RANGE_LINKS = new Set(["ou", "a", "au", "et", "or", "و", "او", "ولا", "ola", "wla"].flatMap((w) => words(w)));
+/** "tlata d byout", "3 ديال البيوت": a filler between a count and the bedroom word. */
+const COUNT_FILLERS = new Set(["d", "de", "dyal", "dial", "د", "ديال"].flatMap((w) => words(w)));
 
 function setBedrooms(ctx: Ctx, n: number, from: number, to: number) {
   ctx.out.bedroomsMin = Math.max(ctx.out.bedroomsMin ?? 0, n);
@@ -179,6 +210,35 @@ function tryBedrooms(ctx: Ctx, i: number): boolean {
       }
       return true;
     }
+  }
+  // A range of counts before the bedroom word: "2 ou 3 chambres", "2-3 ch", "2 à 3 chambres".
+  if (n !== null && next && ctx.claim[i + 1] === "free") {
+    let k = i + 1;
+    if (!next.num && COUNT_RANGE_LINKS.has(next.norm)) k = i + 2;
+    else if (!(next.num && /^\s*[-–/]\s*$/.test(gap(ctx, i + 1)))) k = -1;
+    const m = k > 0 && ctx.claim[k] === "free" ? smallCount(toks[k], 12) : null;
+    if (m !== null && m !== n) {
+      let w = k + 1;
+      if (toks[w] && ctx.claim[w] === "free" && COUNT_FILLERS.has(toks[w].norm) && isBedroomWord(toks[w + 1])) w += 1;
+      if (ctx.claim[w] === "free" && isBedroomWord(toks[w])) {
+        // setBedrooms keeps the largest floor across a query; a range sets the smaller of its own two.
+        ctx.out.bedroomsMin = Math.max(ctx.out.bedroomsMin ?? 0, Math.min(n, m));
+        addSpan(ctx, tok.start, toks[w].end, "bedroomsMin");
+        claim(ctx, i, w + 1);
+        return true;
+      }
+    }
+  }
+  // "tlata d byout"
+  if (n !== null && next && ctx.claim[i + 1] === "free" && COUNT_FILLERS.has(next.norm) && ctx.claim[i + 2] === "free" && isBedroomWord(toks[i + 2])) {
+    setBedrooms(ctx, n, i, i + 3);
+    return true;
+  }
+  // "10 chambres": more than the largest home — read anyway, so the search widens and says so.
+  const big = tok.num ? smallCount(tok, 12) : null;
+  if (n === null && big !== null && next && ctx.claim[i + 1] === "free" && /^[\s+]*$/.test(gap(ctx, i + 1)) && isBedroomWord(next)) {
+    setBedrooms(ctx, big, i, i + 2);
+    return true;
   }
   if (n !== null && next && ctx.claim[i + 1] === "free" && /^[\s+]*$/.test(gap(ctx, i + 1))) {
     // A digit glued to the next digits is a bigger number ("3 200 000"), not a count.
@@ -297,6 +357,12 @@ function readSum(ctx: Ctx, i: number): Sum | null {
     } else if (free(j + 1) && (toks[j]?.norm === "et" || toks[j]?.norm === "و") && inSet(HALF_WORDS, toks[j + 1])) {
       value += 0.5;
       j += 2;
+    } else if (free(j) && toks[j].norm === "وربع") {
+      value += 0.25;
+      j += 1;
+    } else if (free(j + 1) && (toks[j]?.norm === "et" || toks[j]?.norm === "و") && inSet(QUARTER_WORDS, toks[j + 1])) {
+      value += 0.25;
+      j += 2;
     }
     // Moroccan centimes: from ten "millions" up, the unit is ten thousand dirhams.
     const centimes = value >= 10;
@@ -409,9 +475,41 @@ function sumContext(ctx: Ctx, i: number): SumContext {
   return { start, ceiling, floor, monthly };
 }
 
+/**
+ * A deposit or an income word just before the sum ("apport de 200 000",
+ * "je gagne 10 000", "تسبيق 10 مليون"): the index of that word, or -1.
+ * Looks back over at most three free words.
+ */
+function setAsideBefore(ctx: Ctx, i: number): number {
+  for (let k = i - 1; k >= 0 && k >= i - 3; k -= 1) {
+    const tok = ctx.toks[k];
+    if (ctx.claim[k] !== "free" || tok.num) return -1;
+    if (inSet(DEPOSIT_WORDS, tok) || inSet(INCOME_WORDS, tok)) return k;
+  }
+  return -1;
+}
+
+/** "300 000 DH d'apport", "comme apport": the index after the deposit word, or -1. */
+function setAsideAfter(ctx: Ctx, end: number): number {
+  let k = end;
+  let links = 0;
+  while (k < ctx.toks.length && ctx.claim[k] === "free" && links < 2 && inSet(DEPOSIT_LINKS, ctx.toks[k]) && !inSet(DEPOSIT_WORDS, ctx.toks[k])) {
+    k += 1;
+    links += 1;
+  }
+  return k < ctx.toks.length && ctx.claim[k] === "free" && inSet(DEPOSIT_WORDS, ctx.toks[k]) ? k + 1 : -1;
+}
+
 function trySum(ctx: Ctx, i: number): boolean {
   const first = readSum(ctx, i);
   if (!first) return false;
+  // What the visitor has (a deposit) or earns (a salary) is read and set aside, never a ceiling.
+  const before = setAsideBefore(ctx, i);
+  const afterEnd = before < 0 ? setAsideAfter(ctx, first.end) : -1;
+  if (before >= 0 || afterEnd >= 0) {
+    claim(ctx, before >= 0 ? before : i, afterEnd >= 0 ? afterEnd : first.end);
+    return true;
+  }
   const context = sumContext(ctx, i);
 
   // A range: "entre 600 000 et 900 000", "بين 500 و 700 ألف", "de 4000 à 6000 dh/mois".
@@ -428,7 +526,9 @@ function trySum(ctx: Ctx, i: number): boolean {
   if (sum.surface || context.floor) field = null;
   else if (monthly) field = "monthlyMax";
   else if (sum.value >= 100_000) field = "priceMax";
-  else if ((context.ceiling || sum.currency || sum.scaled) && sum.value >= 500) field = "monthlyMax";
+  else if ((context.ceiling || sum.currency || sum.scaled) && sum.value >= 1_000 && sum.value <= 30_000) field = "monthlyMax";
+  // A sum no home costs and no monthly payment reaches ("99 000 DH", "max 800 DH"): read and set aside.
+  else if ((context.ceiling || sum.currency || sum.scaled) && sum.value >= 500) field = null;
   else return false; // a small bare number: text ("Riad Garden 2")
 
   const fromTok = ctx.toks.findIndex((t) => t.end > context.start);
@@ -466,7 +566,7 @@ function matchPhrase(ctx: Ctx, i: number, entry: LexEntry, fuzzy: boolean): numb
     }
     const tok = ctx.toks[j];
     if (!tok || ctx.claim[j] !== "free") return null;
-    const allowFuzzy = fuzzy && !STOP_WORDS.has(tok.norm) && !isProtected(tok.norm);
+    const allowFuzzy = fuzzy && !noFuzzy(tok.norm);
     if (!wordMatches(tok, entry.phrase[w], allowFuzzy)) return null;
     j += 1;
   }
@@ -492,6 +592,7 @@ function bestPhrase(ctx: Ctx, i: number, fuzzy: boolean): PhraseMatch | null {
   }
   let best: PhraseMatch | null = null;
   for (const entry of candidates) {
+    if (fuzzy && entry.exactOnly) continue;
     const end = matchPhrase(ctx, i, entry, fuzzy);
     if (end === null) continue;
     if (!best || end > best.end || (end === best.end && entry.phrase.length > best.entry.phrase.length)) {
@@ -589,31 +690,91 @@ function blank(raw: string): ParsedQuery {
   };
 }
 
+/** "السلام عليكم", "assalam alaikoum": a greeting, never the programme Assalam TG. */
+function tryGreeting(ctx: Ctx, i: number): boolean {
+  const tok = ctx.toks[i];
+  const next = ctx.toks[i + 1];
+  if (tok.num || !GREETING_HEADS.has(tok.norm) || !next || ctx.claim[i + 1] !== "free") return false;
+  if (!wordForms(next.norm).some((f) => GREETING_TAILS.has(f))) return false;
+  claim(ctx, i, i + 2);
+  return true;
+}
+
+/** "2ème", "1er": an ordinal (a floor), not a programme number. */
+function tryOrdinal(ctx: Ctx, i: number): boolean {
+  const tok = ctx.toks[i];
+  const next = ctx.toks[i + 1];
+  if (!tok.num || !next || !adjacent(ctx, i + 1) || ctx.claim[i + 1] !== "free" || !ORDINAL_SUFFIXES.has(next.norm)) return false;
+  claim(ctx, i, i + 2);
+  return true;
+}
+
+/**
+ * Whether a matched phrase may become a value. A delivery status inside a
+ * question about time is a question ("quand sera livré Amaïa ?"); a town
+ * without a programme after a street word is an address ("Avenue Laayoune").
+ */
+function acceptable(ctx: Ctx, entry: LexEntry, i: number, end: number): boolean {
+  if (entry.value.field === "statuses" && ctx.timeQuestion) {
+    for (let k = i; k < end; k += 1) if (inSet(DELIVERY_WORDS, ctx.toks[k])) return false;
+  }
+  if (entry.exactOnly && entry.value.field === "cities" && i > 0 && STREET_WORDS.has(ctx.toks[i - 1].norm)) return false;
+  return true;
+}
+
+const VILLA_WORDS = new Set((KIND_ALIASES.villa ?? []).flatMap((w) => words(w)));
+
+/**
+ * "terrain pour (construire une) villa", "lot pour villa": the villa is what
+ * the buyer will build, so it does not filter the kind — no programme is both
+ * land and a villa, and the filter would only cancel the land search.
+ */
+function landForVilla(ctx: Ctx) {
+  const { out } = ctx;
+  if (!out.segments.includes("terrain" as Segment) || !out.kinds.includes("villa" as Kind)) return;
+  out.kinds = out.kinds.filter((k) => k !== "villa");
+  ctx.toks.forEach((tok, k) => {
+    if (!tok.num && wordForms(tok.norm).some((f) => VILLA_WORDS.has(f))) {
+      ctx.claim[k] = "text";
+      out.spans = out.spans.filter((sp) => !(sp.field === "kinds" && sp.start <= tok.start && sp.end >= tok.end));
+    }
+  });
+}
+
 export function parseQuery(raw: string): ParsedQuery {
   const out = blank(raw);
   const toks = tokenize(raw).slice(0, MAX_TOKENS);
-  const ctx: Ctx = { raw, toks, claim: toks.map(() => "free" as Claim), out };
+  const timeQuestion = toks.some((t) => !t.num && TIME_QUESTION_WORDS.has(t.norm));
+  const ctx: Ctx = { raw, toks, claim: toks.map(() => "free" as Claim), out, timeQuestion };
 
   for (let i = 0; i < toks.length; i += 1) {
     if (ctx.claim[i] !== "free") continue;
+    if (tryGreeting(ctx, i)) {
+      i += 1;
+      continue;
+    }
     const after = tryProtectedPhrase(ctx, i);
     if (after > i) {
       i = after - 1;
       continue;
     }
+    if (tryOrdinal(ctx, i)) continue;
     if (tryBedrooms(ctx, i)) continue;
     if (trySum(ctx, i)) continue;
     const exact = bestPhrase(ctx, i, false);
     if (exact) {
-      applyValue(ctx, exact.entry.value, i, exact.end);
+      if (acceptable(ctx, exact.entry, i, exact.end)) applyValue(ctx, exact.entry.value, i, exact.end);
+      // An address keeps its words as text (they match the neighbourhood); a time question drops them.
+      else for (let k = i; k < exact.end; k += 1) ctx.claim[k] = exact.entry.exactOnly ? "text" : "used";
       continue;
     }
     const tok = toks[i];
-    if (!tok.num && tok.norm.length >= 5 && !STOP_WORDS.has(tok.norm) && !isProtected(tok.norm)) {
+    if (!tok.num && tok.norm.length >= 5 && !noFuzzy(tok.norm)) {
       const near = bestPhrase(ctx, i, true);
-      if (near) applyValue(ctx, near.entry.value, i, near.end);
+      if (near && acceptable(ctx, near.entry, i, near.end)) applyValue(ctx, near.entry.value, i, near.end);
     }
   }
+  landForVilla(ctx);
 
   out.text = toks.filter((t, k) => ctx.claim[k] !== "used" && !STOP_WORDS.has(t.norm)).map((t) => t.norm);
   out.spans.sort((a, b) => a.start - b.start);

@@ -6,7 +6,7 @@ import { shared } from "@/content/shared";
 import { projectCopy } from "@/content/projects";
 import s from "./RelatedProjects.module.css";
 
-/** Three more programmes — same city first, then the same standing — so no page is a dead end. */
+/** Three more programmes, chosen by the page (see `relatedTo`), so no page is a dead end. */
 export function RelatedProjects({ locale, items }: { locale: Locale; items: ProjectListItem[] }) {
   if (items.length === 0) return null;
   const c = projectCopy[locale];

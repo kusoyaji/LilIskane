@@ -1,0 +1,546 @@
+/* The home's first screen — the search. Ink ground with the facade lattice,
+   composed like the budget finder: the question on the reading side, the live
+   answer on the other. Tokens only; transform/opacity for anything that
+   moves; logical properties throughout. */
+
+.hero {
+  position: relative;
+  /* Above the results (whose bar is sticky, z 4), so an open picker can
+     hang over them. */
+  z-index: 5;
+  isolation: isolate;
+  color: var(--color-paper);
+  padding-block: calc(var(--nav-h) + clamp(2.25rem, 7vh, 5rem)) clamp(3rem, 8vh, 5.5rem);
+}
+/* Read from the corner on the reading side, like the overlay. */
+.hero > svg:first-child {
+  opacity: 0.065;
+  mask-image: radial-gradient(90% 80% at 100% 0%, #000 0%, transparent 72%);
+}
+:global([dir="rtl"]) .hero > svg:first-child {
+  mask-image: radial-gradient(90% 80% at 0% 0%, #000 0%, transparent 72%);
+}
+
+.grid {
+  display: grid;
+  gap: clamp(2.5rem, 6vh, 3.5rem);
+}
+@media (min-width: 64rem) {
+  .grid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: stretch;
+    gap: 0;
+  }
+  .ask {
+    padding-inline-end: clamp(3rem, 5vw, 5.5rem);
+  }
+  .answer {
+    padding-inline-start: clamp(2.5rem, 4vw, 4rem);
+    border-inline-start: 1px solid color-mix(in oklab, var(--color-paper) 16%, transparent);
+  }
+}
+
+/* ------------------------------------------------------------- question -- */
+.ask {
+  display: grid;
+  align-content: start;
+  min-inline-size: 0;
+}
+.eyebrow {
+  color: var(--color-ochre-bright);
+}
+/* One line from 64rem in both languages (client, 2026-10-06: "too big"),
+   modest on phones. */
+.title {
+  margin-block-start: clamp(0.85rem, 2vh, 1.25rem);
+  font-size: clamp(2.25rem, 4.2vw, 3.75rem);
+}
+:global([lang="ar"]) .title {
+  font-size: clamp(2.2rem, 4.1vw, 3.6rem);
+}
+@media (min-width: 64rem) {
+  .title {
+    white-space: nowrap;
+  }
+}
+
+.form {
+  margin-block-start: clamp(1.5rem, 4vh, 2.5rem);
+}
+.fieldLabel {
+  display: block;
+  color: color-mix(in oklab, var(--color-paper) 62%, transparent);
+}
+/* The underline field of the budget finder's "Apport personnel", one size up:
+   a rule that lights up in ochre while the field has focus (its focus
+   indicator, so it is drawn at full contrast). */
+.field {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: clamp(0.6rem, 1.2vw, 1rem);
+  margin-block-start: 0.6rem;
+  padding-block: 0.35rem 0.7rem;
+  border-block-end: 2px solid color-mix(in oklab, var(--color-paper) 30%, transparent);
+}
+.field::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: -2px;
+  block-size: 2px;
+  background: var(--color-ochre-bright);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 280ms var(--ease-reveal);
+}
+:global([dir="rtl"]) .field::after {
+  transform-origin: right;
+}
+.field:focus-within::after {
+  transform: scaleX(1);
+}
+.glyph {
+  inline-size: clamp(1.3rem, 2vw, 1.7rem);
+  block-size: auto;
+  color: var(--color-ochre-bright);
+}
+.input {
+  color: var(--color-paper);
+  font-family: var(--font-display);
+  /* Sized so a whole sentence ("3 chambres à Agadir moins de 1,2 million")
+     stays readable in the field; still >= 16px on phones (no iOS zoom). */
+  font-size: clamp(1.25rem, 1.75vw, 1.75rem);
+  font-weight: 500;
+  font-stretch: 108%;
+  letter-spacing: -0.02em;
+}
+@media (max-width: 48rem) {
+  .input {
+    font-size: 1.25rem;
+    letter-spacing: -0.01em;
+  }
+}
+.clear,
+.submit {
+  display: grid;
+  place-items: center;
+  inline-size: 2.75rem;
+  block-size: 2.75rem;
+  padding: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.clear {
+  border: 1px solid color-mix(in oklab, var(--color-paper) 24%, transparent);
+  background: none;
+  color: inherit;
+}
+.submit {
+  grid-column: 4;
+  border: 0;
+  background: var(--color-ochre-bright);
+  color: var(--color-ink);
+}
+.clear:focus-visible,
+.submit:focus-visible,
+.idea:focus-visible,
+.picker:focus-visible,
+.mapLink:focus-visible {
+  outline: 2px solid var(--color-ochre-bright);
+  outline-offset: 2px;
+}
+
+/* Rows under the field: what was understood (or ideas), then the pickers. */
+.chipsRow,
+.pickers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.9rem;
+  min-inline-size: 0;
+}
+.chipsRow {
+  margin-block-start: 1.1rem;
+  min-block-size: 2.75rem;
+}
+.rowLabel {
+  flex: none;
+  color: color-mix(in oklab, var(--color-paper) 56%, transparent);
+}
+.ideas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.idea {
+  min-block-size: 2.25rem;
+  padding: 0.45rem 0.95rem;
+  border: 1px solid color-mix(in oklab, var(--color-paper) 24%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-paper) 4%, transparent);
+  color: var(--color-paper);
+  font-size: var(--text-small);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.pickers {
+  position: relative;
+  margin-block-start: 0.85rem;
+}
+.pickerButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-block-size: 2.75rem;
+  padding-inline: 1rem 0.85rem;
+  border: 1px solid color-mix(in oklab, var(--color-paper) 26%, transparent);
+  border-radius: 999px;
+  background: none;
+  color: var(--color-paper);
+  font-size: var(--text-small);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.picker[aria-expanded="true"] {
+  border-color: var(--color-paper);
+  background: color-mix(in oklab, var(--color-paper) 10%, transparent);
+}
+.picker[data-active] {
+  border-color: var(--color-ochre-bright);
+}
+.pickerCount {
+  display: grid;
+  place-items: center;
+  min-inline-size: 1.2rem;
+  block-size: 1.2rem;
+  padding-inline: 0.25rem;
+  border-radius: 999px;
+  background: var(--color-ochre-bright);
+  color: var(--color-ink);
+  font-size: 0.6875rem;
+}
+.chevron {
+  transition: transform var(--dur-ui) var(--ease-ui);
+}
+.picker[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+/* The open picker: a raised ink panel under the row, over what follows. */
+.pop {
+  position: absolute;
+  z-index: 5;
+  inset-inline: 0;
+  inset-block-start: calc(100% + 0.6rem);
+  display: grid;
+  gap: 0.9rem;
+  max-inline-size: 40rem;
+  padding: 1rem;
+  border-radius: 6px;
+  background: color-mix(in oklab, var(--color-ink) 92%, var(--color-paper));
+  box-shadow: 0 24px 60px rgb(0 0 0 / 0.38), 0 0 0 1px color-mix(in oklab, var(--color-paper) 14%, transparent);
+  animation: pop-in 180ms var(--ease-ui) both;
+}
+.pop[hidden] {
+  display: none;
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+.popGroup {
+  display: grid;
+  gap: 0.5rem;
+}
+.popTitle {
+  font-size: var(--text-small);
+  font-weight: 600;
+  color: color-mix(in oklab, var(--color-paper) 80%, transparent);
+}
+.popChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+/* --------------------------------------------------------------- answer -- */
+.answer {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+.answerEyebrow {
+  color: var(--color-ochre-bright);
+}
+/* Desktop: the figure faces the title, the pictures and the way to the
+   results face the field and the pickers. */
+@media (min-width: 64rem) {
+  .thumbs {
+    margin-block-start: auto;
+  }
+}
+.count {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  margin-block-start: 1.1rem;
+}
+.countFigure {
+  font-family: var(--font-archivo), "Archivo", system-ui, sans-serif;
+  font-size: clamp(4.5rem, 9vw, 8.5rem);
+  font-weight: 500;
+  font-stretch: 112%;
+  line-height: 0.82;
+  letter-spacing: -0.045em;
+  min-inline-size: 1.15ch;
+}
+.countWords {
+  display: grid;
+  gap: 0.35rem;
+  font-size: var(--text-lead);
+  font-weight: 500;
+  line-height: 1.15;
+}
+.countCities {
+  font-size: var(--text-small);
+  font-weight: 400;
+  color: color-mix(in oklab, var(--color-paper) 62%, transparent);
+}
+
+/* The top matches, six slots that cross-fade. */
+.thumbs {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin: clamp(1.5rem, 3.5vh, 2.25rem) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.slot {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 3px;
+  background: color-mix(in oklab, var(--color-paper) 7%, transparent);
+}
+/* Fewer matches than slots: the spare slots are simply empty, never grey
+   squares that read as pictures failing to load; the last picture fades out. */
+.slot[data-empty] {
+  background: transparent;
+}
+.slot[data-empty] .layer:not([data-fresh]) {
+  animation: thumb-out 280ms var(--ease-ui) both;
+}
+@keyframes thumb-out {
+  to {
+    opacity: 0;
+  }
+}
+.layer {
+  position: absolute;
+  inset: 0;
+}
+.layer[data-fresh] {
+  animation: thumb-in 280ms var(--ease-ui) both;
+  animation-delay: calc(var(--i) * 30ms);
+}
+@keyframes thumb-in {
+  from {
+    opacity: 0;
+  }
+}
+.thumbImg {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+.plotTile {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.2rem;
+  inline-size: 100%;
+  block-size: 100%;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 11px, color-mix(in oklab, var(--color-paper) 12%, transparent) 11px 12px),
+    repeating-linear-gradient(90deg, transparent 0 11px, color-mix(in oklab, var(--color-paper) 12%, transparent) 11px 12px),
+    var(--color-olive);
+  text-align: center;
+}
+.plotWord {
+  font-size: 0.5625rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.1;
+  color: color-mix(in oklab, var(--color-paper) 80%, transparent);
+}
+.plotSize {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--color-paper);
+}
+:global([lang="ar"]) .plotWord {
+  text-transform: none;
+  font-size: 0.6875rem;
+}
+
+.relaxed {
+  margin-block-start: 1.25rem;
+  padding: 0.75rem 1rem;
+  border-inline-start: 2px solid var(--color-ochre-bright);
+  background: color-mix(in oklab, var(--color-paper) 6%, transparent);
+  font-size: var(--text-small);
+  line-height: 1.5;
+  color: color-mix(in oklab, var(--color-paper) 86%, transparent);
+}
+.aiSlot {
+  margin-block-start: 1.25rem;
+}
+/* The thinking line carries data-tone (the grounds rule would paint it). */
+.aiSlot > p {
+  background: none;
+}
+
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.5rem;
+  margin-block-start: clamp(1.75rem, 4vh, 2.5rem);
+}
+.mapLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-block-size: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: color-mix(in oklab, var(--color-paper) 82%, transparent);
+  font-size: var(--text-small);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--color-paper) 30%, transparent);
+  text-underline-offset: 0.3em;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .clear:hover,
+  .idea:hover,
+  .picker:hover {
+    border-color: color-mix(in oklab, var(--color-paper) 60%, transparent);
+  }
+  .picker[data-active]:hover {
+    border-color: var(--color-ochre-bright);
+  }
+  .submit:hover {
+    background: var(--color-paper);
+  }
+  .mapLink:hover {
+    color: var(--color-paper);
+    text-decoration-color: currentColor;
+  }
+}
+
+/* ------------------------------------------------------------- phones -- */
+@media (max-width: 63.99rem) {
+  .answer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* Count and the way to the results first; the pictures after. */
+  .answerEyebrow { order: 1; }
+  .count { order: 2; }
+  .relaxed { order: 3; }
+  .aiSlot { order: 4; }
+  .ctas { order: 5; }
+  .thumbs { order: 6; }
+}
+@media (max-width: 40rem) {
+  .hero {
+    padding-block: calc(var(--nav-h) + 1.75rem) 3rem;
+  }
+  .field {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+  .submit {
+    display: none;
+  }
+  .chipsRow,
+  .pickers {
+    gap: 0.5rem 0.75rem;
+  }
+  /* The chips scroll sideways rather than stacking three rows deep. */
+  .chipsRow > ul {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline-end: calc(-1 * var(--gutter));
+    padding-inline-end: var(--gutter);
+    scrollbar-width: none;
+  }
+  .chipsRow > ul::-webkit-scrollbar {
+    display: none;
+  }
+  /* Ideas and pickers: one sideways-scrolling row each, never three lines. */
+  .ideas,
+  .pickerButtons {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-inline-end: calc(-1 * var(--gutter));
+    padding-inline-end: var(--gutter);
+    scrollbar-width: none;
+  }
+  .ideas::-webkit-scrollbar,
+  .pickerButtons::-webkit-scrollbar {
+    display: none;
+  }
+  .ideas > li,
+  .picker {
+    flex: none;
+  }
+  .rowLabel {
+    flex-basis: 100%;
+  }
+  .picker {
+    padding-inline: 0.85rem 0.7rem;
+  }
+  .count {
+    gap: 0.9rem;
+  }
+  .ctas > button:first-child {
+    inline-size: 100%;
+    justify-content: space-between;
+  }
+  .thumbs {
+    gap: 0.3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .field::after,
+  .chevron {
+    transition: none;
+  }
+  .pop,
+  .layer[data-fresh],
+  .slot[data-empty] .layer {
+    animation: none;
+  }
+}

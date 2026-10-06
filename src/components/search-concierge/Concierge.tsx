@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { searchCopy } from "@/content/search";
+import { focusHeroTarget } from "./hero-target";
 import { prefetchIndex } from "./index-cache";
 import s from "./Trigger.module.css";
 
@@ -47,8 +48,19 @@ export function useConcierge(locale: Locale): {
 
   const show = useCallback(
     (from?: Element | null) => {
+      // The home's hero field is the search while it is on screen.
+      if (focusHeroTarget()) return;
       warm();
-      if (from instanceof HTMLElement && from !== document.body) returnTo.current = from;
+      // A field scrolled out of view (the home's hero field, after Ctrl/⌘K from the results) must
+      // not get focus back on close: the browser would scroll the page back up to it.
+      const offscreen =
+        from instanceof HTMLElement &&
+        (from instanceof HTMLInputElement || from instanceof HTMLTextAreaElement) &&
+        (from.getBoundingClientRect().bottom < 0 || from.getBoundingClientRect().top > window.innerHeight);
+      if (offscreen) {
+        (from as HTMLElement).blur();
+        returnTo.current = null;
+      } else if (from instanceof HTMLElement && from !== document.body) returnTo.current = from;
       setMounted(true);
       setOpen(true);
       setNonce((n) => n + 1);

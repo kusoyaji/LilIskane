@@ -15,52 +15,30 @@ import {
   type RefObject,
 } from "react";
 import { Lattice } from "@/components/v2/Lattice";
-import { AMENITY_LABELS, KIND_LABELS, projectCopy, SEGMENT_LABELS, STATUS_LABELS, statusText } from "@/content/projects";
+import { projectCopy, SEGMENT_LABELS } from "@/content/projects";
 import { SEARCH_PAGES, searchCopy } from "@/content/search";
-import { cityById } from "@/data/cities";
-import type { Segment } from "@/data/types";
-import { formatNumber, isolateRun, type Locale } from "@/i18n/config";
+import { formatNumber, type Locale } from "@/i18n/config";
 import { formatRange } from "@/lib/format";
 import { parseQuery, searchDocs, toProjetsHref, type ParsedQuery, type SearchDoc, type SearchOutcome } from "@/lib/search";
-import { STATUS_FACETS, type StatusFacet } from "@/lib/status-facets";
+import type { AiResult } from "@/lib/search/ai/types";
+import { AiAnswerCard } from "./AiAnswerCard";
+import { CriteriaTicks } from "./CriteriaTicks";
 import { loadIndex } from "./index-cache";
-import {
-  EMPTY_EXTRA,
-  hasConstraint,
-  isEmptyExtra,
-  matchPages,
-  merge,
-  reconcile,
-  regionCities,
-  removeRegion,
-  removeValue,
-  setScalar,
-  toggleList,
-  type Extra,
-  type ListField,
-  type ScalarField,
-} from "./query-state";
+import { ChipList } from "./parts/ChipList";
+import { FacetButton } from "./parts/FacetButton";
+import { MarkedInput } from "./parts/MarkedInput";
+import { buildChips, buildFacetGroups, cityNamer, relaxedSentence, removeChip, resolveSearch, type ChipModel, type FacetGroup, type QueryState } from "./parts/model";
+import { EMPTY_EXTRA, hasConstraint, isEmptyExtra, matchPages, merge, reconcile, type Extra } from "./query-state";
+import { useAiSearch } from "./useAiSearch";
 import s from "./ConciergeOverlay.module.css";
 
 type Page = (typeof SEARCH_PAGES)[number];
 type Option =
-  | { kind: "doc"; key: string; href: string; doc: SearchDoc }
+  | { kind: "doc"; key: string; href: string; doc: SearchDoc; ai: AiResult | null }
   | { kind: "page"; key: string; href: string; page: Page };
 
-type Chip = { key: string; label: string; remove: () => { raw: string; extra: Extra } };
-type FacetChip = { key: string; label: string; count: number; on: boolean; toggle: () => { raw: string; extra: Extra } };
-type FacetGroup = { id: string; title: string; chips: FacetChip[] };
-
-const BUDGETS = [600_000, 900_000, 1_500_000];
-const MONTHLY = [4_000, 6_000];
-const BEDROOMS = [1, 2, 3, 4];
 const LENIS = () => (window as Window & { __lenis?: { stop(): void; start(): void } }).__lenis;
-
-function statusFacetLabel(facet: StatusFacet, locale: Locale): string {
-  if (facet === "immediate") return projectCopy[locale].readyNow;
-  if (facet === "imminente") return statusText({ status: "en-construction", readySoon: true }, locale);
-  return STATUS_LABELS[facet][locale];
-}
+const NO_DISMISSED: ReadonlySet<string> = new Set();
 
 /**
  * The concierge: a full-screen search on the ink ground.
@@ -95,7 +73,6 @@ export function ConciergeOverlay({
   const uid = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const mirrorRef = useRef<HTMLDivElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   /** The root's inline overflow and background from before the lock, or null while unlocked. */
   const locked = useRef<{ overflow: string; background: string } | null>(null);
@@ -105,12 +82,12 @@ export function ConciergeOverlay({
   const [failed, setFailed] = useState(false);
   const [raw, setRaw] = useState("");
   const [extra, setExtra] = useState<Extra>(EMPTY_EXTRA);
+  /** Values the AI added that the visitor removed (see parts/model.ts). */
+  const [dismissed, setDismissed] = useState<ReadonlySet<string>>(NO_DISMISSED);
   const [active, setActive] = useState(-1);
   const [pending, setPending] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const [mobileGroup, setMobileGroup] = useState<string | null>(null);
-  const [phIndex, setPhIndex] = useState(0);
-  const [animatedPh, setAnimatedPh] = useState(false);
   const [announce, setAnnounce] = useState("");
 
   /* ------------------------------------------------------ index loading ---- */
@@ -227,47 +204,51 @@ export function ConciergeOverlay({
     };
   }, [open]);
 
-  /* ------------------------------------------------- cycling placeholder ---- */
-  useEffect(() => {
-    setAnimatedPh(!window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-  }, []);
-  useEffect(() => {
-    if (!open || raw || !animatedPh) return;
-    const id = window.setInterval(() => setPhIndex((i) => (i + 1) % c.placeholders.length), 3200);
-    return () => window.clearInterval(id);
-  }, [open, raw, animatedPh, c.placeholders.length]);
-
   /* -------------------------------------------------------------- query ---- */
   const deferredRaw = useDeferredValue(raw);
   const deferredExtra = useDeferredValue(extra);
   const parsed = useMemo(() => parseQuery(deferredRaw), [deferredRaw]);
   const pages = useMemo(() => matchPages(deferredRaw), [deferredRaw]);
-  const query: ParsedQuery = useMemo(() => {
+  /** What the visitor said and picked — before any AI reading. */
+  const userQuery: ParsedQuery = useMemo(() => {
     const merged = merge(parsed, deferredExtra);
     return { ...merged, text: merged.text.filter((w) => !pages.words.has(w)) };
   }, [parsed, deferredExtra, pages]);
 
   const hasQuery = deferredRaw.trim() !== "" || !isEmptyExtra(deferredExtra);
-  const constrained = hasConstraint(query);
-  const outcome: SearchOutcome | null = useMemo(
-    () => (docs && constrained ? searchDocs(docs, query) : null),
-    [docs, constrained, query],
+  const constrained = hasConstraint(userQuery);
+  const instant: SearchOutcome | null = useMemo(
+    () => (docs && constrained ? searchDocs(docs, userQuery) : null),
+    [docs, constrained, userQuery],
   );
+
+  // The AI refines on top of the instant answer; it never blocks it, and an
+  // answer is only ever shown for the exact text it was given.
+  const ai = useAiSearch({ raw: deferredRaw, locale, instant });
+  const answer = ai.forQuery === deferredRaw && deferredRaw.trim() !== "" ? ai.answer : null;
+
+  const resolved = useMemo(
+    () => (docs && (constrained || answer) ? resolveSearch(docs, userQuery, deferredExtra, answer, dismissed) : null),
+    [docs, constrained, answer, userQuery, deferredExtra, dismissed],
+  );
+  const outcome = resolved?.outcome ?? null;
+  const query = resolved?.query ?? userQuery;
 
   const mode: "browse" | "results" | "pages" = !hasQuery
     ? "browse"
-    : constrained
+    : resolved
       ? "results"
       : pages.ids.length
         ? "pages"
         : "browse";
 
-  const docList: SearchDoc[] = useMemo(() => {
+  const rows: Array<{ doc: SearchDoc; ai: AiResult | null }> = useMemo(() => {
     if (!docs) return [];
-    if (mode === "results") return outcome ? outcome.hits.map((hit) => hit.doc) : [];
+    if (mode === "results") return resolved ? resolved.rows : [];
     if (mode === "pages") return [];
-    return docs;
-  }, [docs, mode, outcome]);
+    return docs.map((doc) => ({ doc, ai: null }));
+  }, [docs, mode, resolved]);
+  const docList = useMemo(() => rows.map((row) => row.doc), [rows]);
 
   const pageList: Page[] = useMemo(() => {
     if (!hasQuery) return SEARCH_PAGES;
@@ -275,11 +256,12 @@ export function ConciergeOverlay({
   }, [hasQuery, pages]);
 
   const options: Option[] = useMemo(() => {
-    const docOpts: Option[] = docList.map((doc) => ({
+    const docOpts: Option[] = rows.map(({ doc, ai: fit }) => ({
       kind: "doc",
       key: doc.slug,
       href: `/${locale}/projets/${doc.slug}`,
       doc,
+      ai: fit,
     }));
     const pageOpts: Option[] = pageList.map((page) => ({
       kind: "page",
@@ -288,11 +270,13 @@ export function ConciergeOverlay({
       page,
     }));
     return mode === "results" ? [...docOpts, ...pageOpts] : [...pageOpts, ...docOpts];
-  }, [docList, pageList, mode, locale]);
+  }, [rows, pageList, mode, locale]);
 
   const optionId = (key: string) => `${uid}-o-${key}`;
   const exact = outcome ? outcome.exact : true;
-  const matchCount = mode === "results" ? (exact ? docList.length : null) : (docs?.length ?? null);
+  // The map link opens /projets with the filters, which knows nothing of the AI's extra picks:
+  // it counts the filter result.
+  const matchCount = mode === "results" ? (exact && outcome ? outcome.hits.length : null) : (docs?.length ?? null);
   const mapHref = toProjetsHref(query, locale);
 
   // A new query puts the first answer under Enter, as in any command palette.
@@ -326,12 +310,14 @@ export function ConciergeOverlay({
   }, [message, open]);
 
   /* ------------------------------------------------------------ actions ---- */
-  const apply = useCallback((next: { raw: string; extra: Extra }) => {
+  const apply = useCallback((next: QueryState & { dismissed?: ReadonlySet<string> }) => {
     setRaw(next.raw);
     setExtra(next.extra);
+    if (next.dismissed) setDismissed(next.dismissed);
+    else if (!next.raw && isEmptyExtra(next.extra)) setDismissed(NO_DISMISSED);
   }, []);
 
-  const applyAndRefocus = (next: { raw: string; extra: Extra }) => {
+  const applyAndRefocus = (next: QueryState & { dismissed?: ReadonlySet<string> }) => {
     apply(next);
     inputRef.current?.focus({ preventScroll: true });
   };
@@ -339,6 +325,7 @@ export function ConciergeOverlay({
   const onType = (value: string) => {
     setRaw(value);
     setExtra((current) => reconcile(parseQuery(value), current));
+    if (!value.trim()) setDismissed(NO_DISMISSED);
   };
 
   const go = (href: string) => {
@@ -378,166 +365,30 @@ export function ConciergeOverlay({
     }
   };
 
-  // The input's own scroll (long queries) is mirrored by the highlight layer.
-  const syncMirror = () => {
-    if (mirrorRef.current && inputRef.current) mirrorRef.current.scrollLeft = inputRef.current.scrollLeft;
-  };
-  useEffect(syncMirror, [raw]);
-
   /* -------------------------------------------------------------- chips ---- */
-  const cityName = useCallback(
-    (id: string) =>
-      docs?.find((doc) => doc.cityId === id)?.city[locale] ?? cityById.get(id)?.name[locale] ?? id,
-    [docs, locale],
+  const cityName = useMemo(() => cityNamer(docs, locale), [docs, locale]);
+
+  const chips: ChipModel[] = useMemo(
+    () =>
+      buildChips({ user: userQuery, final: query, raw: deferredRaw, parsed, extra: deferredExtra, locale, c, cityName }),
+    [userQuery, query, deferredRaw, parsed, deferredExtra, locale, c, cityName],
   );
-
-  const chips: Chip[] = useMemo(() => {
-    const out: Chip[] = [];
-    const fromRegion = query.region ? regionCities(deferredRaw, parsed) : [];
-    if (query.region) {
-      out.push({ key: `region-${query.region}`, label: c.regions[query.region], remove: () => removeRegion(raw, extra) });
-    }
-    for (const id of query.cities) {
-      if (fromRegion.includes(id)) continue;
-      out.push({ key: `city-${id}`, label: cityName(id), remove: () => removeValue(raw, extra, "cities", id) });
-    }
-    for (const kind of query.kinds) {
-      out.push({ key: `kind-${kind}`, label: KIND_LABELS[kind][locale], remove: () => removeValue(raw, extra, "kinds", kind) });
-    }
-    for (const seg of query.segments) {
-      out.push({ key: `seg-${seg}`, label: SEGMENT_LABELS[seg][locale], remove: () => removeValue(raw, extra, "segments", seg) });
-    }
-    if (query.bedroomsMin !== null) {
-      const n = query.bedroomsMin;
-      out.push({
-        key: "beds",
-        label: c.bedroomsChip(n, isolateRun(String(n), locale)),
-        remove: () => removeValue(raw, extra, "bedroomsMin", n),
-      });
-    }
-    if (query.priceMax !== null) {
-      const v = query.priceMax;
-      out.push({ key: "price", label: c.priceChip(formatNumber(v, locale)), remove: () => removeValue(raw, extra, "priceMax", v) });
-    }
-    if (query.monthlyMax !== null) {
-      const v = query.monthlyMax;
-      out.push({ key: "monthly", label: c.monthlyChip(formatNumber(v, locale)), remove: () => removeValue(raw, extra, "monthlyMax", v) });
-    }
-    for (const st of query.statuses) {
-      out.push({ key: `st-${st}`, label: statusFacetLabel(st, locale), remove: () => removeValue(raw, extra, "statuses", st) });
-    }
-    for (const a of query.amenities) {
-      out.push({ key: `am-${a}`, label: AMENITY_LABELS[a][locale], remove: () => removeValue(raw, extra, "amenities", a) });
-    }
-    return out;
-  }, [query, parsed, deferredRaw, raw, extra, c, locale, cityName]);
-
-  /** The parsed spans of the raw text, merged, for the highlight layer under the field. */
-  const marks = useMemo(() => {
-    const ranges = [...parsed.spans]
-      .filter((span) => span.end > span.start && span.end <= deferredRaw.length)
-      .sort((a, b) => a.start - b.start)
-      .reduce<Array<[number, number]>>((acc, span) => {
-        const last = acc[acc.length - 1];
-        if (last && span.start <= last[1]) last[1] = Math.max(last[1], span.end);
-        else acc.push([span.start, span.end]);
-        return acc;
-      }, []);
-    const parts: Array<{ text: string; mark: boolean }> = [];
-    let at = 0;
-    for (const [a, b] of ranges) {
-      if (a > at) parts.push({ text: deferredRaw.slice(at, a), mark: false });
-      parts.push({ text: deferredRaw.slice(a, b), mark: true });
-      at = b;
-    }
-    if (at < deferredRaw.length) parts.push({ text: deferredRaw.slice(at), mark: false });
-    return parts;
-  }, [parsed.spans, deferredRaw]);
-  const showMarks = deferredRaw === raw && marks.some((part) => part.mark);
+  const onRemoveChip = (chip: ChipModel) => applyAndRefocus(removeChip(chip, { raw, extra }, dismissed));
 
   /* ------------------------------------------------------------- facets ---- */
-  const facetGroups: FacetGroup[] = useMemo(() => {
-    if (!docs) return [];
-    const count = (q: ParsedQuery) => {
-      const result = searchDocs(docs, q);
-      return result.exact ? result.hits.length : 0;
-    };
-    const cityIds = [...new Set(docs.map((doc) => doc.cityId))].sort((a, b) =>
-      cityName(a).localeCompare(cityName(b), locale),
-    );
-    const list = (field: ListField, values: string[], label: (v: string) => string, extraQ: Partial<ParsedQuery> = {}): FacetChip[] =>
-      values.map((value) => ({
-        key: `${field}-${value}`,
-        label: label(value),
-        count: count({ ...query, [field]: [value], ...extraQ }),
-        on: (query[field] as string[]).includes(value),
-        toggle: () => toggleList(raw, extra, merge(parseQuery(raw), extra), field, value),
-      }));
-    // A scalar replaces the current value (one budget at a time), so its count
-    // is what the selection would be with that value instead.
-    const scalar = (field: ScalarField, values: number[], label: (v: number) => string): FacetChip[] =>
-      values.map((value) => {
-        const on = query[field] === value;
-        return {
-          key: `${field}-${value}`,
-          label: label(value),
-          count: count({ ...query, [field]: value }),
-          on,
-          toggle: () => (on ? removeValue(raw, extra, field, value) : setScalar(raw, extra, field, value)),
-        };
-      });
-    const segments = (["haut-standing", "moyen-standing", "economique", "terrain"] as Segment[]).filter((seg) =>
-      docs.some((doc) => doc.segment === seg),
-    );
-    const statuses = STATUS_FACETS.filter((st) => docs.some((doc) => doc.statuses.includes(st)));
-    return [
-      {
-        id: "city",
-        title: c.filterCity,
-        chips: list("cities", cityIds, cityName, { region: null }),
-      },
-      { id: "standing", title: c.filterStanding, chips: list("segments", segments, (v) => SEGMENT_LABELS[v as Segment][locale]) },
-      { id: "status", title: c.filterStatus, chips: list("statuses", statuses, (v) => statusFacetLabel(v as StatusFacet, locale)) },
-      {
-        id: "bedrooms",
-        title: c.filterBedrooms,
-        chips: scalar("bedroomsMin", BEDROOMS, (n) => isolateRun(`${n}+`, locale)),
-      },
-      {
-        id: "budget",
-        title: c.filterBudget,
-        chips: scalar("priceMax", BUDGETS, (v) => c.priceChip(formatNumber(v, locale))),
-      },
-      {
-        id: "monthly",
-        title: c.filterMonthly,
-        chips: scalar("monthlyMax", MONTHLY, (v) => c.monthlyChip(formatNumber(v, locale))),
-      },
-    ];
-  }, [docs, query, raw, extra, c, locale, cityName]);
+  const facetGroups: FacetGroup[] = useMemo(
+    () => (docs ? buildFacetGroups({ docs, query, raw, extra, locale, c, cityName }) : []),
+    [docs, query, raw, extra, locale, c, cityName],
+  );
 
   /* ------------------------------------------------------------- render ---- */
-  const relaxedText = (() => {
-    if (!outcome || outcome.exact) return null;
-    const fields = (outcome.relaxed as string[]).map((f) => c.relaxedFields[f]).filter(Boolean);
-    return fields.length ? c.relaxedWidened(fields.join(c.listJoin)) : c.relaxedClosest;
-  })();
+  const relaxedText = outcome ? relaxedSentence(outcome, c) : null;
 
   const listboxId = `${uid}-listbox`;
   const inputId = `${uid}-input`;
 
-  const renderFacetChip = (chip: FacetChip) => (
-    <button
-      key={chip.key}
-      type="button"
-      className={`${s.fchip} u-press`}
-      aria-pressed={chip.on}
-      data-empty={!chip.on && chip.count === 0 ? "" : undefined}
-      onClick={() => applyAndRefocus(chip.toggle())}
-    >
-      <span>{chip.label}</span>
-      <span className={`u-numeric ${s.fcount}`}>{formatNumber(chip.count, locale)}</span>
-    </button>
+  const renderFacetChip = (chip: FacetGroup["chips"][number]) => (
+    <FacetButton key={chip.key} chip={chip} locale={locale} onPick={(picked) => applyAndRefocus(picked.toggle())} />
   );
 
   const docGroupTitle =
@@ -616,8 +467,8 @@ export function ConciergeOverlay({
           </span>
           <span id={`${id}-m`} className={s.place}>
             {doc.city[locale]}
+            <span className="u-visually-hidden">{locale === "ar" ? "،" : ","}</span>
             <span aria-hidden> · </span>
-            <span className="u-visually-hidden">, </span>
             {doc.neighbourhood[locale]}
           </span>
           <span className={s.badges}>
@@ -639,6 +490,7 @@ export function ConciergeOverlay({
               </span>
             )}
           </span>
+          {option.ai && <CriteriaTicks locale={locale} doc={doc} ai={option.ai} query={query} className={s.ticks} />}
         </span>
         <span id={`${id}-p`} className={s.side}>
           {land ? (
@@ -723,50 +575,23 @@ export function ConciergeOverlay({
               <circle cx="10.5" cy="10.5" r="6.75" fill="none" stroke="currentColor" strokeWidth="1.6" />
               <path d="M15.5 15.5L21 21" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
             </svg>
-            <div className={s.inputWrap}>
-              {showMarks && (
-                <div ref={mirrorRef} className={`${s.input} ${s.mirror}`} aria-hidden dir="auto">
-                  {marks.map((part, i) =>
-                    part.mark ? (
-                      <mark key={i} className={s.mark}>
-                        {part.text}
-                      </mark>
-                    ) : (
-                      <span key={i}>{part.text}</span>
-                    ),
-                  )}
-                </div>
-              )}
-              <input
-                ref={inputRef}
-                id={inputId}
-                className={s.input}
-                data-ph={animatedPh && !raw ? "" : undefined}
-                type="text"
-                dir="auto"
-                role="combobox"
-                aria-expanded={options.length > 0}
-                aria-controls={listboxId}
-                aria-autocomplete="list"
-                aria-activedescendant={activeOption ? optionId(activeOption.key) : undefined}
-                autoComplete="off"
-                autoCorrect="off"
-                autoCapitalize="off"
-                spellCheck={false}
-                enterKeyHint="search"
-                placeholder={c.placeholders[0]}
-                value={raw}
-                onChange={(event) => onType(event.target.value)}
-                onKeyDown={onKeyDown}
-                onScroll={syncMirror}
-                onSelect={syncMirror}
-              />
-              {animatedPh && !raw && (
-                <span key={phIndex} className={`${s.input} ${s.ph}`} aria-hidden>
-                  {c.placeholders[phIndex]}
-                </span>
-              )}
-            </div>
+            <MarkedInput
+              inputRef={inputRef}
+              id={inputId}
+              className={s.input}
+              value={raw}
+              onValue={onType}
+              spans={parsed.spans}
+              spansFor={deferredRaw}
+              placeholders={c.placeholders}
+              cycle={open}
+              role="combobox"
+              aria-expanded={options.length > 0}
+              aria-controls={listboxId}
+              aria-autocomplete="list"
+              aria-activedescendant={activeOption ? optionId(activeOption.key) : undefined}
+              onKeyDown={onKeyDown}
+            />
             {raw || !isEmptyExtra(extra) ? (
               <button
                 type="button"
@@ -786,23 +611,14 @@ export function ConciergeOverlay({
           {chips.length > 0 && (
             <div className={s.chipsRow}>
               <span className={`u-eyebrow ${s.chipsLabel}`}>{parsed.spans.length ? c.understood : c.criteria}</span>
-              <ul className={s.chips}>
-                {chips.map((chip) => (
-                  <li key={chip.key} className={s.chip}>
-                    <span>{chip.label}</span>
-                    <button
-                      type="button"
-                      className={s.chipX}
-                      aria-label={c.removeChip(chip.label)}
-                      onClick={() => applyAndRefocus(chip.remove())}
-                    >
-                      <svg width="10" height="10" viewBox="0 0 14 14" aria-hidden focusable="false">
-                        <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="2" />
-                      </svg>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              <ChipList
+                chips={chips}
+                onRemove={onRemoveChip}
+                removeLabel={c.removeChip}
+                aiMark={c.aiMark}
+                aiTitle={c.aiTitle}
+                className={s.chips}
+              />
             </div>
           )}
 
@@ -865,7 +681,19 @@ export function ConciergeOverlay({
               </section>
             )}
 
-            {relaxedText && (
+            {hasQuery && (ai.state === "thinking" || answer) && (
+              <div className={s.aiSlot}>
+                <AiAnswerCard
+                  locale={locale}
+                  state={ai.state}
+                  answer={answer}
+                  onQuery={(text) => applyAndRefocus({ raw: text, extra })}
+                />
+              </div>
+            )}
+
+            {/* Said once: when the concierge has answered, its sentence says what was widened. */}
+            {relaxedText && !(ai.state === "ready" && answer?.summary) && (
               <div className={s.relaxed} role="note">
                 <p className={s.relaxedLead}>{c.relaxedLead}</p>
                 <p>{relaxedText}</p>

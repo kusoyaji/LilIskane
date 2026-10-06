@@ -2,7 +2,7 @@ import { contact } from "@/content/contact";
 import { company } from "@/data/company";
 import { cityById } from "@/data/cities";
 import type { Locale } from "@/i18n/config";
-import { Lattice, LinkButton } from "@/components/v2";
+import { Lattice } from "@/components/v2";
 import { MoroccoMap } from "./MoroccoMap";
 import s from "./contact.module.css";
 
@@ -70,13 +70,9 @@ export function VisitUs({ locale }: { locale: Locale }) {
                 </dd>
               </div>
             </dl>
-
-            <div className={`u-enter ${s.visitActions}`}>
-              <LinkButton href="#rendez-vous">{t.book}</LinkButton>
-              <LinkButton href={company.phoneHref} variant="outline" arrow={false}>
-                {t.call}
-              </LinkButton>
-            </div>
+            {/* No buttons here: "Prendre rendez-vous" only scrolled back up to
+                the form above, and "Nous appeler" repeated the number on the
+                line just above it, which is already a link. */}
           </div>
         </div>
       </div>

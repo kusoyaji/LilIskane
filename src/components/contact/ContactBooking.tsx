@@ -6,7 +6,7 @@ import { company } from "@/data/company";
 import type { MediaRef } from "@/data/types";
 import type { Locale } from "@/i18n/config";
 import { AppointmentForm } from "./AppointmentForm";
-import { MEETING_MODES, type CityOption, type ProjectPrefill } from "./model";
+import type { CityOption, ProjectPrefill } from "./model";
 import { ModeIcon } from "./ModeIcon";
 import s from "./contact.module.css";
 
@@ -30,8 +30,8 @@ function internationalPhone(href: string): string {
 
 /**
  * The opening of /contact: the page IS the call to action, so the form is in
- * the first screen. Left, the statement and every direct route (the phone
- * number first, as a link); right, the appointment request on a paper card.
+ * the first screen. Left, the statement and the one direct route (the phone
+ * number, as a link); right, the appointment request on a paper card.
  * On desktop the left column holds still while the form scrolls past it.
  */
 export function ContactBooking({
@@ -45,7 +45,6 @@ export function ContactBooking({
 }) {
   const t = contact[locale];
   const h = t.hero;
-  const [street, city] = company.hq[locale].split(/[,،]\s*/);
 
   return (
     <section className={s.booking} data-tone="ink" data-nav-media aria-labelledby="contact-title">
@@ -68,17 +67,9 @@ export function ContactBooking({
               </h1>
               <p className={`u-enter ${s.heroLead}`}>{h.lead}</p>
 
-              <ul className={`u-enter ${s.modeList}`} aria-label={h.modesLabel}>
-                {MEETING_MODES.map((m) => (
-                  <li key={m} className={s.modeItem}>
-                    <span className={s.modeIcon} aria-hidden>
-                      <ModeIcon mode={m} size={18} />
-                    </span>
-                    {h.modes[m]}
-                  </li>
-                ))}
-              </ul>
-
+              {/* The phone only. The three ways to meet are chosen in the form
+                  itself (step 03), and the head office has its own section,
+                  with the map, directly below. */}
               <div className={`u-enter ${s.direct}`}>
                 <div>
                   <p className={`u-eyebrow ${s.directLabel}`}>{h.phoneLabel}</p>
@@ -95,17 +86,6 @@ export function ContactBooking({
                     <a href={company.phoneHref} className={`u-numeric ${s.plainLink}`} dir="ltr">
                       {internationalPhone(company.phoneHref)}
                     </a>
-                  </p>
-                </div>
-                <div>
-                  <p className={`u-eyebrow ${s.directLabel}`}>{h.hqLabel}</p>
-                  <p className={s.hqText}>
-                    {street}
-                    <br />
-                    {city}
-                  </p>
-                  <p className={s.directSmall}>
-                    {company.name[locale]} · {company.group[locale]}
                   </p>
                 </div>
               </div>

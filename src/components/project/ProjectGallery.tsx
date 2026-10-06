@@ -112,18 +112,23 @@ export function ProjectGallery({
           render: c.renderShort,
         }}
       >
+        {/* Heading at the start, the "see all" control at the end of the same
+            row, on the title's baseline — the way "À voir aussi" sets its
+            link — rather than a lone button under the title. */}
         <header className={s.head}>
-          <p className="u-eyebrow u-enter" style={{ color: "var(--color-ochre-deep)" }}>
-            {c.galleryEyebrow}
-            <span className={s.count}>
-              {" · "}
-              <bdi>{g.count(images.length)}</bdi>
-            </span>
-          </p>
-          <h2 id="gallery-title" className={`u-display ${s.title}`} data-reveal="mask">
-            <span className="reveal-inner">{allPhotos && delivered ? c.galleryTitleDelivered : c.galleryTitleRender}</span>
-          </h2>
-          {note && <p className={s.lede}>{note}</p>}
+          <div className={s.headText}>
+            <p className="u-eyebrow u-enter" style={{ color: "var(--color-ochre-deep)" }}>
+              {c.galleryEyebrow}
+              <span className={s.count}>
+                {" · "}
+                <bdi>{g.count(images.length)}</bdi>
+              </span>
+            </p>
+            <h2 id="gallery-title" className={`u-display ${s.title}`} data-reveal="mask">
+              <span className="reveal-inner">{allPhotos && delivered ? c.galleryTitleDelivered : c.galleryTitleRender}</span>
+            </h2>
+            {note && <p className={s.lede}>{note}</p>}
+          </div>
           {images.length > 1 && (
             <button type="button" className={`${s.openAll} u-press u-enter`} data-gallery-index={0}>
               {g.open}

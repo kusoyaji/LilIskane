@@ -315,55 +315,6 @@
   text-wrap: pretty;
 }
 
-/* ------------------------------------------------------------- seals ---- */
-
-.seals {
-  position: relative;
-  isolation: isolate;
-  padding-block: clamp(5rem, 13vh, 10rem);
-}
-
-.sealGrid {
-  list-style: none;
-  margin: clamp(3rem, 9vh, 6rem) 0 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(2rem, 3.5vw, 3.5rem);
-}
-
-.seal {
-  display: grid;
-  align-content: start;
-  gap: 1.25rem;
-  padding-block-start: 1.75rem;
-  border-block-start: 1px solid color-mix(in oklab, var(--color-ink) 26%, transparent);
-}
-
-.sealMeta {
-  color: var(--color-ochre-deep);
-}
-
-.sealMark {
-  font-size: clamp(3rem, 5.2vw, 5.5rem);
-  margin-block: 0.5rem 0.25rem;
-}
-
-.sealTitle {
-  font-family: var(--font-display);
-  font-size: var(--text-title);
-  font-weight: 500;
-  line-height: 1.1;
-  letter-spacing: -0.015em;
-}
-
-.sealBody {
-  line-height: 1.65;
-  color: var(--color-ink-soft);
-  max-inline-size: 42ch;
-  text-wrap: pretty;
-}
-
 /* -------------------------------------------------------- guarantees ---- */
 
 .guarantees {
@@ -579,10 +530,6 @@
 
   .value {
     min-block-size: 0;
-  }
-
-  .sealGrid {
-    grid-template-columns: minmax(0, 1fr);
   }
 
   .row {

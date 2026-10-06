@@ -24,6 +24,11 @@ function percent(value: number, locale: Locale): string {
  * draws (via `toListItems`, so the inactive language never ships), and renders
  * every thumbnail here so the media manifest stays out of the client bundle.
  * The client child only does arithmetic and picks which thumbnails to show.
+ *
+ * It is one of the home's three ways into the search: it counts within the
+ * current search (home-search/context.tsx), and its button sets its ceiling
+ * on the results instead of leaving the page — the count it shows is the
+ * count the results show after the click.
  */
 export function BudgetFinder({ locale }: { locale: Locale }) {
   const t = budgetCopy[locale];

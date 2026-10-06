@@ -427,6 +427,10 @@ export const privacy: Copy<LegalDoc> = {
             kind: "note",
             text: "Les simulateurs de budget et de crédit calculent dans votre navigateur : les montants que vous y saisissez ne nous sont pas transmis.",
           },
+          {
+            kind: "note",
+            text: "Les recherches saisies dans le concierge de recherche sont transmises au fournisseur d'intelligence artificielle du site, Google Gemini, pour produire la réponse ; elles ne sont pas rattachées à votre identité.",
+          },
         ],
       },
       {
@@ -573,6 +577,10 @@ export const privacy: Copy<LegalDoc> = {
           {
             kind: "note",
             text: "تُجري أدوات محاكاة الميزانية والقرض حساباتها داخل متصفحكم: المبالغ التي تُدخلونها لا تُرسَل إلينا.",
+          },
+          {
+            kind: "note",
+            text: `تُرسَل عمليات البحث التي تكتبونها في مساعد البحث إلى مزوّد الذكاء الاصطناعي للموقع، ${ar("Google Gemini")}، لإعداد الجواب، ولا تُربَط بهويتكم.`,
           },
         ],
       },

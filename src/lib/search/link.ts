@@ -1,4 +1,5 @@
 import type { Locale } from "../../i18n/config.ts";
+import { SERVED_CITY_IDS } from "./lexicon.ts";
 import type { ParsedQuery } from "./types.ts";
 
 /**
@@ -28,7 +29,8 @@ export function toProjetsHref(query: ParsedQuery, locale: Locale): string {
     if (value !== null && Number.isFinite(value) && value > 0) pairs.push([key, String(Math.round(value))]);
   };
 
-  list("ville", query.cities);
+  // A city without a programme (Fès, Nador…) has nothing to show on /projets.
+  list("ville", query.cities.filter((id) => SERVED_CITY_IDS.has(id)));
   number("prix", query.priceMax);
   number("mensualite", query.monthlyMax);
   list("standing", query.segments);

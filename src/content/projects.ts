@@ -394,7 +394,8 @@ export const searchCopy: Copy<{
 }> = {
   fr: {
     heroEyebrow: "Nos projets",
-    heroTitle: "Trouvez votre adresse.",
+    // The catalogue, not a second home: the home is the search page.
+    heroTitle: "Nos programmes, ville par ville.",
     heroLead: (programmes, cities) =>
       `${programmes} programmes dans ${cities} villes, du studio au lot de terrain, en lancement ou déjà livrés. Décrivez ce que vous cherchez, en français ou en arabe.`,
     budget: "Mensualité maximale",
@@ -440,7 +441,8 @@ export const searchCopy: Copy<{
     smartExamples: ["3 chambres à Agadir", "Près de Casablanca", "Terrain moins de 1 million", "شقة بمراكش"],
     smartNamed: "Programmes",
     smartCount: (n, formatted) =>
-      n === 1 ? "1 programme correspond" : `${formatted} programmes correspondent`,
+      // A preview of what Rechercher will show — the list below changes on submit.
+      n === 1 ? "1 programme correspond · Rechercher pour l’afficher" : `${formatted} programmes correspondent · Rechercher pour les afficher`,
     smartClosest: "Aucun programme exact : les plus proches seront affichés",
     mapEyebrow: "La carte",
     mapHint: "Choisissez une ville pour filtrer.",
@@ -456,7 +458,7 @@ export const searchCopy: Copy<{
   },
   ar: {
     heroEyebrow: "مشاريعنا",
-    heroTitle: "اعثروا على عنوانكم.",
+    heroTitle: "مشاريعنا، مدينةً بمدينة.",
     heroLead: (programmes, cities) =>
       `${programmes} مشروعاً في ${cities} مدن، من الاستوديو إلى البقعة الأرضية، في طور الإطلاق أو مُسلَّمة. صِفوا ما تبحثون عنه، بالعربية أو بالفرنسية.`,
     budget: "القسط الشهري الأقصى",
@@ -503,7 +505,7 @@ export const searchCopy: Copy<{
     smartExamples: ["شقة بمراكش", "قرب الدار البيضاء", "بقعة أرضية أقل من مليون", "3 chambres à Agadir"],
     smartNamed: "المشاريع",
     smartCount: (n, formatted) =>
-      arCount(n, "مشروع واحد مطابق", "مشروعان مطابقان", "مشاريع مطابقة", "مشروعاً مطابقاً", formatted),
+      `${arCount(n, "مشروع واحد مطابق", "مشروعان مطابقان", "مشاريع مطابقة", "مشروعاً مطابقاً", formatted)} · اضغطوا «ابحثوا» للعرض`,
     smartClosest: "لا يوجد مشروع مطابق تماماً: ستُعرض الأقرب",
     mapEyebrow: "الخريطة",
     mapHint: "اختاروا مدينة للتصفية.",

@@ -68,10 +68,11 @@ export function StepChapter({
   const total = t.steps.length;
   const pad = (n: number) => String(n).padStart(2, "0");
 
+  // Only links that leave the reading path. Step 3 and step 8 used to carry
+  // buttons to the simulator and the guarantees — the very next section in
+  // each case, and step 3's sat beside the index's own "Simuler mon crédit".
   const links: Record<number, { href: string; label: string }> = {
     2: { href: `/${locale}/projets`, label: t.stepLinks.projects },
-    3: { href: "#simulateur", label: t.stepLinks.simulate },
-    8: { href: "#garanties", label: t.stepLinks.guarantees },
   };
 
   return (
@@ -123,7 +124,7 @@ export function StepChapter({
                   <p className={`u-enter u-body ${s.stepBody}`}>{step.body}</p>
                   {link && (
                     <div className="u-enter" style={{ marginBlockStart: "2rem" }}>
-                      <LinkButton href={link.href} variant={n === 3 ? "accent" : "outline"}>
+                      <LinkButton href={link.href} variant="outline">
                         {link.label}
                       </LinkButton>
                     </div>

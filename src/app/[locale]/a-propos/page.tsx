@@ -4,7 +4,6 @@ import { Chronology } from "@/components/about/Chronology";
 import { Films } from "@/components/about/Films";
 import { Guarantees } from "@/components/about/Guarantees";
 import { NextChapter } from "@/components/about/NextChapter";
-import { Seals } from "@/components/about/Seals";
 import { Values } from "@/components/about/Values";
 import { Who } from "@/components/about/Who";
 import s from "@/components/about/about.module.css";
@@ -38,9 +37,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
  * The page is built for the people who wrote the history it tells, so it reads
  * as a record rather than a brochure: who the company is and what it builds,
  * then the ten dates as the centrepiece (a pinned year counter turned by the
- * reader's own scroll), then what it stands for, what third parties have
- * certified, and what every buyer is guaranteed. Every figure is read from
- * `src/data/company.ts` — none is typed into a component.
+ * reader's own scroll), then what it stands for and what every buyer is
+ * guaranteed. Every figure is read from `src/data/company.ts` — none is typed
+ * into a component.
+ *
+ * The certifications (ISO 9001, the Arab League prize, HQE) are told once, as
+ * dates in the chronology. A separate "Certifications & distinctions" block
+ * used to tell the same three again a few screens later; its one extra fact
+ * (ISO 9001:2015 in 2017) now closes the 2005 entry.
  *
  * One dark ground only, the chronology, and it is entered and left behind a
  * full-bleed photograph (Riad Garden I as delivered; Riad Garden II as
@@ -58,7 +62,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
     year: m.year,
     chapter: t.chrono.chapters[m.year] ?? "",
     title: m.title[locale],
-    body: keepNumbers(m.body[locale], locale),
+    body: keepNumbers([m.body[locale], t.chrono.addenda[m.year]].filter(Boolean).join(" "), locale),
   }));
 
   return (
@@ -107,11 +111,8 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         <Values locale={locale} />
       </div>
 
-      <div data-tone="sand">
-        <Seals locale={locale} />
-      </div>
-
-      <div data-tone="paper">
+      {/* Warm, not paper: two paper sections in a row read as one long one. */}
+      <div data-tone="warm">
         <Guarantees locale={locale} />
       </div>
 

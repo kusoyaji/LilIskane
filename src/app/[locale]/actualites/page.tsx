@@ -41,7 +41,6 @@ export default async function NewsPage({ params }: { params: Promise<{ locale: s
 
   const launches = projects.filter((p) => p.status === "en-lancement");
   const featured = getProject(FEATURED);
-  const previous = featured?.previousPhaseSlug ? getProject(featured.previousPhaseSlug) : undefined;
   const rest = launches.filter((p) => p.slug !== featured?.slug);
   const cities = new Set(launches.map((p) => p.cityId)).size;
 
@@ -49,7 +48,7 @@ export default async function NewsPage({ params }: { params: Promise<{ locale: s
     <>
       <div data-tone="paper">
         <NewsMasthead locale={locale} launches={launches.length} cities={cities} />
-        {featured && <Featured locale={locale} project={featured} previous={previous} />}
+        {featured && <Featured locale={locale} project={featured} />}
       </div>
       <div data-tone="paper">
         <NewsList locale={locale} launches={rest} />

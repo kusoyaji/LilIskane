@@ -3,9 +3,16 @@
 }
 
 .head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.5rem 3rem;
+  margin-block-end: clamp(2.5rem, 6vh, 4rem);
+}
+.headText {
   display: grid;
   gap: 1.25rem;
-  margin-block-end: clamp(2.5rem, 6vh, 4rem);
 }
 .title {
   font-size: var(--text-display);

@@ -1,29 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import {
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
-import { LinkButton } from "@/components/v2/LinkButton";
+import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
+import { useHomeSearch } from "@/components/home-search/context";
+import { useTween } from "@/components/home-search/useTween";
+import { Arrow } from "@/components/v2/LinkButton";
+import v2 from "@/components/v2/v2.module.css";
 import type { BudgetCopy } from "@/content/home-conversion";
 import type { Price } from "@/data/types";
 import { formatNumber, type Locale } from "@/i18n/config";
-import { CREDIT_DEFAULTS, maxAffordablePrice } from "@/lib/credit";
-import {
-  DEFAULT_DEPOSIT,
-  DEFAULT_MONTHLY,
-  MONTHLY_MAX,
-  MONTHLY_MIN,
-  effectiveTotal,
-  matchBudget,
-  searchMonthlyFor,
-  toQuery,
-} from "./match";
+import { CREDIT_DEFAULTS, DEFAULT_DEPOSIT, maxAffordablePrice } from "@/lib/credit";
+import { DEFAULT_MONTHLY, MONTHLY_MAX, MONTHLY_MIN, ceilingOf, effectiveTotal } from "./match";
 import s from "./BudgetFinder.module.css";
 
 export type FinderItem = {
@@ -41,44 +28,6 @@ const STEP = 250;
 const START = DEFAULT_MONTHLY;
 const DURATIONS = [15, 20, 25] as const;
 const TICKS = [5_000, 10_000, 15_000];
-
-/**
- * Eases a displayed number towards its target so the ceiling *travels* as the
- * slider moves instead of flickering through every intermediate digit. Short
- * (240ms) and cancelled on each new target, so it never lags a fast drag.
- * Reduced motion gets the exact value immediately.
- */
-function useTween(target: number, duration = 240): number {
-  const [shown, setShown] = useState(target);
-  const from = useRef(target);
-  const raf = useRef(0);
-
-  useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      from.current = target;
-      setShown(target);
-      return;
-    }
-    const start = performance.now();
-    const origin = from.current;
-    cancelAnimationFrame(raf.current);
-    const tick = (now: number) => {
-      const p = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - p, 3);
-      const value = origin + (target - origin) * eased;
-      from.current = value;
-      setShown(value);
-      if (p < 1) raf.current = requestAnimationFrame(tick);
-    };
-    raf.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf.current);
-  }, [target, duration]);
-
-  return shown;
-}
 
 function DepositField({
   id,
@@ -153,34 +102,40 @@ export function BudgetFinderClient({
   const [deposit, setDeposit] = useState(DEFAULT_DEPOSIT);
   const [years, setYears] = useState<number>(CREDIT_DEFAULTS.years);
 
+  // The ceiling as shown and as applied to the search: whole thousands, down.
   const ceiling = useMemo(
-    () =>
-      maxAffordablePrice(monthly, deposit, CREDIT_DEFAULTS.annualRate, years),
+    () => ceilingOf(maxAffordablePrice(monthly, deposit, CREDIT_DEFAULTS.annualRate, years)),
     [monthly, deposit, years],
   );
   const shownCeiling = useTween(ceiling);
 
-  const { found, relaxed } = useMemo(
-    () => matchBudget(items, ceiling),
-    [items, ceiling],
-  );
+  // Live: the finder answers within the current search (a city typed in the
+  // hero, a status picked…). What it counts is what the results will show
+  // once its button sets this ceiling — the same pipeline, run ahead.
+  const search = useHomeSearch();
+  const target = search.preview({ price: ceiling });
+  const relaxed = !target.exact;
+  const total = search.active ? search.preview({ price: null }).rows.length : items.length;
+  const inReach = new Set(relaxed ? [] : target.rows.map((row) => row.doc.slug));
+  const bySlug = useMemo(() => new Map(items.map((item) => [item.slug, item])), [items]);
+  const found = target.rows.map((row) => bySlug.get(row.doc.slug)).filter((item): item is FinderItem => Boolean(item));
 
   // Exact: the most the budget buys first — that is the interesting answer.
-  // Relaxed: the nearest out-of-reach programmes first — the honest one.
-  const top = useMemo(() => {
-    const sorted = [...found].sort((a, b) =>
-      relaxed
-        ? effectiveTotal(a.price) - effectiveTotal(b.price)
-        : effectiveTotal(b.price) - effectiveTotal(a.price),
-    );
-    return sorted.slice(0, 3);
-  }, [found, relaxed]);
+  // Relaxed: the most accessible first — the honest one.
+  const top = [...found]
+    .sort((a, b) =>
+      relaxed ? effectiveTotal(a.price) - effectiveTotal(b.price) : effectiveTotal(b.price) - effectiveTotal(a.price),
+    )
+    .slice(0, 3);
 
   const count = relaxed ? 0 : found.length;
   const linkCount = found.length;
 
-  const query = toQuery(searchMonthlyFor(monthly, deposit, years), deposit);
-  const href = `/${locale}/projets?${query}`;
+  const apply = () => {
+    const label = t.chip.replace("{price}", formatNumber(ceiling, locale)).replace("{monthly}", formatNumber(monthly, locale));
+    search.setPriceCeiling(ceiling, label);
+    search.showResults();
+  };
 
   // The ladder: every programme on one price axis, the ceiling sweeping across it.
   const totals = items.map((i) => effectiveTotal(i.price));
@@ -188,7 +143,7 @@ export function BudgetFinderClient({
   const ceilingPos = Math.min(1, Math.max(0, shownCeiling / scaleMax));
   const fill = (monthly - MIN) / (MAX - MIN);
 
-  const ceilingRounded = Math.round(shownCeiling / 1_000) * 1_000;
+  const ceilingRounded = ceilingOf(shownCeiling + 999);
   const priceText = (p: Price) =>
     p.unit === "per-sqm"
       ? `${formatNumber(p.amount, locale)} ${t.perSqm}`
@@ -316,12 +271,11 @@ export function BudgetFinderClient({
               />
               {items.map((i) => {
                 const pos = Math.min(1, effectiveTotal(i.price) / scaleMax);
-                const inReach = !relaxed && effectiveTotal(i.price) <= ceiling;
                 return (
                   <span
                     key={i.slug}
                     className={s.ladderTick}
-                    data-in={inReach || undefined}
+                    data-in={inReach.has(i.slug) || undefined}
                     style={{ insetInlineStart: `${pos * 100}%` }}
                   />
                 );
@@ -347,10 +301,7 @@ export function BudgetFinderClient({
             <span className={s.countText}>
               <span>{count <= 1 ? t.countOne : count === 2 ? t.countTwo : count <= 10 ? t.countFew : t.countMany}</span>
               <span className={s.countOf}>
-                {t.countOf.replace(
-                  "{total}",
-                  formatNumber(items.length, locale),
-                )}
+                {(search.active ? t.countOfSearch : t.countOf).replace("{total}", formatNumber(total, locale))}
               </span>
             </span>
           </div>
@@ -358,9 +309,10 @@ export function BudgetFinderClient({
           {relaxed && <p className={s.relaxed}>{t.relaxed}</p>}
 
           <div className={s.cta}>
-            <LinkButton href={href} variant="light">
-              {ctaLabel}
-            </LinkButton>
+            <button type="button" className={`${v2.btn} ${v2.btnLight} u-press`} onClick={apply}>
+              <span>{ctaLabel}</span>
+              <Arrow />
+            </button>
           </div>
         </div>
       </div>

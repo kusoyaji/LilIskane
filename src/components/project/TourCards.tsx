@@ -334,7 +334,7 @@ export function TourCards({ locale, tours, body, renderNote }: Props) {
           the tours move past it, so the section reads as one continuous move
           rather than a row of cards with a screen of dead space beneath. */}
       <div className="tours__stage">
-        <div className="tours__head u-shell">
+        <div className={`tours__head u-shell ${st.head}`}>
           <p className="u-eyebrow u-enter" style={{ color: "var(--color-ochre-deep)" }}>
             {t.project.tourEyebrow}
           </p>

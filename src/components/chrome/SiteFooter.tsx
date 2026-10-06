@@ -39,7 +39,15 @@ export function SiteFooter({ locale }: { locale: Locale }) {
     // so the field has already ramped to ink by the time you reach it, and the
     // last join on the page is as soft as the rest.
     <footer data-tone="ink" style={{ background: "var(--color-ink)", color: "var(--color-paper)" }}>
-      <div className="u-shell" style={{ paddingBlock: "clamp(3.5rem, 8vw, 6rem)" }}>
+      {/* A hairline opens the footer: after an ink section (the home's budget finder, a programme's
+          closing band) the page would otherwise run into it with no ending. */}
+      <div
+        className="u-shell"
+        style={{
+          paddingBlock: "clamp(3.5rem, 8vw, 6rem)",
+          borderBlockStart: "1px solid color-mix(in oklab, var(--color-paper) 12%, transparent)",
+        }}
+      >
         <div className="grid gap-12 lg:grid-cols-[1.2fr_1fr_1fr]">
           <div>
             {/* The client's own mark, as they publish it — on its white card,

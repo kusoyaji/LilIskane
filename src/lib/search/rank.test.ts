@@ -233,3 +233,82 @@ test("digits and short words refine a name but never filter alone", () => {
   assert.equal(namedProgramme(docs, parseQuery("R+3")), null);
   assert.equal(namedProgramme(docs, parseQuery("F3 Agadir")), null);
 });
+
+/* ------------------------------------------------------------------ */
+/* Final review regressions (2026-10-06)                               */
+/* ------------------------------------------------------------------ */
+
+test("a question about one programme's delivery shows that programme, not a sibling", () => {
+  const rg2 = run("quand sera livré Riad Garden II ?");
+  assert.equal(slugs(rg2)[0], "riad-garden-ii");
+  assert.ok(!slugs(rg2).includes("riad-garden-i"));
+  assert.equal(slugs(run("quand sera livré Amaïa ?"))[0], "amaia");
+  assert.equal(slugs(run("Massylia est livré quand ?"))[0], "massylia");
+});
+
+test("a named programme that fails a filter is kept and the filter widened", () => {
+  const out = run("Riad Garden II 3 chambres moins de 1 million");
+  assert.equal(slugs(out)[0], "riad-garden-ii");
+  assert.ok(!slugs(out).includes("dyar-al-bahia-2"), "matching only 'ii' is not matching the name");
+  assert.equal(out.exact, false);
+  assert.ok(out.relaxed.includes("priceMax"));
+});
+
+test("a deposit does not shrink the results to one programme", () => {
+  const out = run("j'ai 300 000 dh d'apport");
+  assert.equal(out.hits.length, 23);
+  assert.equal(out.exact, true);
+});
+
+test("greetings: the Marrakech flats are an exact answer, and nothing names Assalam TG", () => {
+  for (const raw of ["السلام عليكم بغيت شقة فمراكش", "Assalamou alaikoum, je cherche à Marrakech"]) {
+    const out = run(raw);
+    assert.equal(out.exact, true, raw);
+    assert.ok(out.hits.every((h) => h.doc.cityId === "marrakech"), raw);
+    assert.equal(namedProgramme(docs, parseQuery(raw)), null, raw);
+  }
+  assert.equal(namedProgramme(docs, parseQuery("السلام عليكم")), null);
+  assert.equal(slugs(run("Assalam Tanger"))[0], "assalam-tg");
+  assert.equal(slugs(run("السلام طنجة"))[0], "assalam-tg");
+});
+
+test("Avenue Mohammed VI finds the programmes on it, not Mohammedia", () => {
+  const top = slugs(run("Avenue Mohammed VI")).slice(0, 5).sort();
+  assert.deepEqual(top, ["al-youssoufia-r2", "al-youssoufia-r3", "assafa", "riad-garden-i", "riad-garden-ii"].sort());
+});
+
+test("a city without a programme is never an exact answer", () => {
+  for (const raw of ["appartement à Fès", "Nador", "Meknès", "Oujda villa", "Laâyoune"]) {
+    const out = run(raw);
+    assert.equal(out.exact, false, raw);
+    assert.ok(out.relaxed.includes("cities"), raw);
+    assert.ok(out.hits.length > 0, raw);
+  }
+  assert.equal(run("Fès ou Marrakech").exact, true);
+  assert.equal(run("appartement Massira Marrakech").exact, true, "a neighbourhood elsewhere is noise");
+});
+
+test("land for a villa near Rabat: Al Maamora R+1, exact", () => {
+  const out = run("terrain pour construire une villa près de Rabat");
+  assert.equal(out.exact, true);
+  assert.equal(slugs(out)[0], "al-maamora-r1");
+});
+
+test("a comparison keeps both programmes", () => {
+  const top = slugs(run("Massylia ou Jnane Souss ?"));
+  assert.ok(top.includes("massylia") && top.includes("jnane-souss"));
+  const ar = slugs(run("قارن بين ماسيليا وجنان سوس"));
+  assert.ok(ar.includes("massylia") && ar.includes("jnane-souss"));
+});
+
+test("two-edit typos on long programme names: masilia, Yasmine", () => {
+  assert.equal(slugs(run("masilia"))[0], "massylia");
+  assert.equal(slugs(run("Yasmine Essaouira"))[0], "al-yassamine");
+});
+
+test("the kind or standing typed with a shared name picks the programme", () => {
+  assert.equal(namedProgramme(docs, parseQuery("Odyssée studios"))?.slug, "odyssee-studios");
+  assert.equal(namedProgramme(docs, parseQuery("Océane lots"))?.slug, "oceane-r1");
+  assert.equal(namedProgramme(docs, parseQuery("Océane terrain"))?.slug, "oceane-r1");
+  assert.equal(namedProgramme(docs, parseQuery("Odyssée"))?.slug, "odyssee");
+});

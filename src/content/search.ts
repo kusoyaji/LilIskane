@@ -36,6 +36,10 @@ type SearchCopy = {
   /** …and when every chip was picked from the panel. */
   criteria: string;
   removeChip: (label: string) => string;
+  /** The small mark on a chip the AI read into the query (not the visitor). */
+  aiMark: string;
+  /** What that mark means, spelled out (accessible name, tooltip). */
+  aiTitle: string;
   relaxedLead: string;
   relaxedWidened: (fields: string) => string;
   relaxedClosest: string;
@@ -107,9 +111,11 @@ export const searchCopy: Copy<SearchCopy> = {
     programmesTitle: "Programmes",
     allProgrammes: "Tous les programmes",
     pagesTitle: "Pages",
-    understood: "Compris",
+    understood: "Vos critères",
     criteria: "Critères",
     removeChip: (label) => `Retirer « ${label} »`,
+    aiMark: "IA",
+    aiTitle: "proposé par l'IA",
     relaxedLead: "Aucun programme ne réunit tout cela.",
     relaxedWidened: (fields) => `Les plus proches, en élargissant : ${fields}.`,
     relaxedClosest: "Voici les plus proches.",
@@ -199,9 +205,11 @@ export const searchCopy: Copy<SearchCopy> = {
     programmesTitle: "المشاريع",
     allProgrammes: "جميع المشاريع",
     pagesTitle: "صفحات",
-    understood: "فهمنا",
+    understood: "معاييركم",
     criteria: "المعايير",
     removeChip: (label) => `حذف «${label}»`,
+    aiMark: "ذكاء اصطناعي",
+    aiTitle: "مقترح من الذكاء الاصطناعي",
     relaxedLead: "لا يوجد مشروع يجمع كل هذه الشروط.",
     relaxedWidened: (fields) => `أقرب الاقتراحات بعد توسيع: ${fields}.`,
     relaxedClosest: "إليكم أقرب الاقتراحات.",
@@ -251,8 +259,9 @@ export const searchCopy: Copy<SearchCopy> = {
     filterMonthly: "القسط الشهري",
     bedroomsChip: (n, formatted) =>
       n === 1 ? "غرفة فأكثر" : n === 2 ? "غرفتان فأكثر" : `${formatted} غرف فأكثر`,
-    priceChip: (formatted) => `≤ ${formatted} درهم`,
-    monthlyChip: (formatted) => `≤ ${formatted} درهم شهرياً`,
+    // Words, not "≤": mirrored in RTL it reads as "≥" to a reader used to French notation.
+    priceChip: (formatted) => `حتى ${formatted} درهم`,
+    monthlyChip: (formatted) => `حتى ${formatted} درهم شهرياً`,
     regions: {
       "casablanca-settat": "جهة الدار البيضاء-سطات",
       "rabat-sale-kenitra": "جهة الرباط-سلا-القنيطرة",

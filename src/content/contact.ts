@@ -95,9 +95,6 @@ type ContactCopy = {
     lead: string;
     phoneLabel: string;
     phoneAbroad: string;
-    hqLabel: string;
-    modesLabel: string;
-    modes: Record<MeetingMode, string>;
     photoCaption: string;
   };
   visit: {
@@ -108,8 +105,6 @@ type ContactCopy = {
     phone: string;
     group: string;
     hq: string;
-    call: string;
-    book: string;
   };
   data: {
     eyebrow: string;
@@ -138,9 +133,6 @@ export const contact: Copy<ContactCopy> = {
       lead: "Un conseiller commercial répond à vos questions sur nos programmes, leurs prix et leur financement. Sans engagement.",
       phoneLabel: "Par téléphone",
       phoneAbroad: "Depuis l'étranger",
-      hqLabel: "Siège",
-      modesLabel: "Trois façons de nous rencontrer",
-      modes: { agence: "En agence", telephone: "Par téléphone", visio: "En visioconférence" },
       photoCaption: "Riad Garden I, Marrakech — photographie d'un programme livré",
     },
     visit: {
@@ -151,8 +143,6 @@ export const contact: Copy<ContactCopy> = {
       phone: "Téléphone",
       group: "Groupe",
       hq: "Siège",
-      call: "Nous appeler",
-      book: "Prendre rendez-vous",
     },
     data: {
       eyebrow: "Loi n° 09-08",
@@ -271,9 +261,6 @@ export const contact: Copy<ContactCopy> = {
       lead: "يجيب مستشار تجاري عن أسئلتكم حول مشاريعنا وأسعارها وتمويلها. دون أي التزام.",
       phoneLabel: "عبر الهاتف",
       phoneAbroad: "من خارج المغرب",
-      hqLabel: "المقر الرئيسي",
-      modesLabel: "ثلاث طرق للقائنا",
-      modes: { agence: "في الوكالة", telephone: "عبر الهاتف", visio: "عبر الفيديو" },
       photoCaption: "رياض غاردن 1، مراكش — صورة لمشروع تم تسليمه",
     },
     visit: {
@@ -284,8 +271,6 @@ export const contact: Copy<ContactCopy> = {
       phone: "الهاتف",
       group: "المجموعة",
       hq: "المقر",
-      call: "اتصلوا بنا",
-      book: "حجز موعد",
     },
     data: {
       eyebrow: `القانون رقم ${L("09-08")}`,

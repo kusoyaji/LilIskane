@@ -1,7 +1,7 @@
 import type { Copy } from "./shared";
 
 /**
- * Copy for the end of the home page: the budget finder and the services grid.
+ * Copy for the budget finder, the home's third way into the search.
  *
  * Nothing here states a figure about the company. The only numbers are the
  * simulator's own assumptions, which come from `CREDIT_DEFAULTS` in
@@ -31,6 +31,10 @@ export type BudgetCopy = {
   /** 11 and over. */
   countMany: string;
   countOf: string;
+  /** `{total}` = what the current search finds, budget aside. */
+  countOfSearch: string;
+  /** The results chip the finder sets: `{price}` = its ceiling, `{monthly}` = the payment. */
+  chip: string;
   scaleLabel: string;
   scaleYou: string;
   bestMatches: string;
@@ -45,8 +49,6 @@ export type BudgetCopy = {
   disclaimer: string;
   /** `{rate}`, `{ins}` are filled from CREDIT_DEFAULTS. */
   basis: string;
-  sliderMinLabel: string;
-  sliderMaxLabel: string;
 };
 
 export const budgetCopy: Copy<BudgetCopy> = {
@@ -70,6 +72,8 @@ export const budgetCopy: Copy<BudgetCopy> = {
     countFew: "programmes à votre portée",
     countMany: "programmes à votre portée",
     countOf: "sur {total}",
+    countOfSearch: "sur {total} pour votre recherche",
+    chip: "≤ {price} DH · {monthly} DH/mois",
     scaleLabel: "Les programmes, du plus accessible au plus haut",
     scaleYou: "Votre plafond",
     bestMatches: "Les plus proches de votre budget",
@@ -84,8 +88,6 @@ export const budgetCopy: Copy<BudgetCopy> = {
     disclaimer:
       "Simulation indicative, sans valeur d'offre de crédit. Les conditions réelles dépendent de votre banque et de votre dossier. Visuels marqués « Rendu » : images non contractuelles.",
     basis: "Base de calcul : taux {rate} %, assurance {ins} % par an incluse.",
-    sliderMinLabel: "2 000",
-    sliderMaxLabel: "20 000",
   },
   ar: {
     eyebrow: "ميزانيتكم",
@@ -107,6 +109,8 @@ export const budgetCopy: Copy<BudgetCopy> = {
     countFew: "مشاريع في متناولكم",
     countMany: "مشروعاً في متناولكم",
     countOf: "من أصل {total}",
+    countOfSearch: "من أصل {total} حسب بحثكم",
+    chip: "حتى {price} درهم · {monthly} درهم شهرياً",
     scaleLabel: "المشاريع، من الأقل ثمناً إلى الأعلى",
     scaleYou: "سقفكم",
     bestMatches: "الأقرب إلى ميزانيتكم",
@@ -121,115 +125,5 @@ export const budgetCopy: Copy<BudgetCopy> = {
     disclaimer:
       "محاكاة إرشادية لا تُعدّ عرض قرض. تتوقف الشروط الفعلية على بنككم وملفكم. الصور المعلَّمة «تصوّر»: صور غير تعاقدية.",
     basis: "أساس الحساب: نسبة فائدة {rate}٪، مع احتساب تأمين {ins}٪ سنوياً.",
-    sliderMinLabel: "2 000",
-    sliderMaxLabel: "20 000",
-  },
-};
-
-export type ServiceEntry = {
-  title: string;
-  body: string;
-  action: string;
-  caption?: string;
-};
-
-export type ServicesCopy = {
-  eyebrow: string;
-  title: string;
-  lead: string;
-  guide: ServiceEntry;
-  /**
-   * The tile shows one worked example computed from the finder's defaults.
-   * `{deposit}` and `{years}` are filled at render time from `DEFAULT_DEPOSIT`
-   * and `CREDIT_DEFAULTS.years` — never typed in here.
-   */
-  simulator: ServiceEntry & {
-    example: string;
-    perMonth: string;
-    ceilingLabel: string;
-    currency: string;
-  };
-  tours: ServiceEntry;
-  visit: ServiceEntry;
-  guaranteesEyebrow: string;
-  guaranteesTitle: string;
-  guaranteesLead: string;
-  /** Unit after the big numeral, by number of years. */
-  unit: (years: number) => string;
-};
-
-export const servicesCopy: Copy<ServicesCopy> = {
-  fr: {
-    eyebrow: "Accompagnement",
-    title: "De la première visite à la remise des clés.",
-    lead:
-      "Acheter un logement est la décision d'une vie. À chaque étape, un outil précis ou un interlocuteur — jamais une impasse.",
-    guide: {
-      title: "Guide d'achat",
-      body: "Les étapes d'un achat sur plan, du choix du programme à la signature chez le notaire et au PV de livraison.",
-      action: "Lire le guide",
-      caption: "Riad Garden I, livré",
-    },
-    simulator: {
-      title: "Simulateur de crédit",
-      body: "Votre mensualité, votre apport, votre durée : une estimation du coût de votre crédit, poste par poste.",
-      action: "Simuler",
-      example: "Exemple : {deposit} DH d'apport, {years} ans",
-      perMonth: "DH / mois",
-      ceilingLabel: "Prix accessible, jusqu'à",
-      currency: "DH",
-    },
-    tours: {
-      title: "Visites virtuelles 360°",
-      body: "Parcourez depuis chez vous les appartements témoins de Riad Garden II, et celui de Riad Garden I, déjà livré.",
-      action: "Lancer une visite",
-      caption: "Appartement livré, Riad Garden I",
-    },
-    visit: {
-      title: "Prendre rendez-vous",
-      body: "Un conseiller vous reçoit en agence ou à distance, et vous fait visiter l'appartement témoin.",
-      action: "Choisir un créneau",
-      caption: "Riad Garden I, livré",
-    },
-    guaranteesEyebrow: "Après la livraison",
-    guaranteesTitle: "Trois garanties vous couvrent.",
-    guaranteesLead: "Les garanties légales qui accompagnent chaque logement remis.",
-    unit: (years) => (years > 1 ? "ans" : "an"),
-  },
-  ar: {
-    eyebrow: "المواكبة",
-    title: "من الزيارة الأولى إلى تسليم المفاتيح.",
-    lead: "شراء مسكن قرار العمر. في كل مرحلة أداة دقيقة أو محاور مختص — لا طريق مسدود أبداً.",
-    guide: {
-      title: "دليل الشراء",
-      body: "مراحل الشراء على التصميم، من اختيار المشروع إلى التوقيع لدى الموثق ومحضر التسليم.",
-      action: "قراءة الدليل",
-      caption: "رياض غاردن 1، مُسلَّم",
-    },
-    simulator: {
-      title: "محاكي القرض",
-      body: "مبلغ القسط والمساهمة والمدة: تقدير لكلفة قرضكم، بنداً ببند.",
-      action: "إجراء المحاكاة",
-      example: "مثال: مساهمة شخصية {deposit} درهم، {years} سنة",
-      perMonth: "درهم في الشهر",
-      ceilingLabel: "الثمن الممكن، حتى",
-      currency: "درهم",
-    },
-    tours: {
-      title: "زيارات افتراضية 360°",
-      body: "تجوّلوا من بيوتكم داخل الشقق النموذجية لرياض غاردن 2، وشقة رياض غاردن 1 المُسلَّم.",
-      action: "بدء الزيارة",
-      caption: "شقة مُسلَّمة، رياض غاردن 1",
-    },
-    visit: {
-      title: "حجز موعد",
-      body: "يستقبلكم مستشار في الوكالة أو عن بُعد، ويرافقكم لزيارة الشقة النموذجية.",
-      action: "اختيار موعد",
-      caption: "رياض غاردن 1، مُسلَّم",
-    },
-    guaranteesEyebrow: "بعد التسليم",
-    guaranteesTitle: "ثلاثة ضمانات تحميكم.",
-    guaranteesLead: "الضمانات القانونية التي ترافق كل مسكن يتم تسليمه.",
-    unit: (years) => (years === 1 ? "سنة" : years === 2 ? "سنتان" : "سنوات"),
   },
 };

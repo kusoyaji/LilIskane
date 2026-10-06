@@ -75,9 +75,10 @@ function shownElsewhere(project: Project): string[] {
 }
 
 /**
- * Three programmes worth seeing next: same city first, then the same
- * standing, then the closest price — so a buyer looking at a 485 000 DH flat
- * is not sent to a 2.4 M DH one.
+ * Three programmes worth seeing next, among those the page does not already
+ * link (`exclude`: the sibling phase and the rest of the city): same city
+ * first when any is left, then the same standing, then the closest price — so
+ * a buyer looking at a 485 000 DH flat is not sent to a 2.4 M DH one.
  */
 function relatedTo(project: Project, exclude: Set<string>): Project[] {
   const price = effectiveTotal(project.price);
@@ -121,8 +122,18 @@ export default async function ProjectPage({
   const t = getDictionary(typedLocale);
   const c = projectCopy[typedLocale];
   const sibling = siblingOf(project);
+
+  // Each other programme is linked once per page: the sibling phase has its
+  // card in the overview, the rest of the city is listed under the map, and
+  // "À voir aussi" looks further afield instead of repeating either.
+  const sameCityProjects = projects.filter(
+    (p) => p.cityId === project.cityId && p.slug !== project.slug && p.slug !== sibling?.project.slug,
+  );
   const related = toListItems(
-    relatedTo(project, new Set(sibling ? [sibling.project.slug] : [])),
+    relatedTo(
+      project,
+      new Set([...(sibling ? [sibling.project.slug] : []), ...sameCityProjects.map((p) => p.slug)]),
+    ),
     typedLocale,
   );
 
@@ -132,9 +143,7 @@ export default async function ProjectPage({
     .filter((city) => city !== undefined)
     .map((city) => ({ id: city.id, lat: city.lat, lng: city.lng }));
 
-  const sameCity = projects
-    .filter((p) => p.cityId === project.cityId && p.slug !== project.slug)
-    .map((p) => ({
+  const sameCity = sameCityProjects.map((p) => ({
       slug: p.slug,
       name: p.name[typedLocale],
       status: p.readyNow

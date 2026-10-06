@@ -9,7 +9,12 @@ import { cityById } from "@/data/cities";
 import { formatNumber, isolateRun, type Locale } from "@/i18n/config";
 import { parseQuery, searchDocs, toProjetsHref, type ParsedQuery, type SearchDoc } from "@/lib/search";
 import { namedProgramme } from "@/lib/search/rank";
+import { answerProgramme, projetsQuery } from "@/lib/search/ai/apply";
+import { aiCopy } from "@/lib/search/ai/copy";
+import { isAiWorthy } from "@/lib/search/ai/worthy";
+import { AiAnswerCard } from "@/components/search-concierge/AiAnswerCard";
 import { loadIndex } from "@/components/search-concierge/index-cache";
+import { fetchAiAnswer, useAiSearch } from "@/components/search-concierge/useAiSearch";
 import {
   EMPTY_EXTRA,
   hasConstraint,
@@ -74,6 +79,13 @@ export function SmartQuery({ locale }: { locale: Locale }) {
   // travel in the /projets URL, so the programmes it matched are offered here.
   const named =
     outcome?.exact && parsed.text.length > 0 && !opens ? outcome.hits.filter((h) => h.score >= 1).slice(0, 4) : [];
+
+  // The concierge reads the same sentence (Gemini, server-side) once the
+  // visitor pauses; its one-line answer shows under the chips. The instant
+  // parse above never waits for it.
+  const ai = useAiSearch({ raw: deferredRaw, locale, instant: outcome });
+  const answer = ai.forQuery === deferredRaw && deferredRaw.trim() !== "" ? ai.answer : null;
+  const [asking, setAsking] = useState(false);
 
   /* -------------------------------------------------------------- chips ---- */
   const chips: Chip[] = useMemo(() => {
@@ -151,6 +163,28 @@ export function SmartQuery({ locale }: { locale: Locale }) {
       router.push(`/${locale}/projets/${programme.slug}`);
       return;
     }
+    // A sentence worth reading: ask the concierge first (≤ 6 s, usually already
+    // answered while the visitor paused), then go where its answer points —
+    // the one programme it is about, or /projets with its filters. If it
+    // cannot answer, the instant parse below decides, as before.
+    if (index && isAiWorthy(raw, query, searchDocs(index, query))) {
+      setAsking(true);
+      const reply = await fetchAiAnswer(raw, locale, { timeoutMs: 6000 });
+      setAsking(false);
+      if (reply) {
+        const slug = answerProgramme(reply);
+        if (slug) {
+          router.push(`/${locale}/projets/${slug}`);
+          return;
+        }
+        const refined = projetsQuery(query, reply, index);
+        if (hasStructured(refined)) {
+          scrollAfter.current = true;
+          startTransition(() => router.push(toProjetsHref(refined, locale), { scroll: false }));
+          return;
+        }
+      }
+    }
     if (!hasStructured(query)) {
       // Only words the URL cannot carry ("Riad Garden", "Tassila"): the
       // programmes they matched are the answer, so go to them, not to an
@@ -179,7 +213,7 @@ export function SmartQuery({ locale }: { locale: Locale }) {
   }
 
   return (
-    <form role="search" className={s.smart} onSubmit={submit} aria-busy={pending || undefined}>
+    <form role="search" className={s.smart} onSubmit={submit} aria-busy={pending || asking || undefined}>
       <label htmlFor={inputId} className="u-visually-hidden">
         {c.smartLabel}
       </label>
@@ -204,11 +238,19 @@ export function SmartQuery({ locale }: { locale: Locale }) {
           onPointerEnter={warm}
           aria-describedby={statusId}
         />
-        <button type="submit" className={`u-press ${s.smartSubmit}`} disabled={pending}>
+        <button type="submit" className={`u-press ${s.smartSubmit}`} disabled={pending || asking}>
           <span className={s.smartSubmitText}>{opens ? c.smartOpen(opens.name[locale]) : c.smartSubmit}</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden className={s.smartArrow}>
-            <path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          {asking ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden className={s.smartSpinner}>
+              <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeOpacity="0.28" />
+              <path d="M12 3.5a8.5 8.5 0 0 1 8.5 8.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+            </svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden className={s.smartArrow}>
+              <path d="M5 12h13M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          )}
+          {asking && <span className="u-visually-hidden">{aiCopy[locale].submitting}</span>}
         </button>
       </div>
 
@@ -272,6 +314,20 @@ export function SmartQuery({ locale }: { locale: Locale }) {
         <p id={statusId} className={`u-numeric ${s.smartStatus}`} aria-live="polite">
           {status}
         </p>
+
+        {raw.trim() !== "" && ai.state !== "idle" && (
+          <AiAnswerCard
+            locale={locale}
+            state={ai.state}
+            answer={answer}
+            compact
+            onQuery={(text) => {
+              setRaw(text);
+              warm();
+              inputRef.current?.focus();
+            }}
+          />
+        )}
       </div>
     </form>
   );

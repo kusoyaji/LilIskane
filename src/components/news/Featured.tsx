@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { Figure } from "@/components/media/Figure";
-import { Arrow, LinkButton } from "@/components/v2";
+import { LinkButton } from "@/components/v2";
 import { getCity } from "@/data/cities";
 import type { Project } from "@/data/types";
 import { news } from "@/content/news";
@@ -11,11 +10,12 @@ import s from "./news.module.css";
 /**
  * The lead story: the programme being launched, as large as the page allows.
  *
- * The render is labelled as a render. Beneath the facts sits the one piece of
- * evidence a launch can offer — the earlier phase, photographed after
- * delivery — so the lead story carries its own proof.
+ * The render is labelled as a render, and nothing else sits on it. A card for
+ * the delivered first phase used to cover its lower corner; it repeated the
+ * summary's last sentence ("la première tranche … est déjà livrée"), and the
+ * programme page links that phase with its photograph.
  */
-export function Featured({ locale, project, previous }: { locale: Locale; project: Project; previous?: Project }) {
+export function Featured({ locale, project }: { locale: Locale; project: Project }) {
   const t = news[locale];
   const city = getCity(project.cityId).name[locale];
 
@@ -48,21 +48,6 @@ export function Featured({ locale, project, previous }: { locale: Locale; projec
             </span>
             {project.hero.nature === "render" && <span className={`${s.note} ${s.featNoteTop}`}>{t.renderNote}</span>}
           </div>
-          {previous && previous.readyNow && (
-            <div className={`u-enter ${s.previous}`}>
-              <div className={s.prevThumb}>
-                <Figure ref_={previous.hero} locale={locale} sizes="112px" className="h-full w-full object-cover" />
-              </div>
-              <div>
-                <span className={`u-eyebrow ${s.prevTag}`}>{t.photoNote}</span>
-                <p className={s.prevText}>{t.previousPhase(previous.name[locale])}</p>
-                <Link href={`/${locale}/projets/${previous.slug}`} className={s.prevLink}>
-                  <span>{t.seePrevious(previous.name[locale])}</span>
-                  <Arrow />
-                </Link>
-              </div>
-            </div>
-          )}
         </div>
 
         <div className={s.featText}>

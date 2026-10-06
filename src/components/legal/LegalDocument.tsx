@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Arrow, CtaBand, LinkButton, PageHero } from "@/components/v2";
+import { Arrow, LinkButton, PageHero } from "@/components/v2";
 import { company } from "@/data/company";
 import { legalChrome, legalDocs, legalHref, type LegalBlock, type LegalPage } from "@/content/legal";
 import { isolateRun, type Locale } from "@/i18n/config";
@@ -97,13 +97,9 @@ export function LegalDocument({ locale, page }: { locale: Locale; page: LegalPag
           </div>
         </section>
       </div>
-
-      {/* Paper, not ink: the band is an opaque photograph, so its ground is
-          never seen — an ink tone would only darken the page a screen early,
-          under the last lines of text. */}
-      <div data-tone="paper">
-        <CtaBand locale={locale} />
-      </div>
+      {/* No closing band: the block above already gives the phone number and
+          the way to the contact page, and a second "Prendre rendez-vous /
+          Nous appeler" straight after it said the same thing twice. */}
     </>
   );
 }

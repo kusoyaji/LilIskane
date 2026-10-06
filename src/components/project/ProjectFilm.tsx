@@ -31,6 +31,7 @@ export function ProjectFilm({ locale, project, film }: { locale: Locale; project
           title={film.title[locale]}
           poster={film.poster ?? project.hero}
           caption={`${film.title[locale]} · ${c.source}`}
+          sizes="(min-width: 96rem) 90rem, 92vw"
         />
       </div>
     </section>

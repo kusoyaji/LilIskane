@@ -6,7 +6,8 @@ import type { Project } from "@/data/types";
 import { formatNumber, type Locale } from "@/i18n/config";
 import { formatPrice, statusLabel } from "@/lib/format";
 import { shared } from "@/content/shared";
-import { fill, mapCopy, programmeCount, segmentLabels } from "@/content/home-portfolio";
+import { fill, mapCopy, segmentLabels } from "@/content/home-portfolio";
+import { MAP_ID } from "@/components/home-search/ids";
 import { MapExplorer, type MapCity, type MapDot } from "./map/MapExplorer";
 import s from "./map/Map.module.css";
 
@@ -73,6 +74,8 @@ const PHONE_LABEL_SIDE: Record<string, MapDot["side"]> = {
   mohammedia: "n",
   "sidi-rahal": "e",
   "had-soualem": "ne",
+  // Below its pin, the label would land on the loupe caption ("Axe Rabat – Casablanca").
+  agadir: "e",
 };
 
 /**
@@ -220,8 +223,6 @@ export function MapSection({ locale }: { locale: Locale }) {
         phoneSide: PHONE_LABEL_SIDE[id] ?? LABEL_SIDE[id] ?? "e",
         labelled: true,
         count: list.length,
-        countLabel: programmeCount(list.length, locale, fmt),
-        countFigure: fmt(list.length),
         programmes: list.map((p) => programmeItem(p, locale)),
       };
     });
@@ -284,7 +285,7 @@ export function MapSection({ locale }: { locale: Locale }) {
   );
 
   return (
-    <section className={s.section} aria-labelledby="map-title">
+    <section id={MAP_ID} className={s.section} aria-labelledby="map-title">
       <div className={`u-shell ${s.grid}`}>
         <MapExplorer
           locale={locale}
@@ -302,7 +303,6 @@ export function MapSection({ locale }: { locale: Locale }) {
             legendCity: t.legendCity,
             seeAll: t.seeAll,
           }}
-          allHref={`/${locale}/projets`}
           intro={
             <div key="intro" className={s.intro}>
               <p className="u-eyebrow u-enter" style={{ color: "var(--color-ochre-deep)" }}>

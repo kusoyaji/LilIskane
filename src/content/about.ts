@@ -27,7 +27,6 @@ const fr = build("fr");
 const ar = build("ar");
 
 type Item = { title: string; note: string };
-type Seal = { mark: string; meta: string; title: string; body: string };
 
 export const about: Copy<{
   metaTitle: string;
@@ -50,12 +49,17 @@ export const about: Copy<{
     title: string;
     /** One-word chapter per milestone, keyed by year. Our framing, not a fact. */
     chapters: Record<number, string>;
+    /**
+     * A sentence appended to a milestone's own text, keyed by year. Holds what
+     * the former "Certifications & distinctions" block said that the ten dates
+     * did not (that block otherwise repeated 2003, 2005 and 2025 word for word).
+     */
+    addenda: Record<number, string>;
     jump: string;
     of: string;
   };
   next: { eyebrow: string; title: string; body: string; cta: string; renderNote: string };
   values: { eyebrow: string; title: string; lead: string; caption: string };
-  seals: { eyebrow: string; title: string; lead: string; items: Seal[] };
   guarantees: {
     eyebrow: string;
     title: string;
@@ -114,6 +118,9 @@ export const about: Copy<{
         2024: "Accession",
         2025: "Environnement",
       },
+      addenda: {
+        [company.isoSince]: `En ${fr.iso2015}, le système est aligné sur la version ISO 9001:2015.`,
+      },
       jump: "Aller à l'année",
       of: "sur",
     },
@@ -129,31 +136,6 @@ export const about: Copy<{
       title: "Quatre valeurs, depuis la création.",
       lead: "Elles orientent nos décisions au quotidien et forment le socle commun de toutes nos équipes.",
       caption: "Riad Garden I · chambre et salle d'eau d'un appartement livré",
-    },
-    seals: {
-      eyebrow: "Certifications & distinctions",
-      title: "La qualité n'est pas une promesse. C'est une démarche.",
-      lead: "Structurée, mesurée, pilotée dans la durée — et reconnue par des tiers.",
-      items: [
-        {
-          mark: "ISO 9001",
-          meta: `AFNOR · depuis ${fr.iso}`,
-          title: "Management de la qualité",
-          body: `Certifiée par AFNOR (France) sur l'ensemble de ses activités depuis ${fr.iso}, parmi les premiers promoteurs certifiés au Maroc. En ${fr.iso2015}, le système est aligné sur la version ISO 9001:2015 : analyse du contexte, gestion des risques et opportunités, implication de toutes les équipes.`,
-        },
-        {
-          mark: "1er Prix",
-          meta: `Le Caire · ${fr.prize}`,
-          title: "Ligue Arabe de l'Habitat",
-          body: `Décerné par le Conseil des Ministres Arabes de l'Habitat pour le programme novateur de la ville nouvelle d'Essaouira El Jadida : ${fr.units} unités.`,
-        },
-        {
-          mark: "HQE",
-          meta: "Témara · 2025",
-          title: "Résidence Beethoven",
-          body: "Label HQE, niveau Exceptionnel : la qualité environnementale et la performance énergétique du programme, reconnues sur l'ensemble de son cycle de vie.",
-        },
-      ],
     },
     guarantees: {
       eyebrow: "Garanties & durabilité",
@@ -212,6 +194,9 @@ export const about: Copy<{
         2024: "الولوج إلى الملكية",
         2025: "البيئة",
       },
+      addenda: {
+        [company.isoSince]: `وفي ${ar.iso2015}، تمت ملاءمة النظام مع صيغة ISO 9001:2015.`,
+      },
       jump: "الانتقال إلى سنة",
       of: "من",
     },
@@ -227,31 +212,6 @@ export const about: Copy<{
       title: "أربع قيم، منذ التأسيس.",
       lead: "توجّه قراراتنا اليومية، وتشكّل الأساس المشترك لكل فرقنا.",
       caption: "رياض غاردن 1 · غرفة نوم وحمّام في شقة مُسلَّمة",
-    },
-    seals: {
-      eyebrow: "الشهادات والتتويجات",
-      title: "الجودة ليست وعداً، بل منهج عمل.",
-      lead: "منهج منظَّم ومقيس ومتابَع على المدى الطويل — تعترف به جهات مستقلة.",
-      items: [
-        {
-          mark: "ISO 9001",
-          meta: `AFNOR · منذ ${ar.iso}`,
-          title: "نظام تدبير الجودة",
-          body: `حاصلة على شهادة AFNOR (فرنسا) لجميع أنشطتها منذ ${ar.iso}، ومن أوائل المنعشين العقاريين المعتمدين بالمغرب. وفي ${ar.iso2015}، مُلاءَمة النظام مع صيغة ISO 9001:2015: تحليل السياق، وتدبير المخاطر والفرص، وإشراك جميع الفرق.`,
-        },
-        {
-          mark: "الجائزة الأولى",
-          meta: `القاهرة · ${ar.prize}`,
-          title: "الجامعة العربية للإسكان",
-          body: `منحها مجلس وزراء الإسكان العرب عن البرنامج المبتكر لمدينة الصويرة الجديدة: ${ar.units} وحدة سكنية.`,
-        },
-        {
-          mark: "HQE",
-          meta: `تمارة · ${y(2025, "ar")}`,
-          title: "إقامة بيتهوفن",
-          body: "علامة HQE بمستوى استثنائي: اعتراف بالجودة البيئية والنجاعة الطاقية للمشروع على امتداد دورة حياته.",
-        },
-      ],
     },
     guarantees: {
       eyebrow: "الضمانات والاستدامة",
