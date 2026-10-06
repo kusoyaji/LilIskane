@@ -108,5 +108,5 @@ Présentation du 6 octobre 2026.
 
 ## Adresses
 
-- v2 : *à compléter après mise en ligne*
+- v2 : https://chaabi-lil-iskane-h1d6ki88g-leadpal.vercel.app (aperçu — accès réservé à l'équipe Vercel « leadpal » tant que la protection des aperçus est active)
 - v1 (conservée) : https://chaabi-lil-iskane-n5j4moov5-mehdis-projects-7fee69af.vercel.app
