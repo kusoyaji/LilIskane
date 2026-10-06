@@ -2,46 +2,41 @@
 
 Présentation du 6 octobre 2026.
 
-## Avant la réunion (10 minutes)
+## Avant la réunion (5 minutes)
 
-1. Ouvrir la page d'accueil sur l'ordinateur de présentation **une minute à l'avance**, puis recharger.
-   Le film d'ouverture pèse 9,9 Mo : une fois en cache, il répond instantanément au défilement.
+1. Ouvrir l'accueil sur l'ordinateur de présentation et recharger une fois.
 2. Plein écran (F11), zoom du navigateur à 100 %.
-3. Vérifier la connexion : les films (YouTube) et les visites 360° (Matterport) se chargent en
-   direct. Sans réseau, tout le reste fonctionne.
-4. Optionnel : la v1 dans un second onglet, pour comparer (URL en bas de page).
-5. **Ne pas envoyer le formulaire de contact sans le dire** : c'est une maquette, aucune demande n'est
+3. Vérifier la connexion : la recherche IA (Gemini), les films (YouTube) et les visites 360°
+   (Matterport) se chargent en direct. Sans réseau, la recherche instantanée fonctionne quand même.
+4. **Ne pas envoyer le formulaire de contact sans le dire** : c'est une maquette, aucune demande n'est
    transmise. La confirmation s'affiche normalement.
 
-## Le parcours (environ 12 minutes)
+## Le parcours (environ 10 minutes)
 
-1. **Accueil — le film.** Faire défiler lentement : *« Chaabi Lil Iskane depuis 1948 »* dans la rue,
-   puis la cour et le bassin, puis le salon. Le mouvement suit le défilement : on fait entrer
-   l'acheteur dans Riad Garden II avant qu'il existe.
-2. **L'héritage.** 1948, plus de 75 ans, 15 villes, 11 000 logements à Essaouira El Jadida,
-   ISO 9001 depuis 2005, le Prix de la Ligue Arabe de l'Habitat — *chaque chiffre vient de vos
-   propres pages*. La section se termine sur **votre film institutionnel** : *Lire le film*.
-3. **Riad Garden II.** Le programme phare : prix d'entrée, surfaces, les intérieurs pièce par
-   pièce, et la première tranche, déjà livrée, sur la même avenue.
-4. **« Le rendu, puis le réel. »** *Moment fort* : faire glisser le curseur en direct, du rendu de
-   Riad Garden II à la photographie de Riad Garden I livré. Changer de pièce avec les pastilles.
-5. **Le portefeuille.** Les **23 programmes** de votre site, avec vos propres mentions : *En cours de
-   construction*, *Livraison imminente*, *Livraison immédiate*, *En promotion · Remise 6 %*.
-   Le défilement devient horizontal ; filtrer par standing.
-6. **La carte du Maroc.** Cliquer Agadir ou Marrakech : la liste des programmes apparaît. Une seule
-   silhouette, Sahara compris, sans aucune frontière intérieure.
-7. **« Partez de ce que vous payez chaque mois. »** Bouger le curseur de mensualité, puis
-   *Voir les N programmes* : la page Projets s'ouvre déjà filtrée. Montrer le filtre
-   **Livraison immédiate** : les cinq programmes où l'on peut recevoir ses clés maintenant.
-8. **Une page programme récente** — Massylia (Agadir) ou Patio Verde (Mohammedia) : la galerie
-   (*Voir toutes les images*, flèches du clavier, ou balayage sur téléphone), le film du programme,
-   puis la visite 360° de l'appartement témoin.
-9. **Riad Garden II** : le film scrubé, une visite 360°, le simulateur de crédit, puis
-   *Prendre rendez-vous* — le formulaire arrive pré-rempli.
-10. **Passer en arabe** (bouton العربية) **sur la même page** : tout le site bascule en droite à
-    gauche, galerie et films compris, sans revenir à l'accueil.
-11. **À propos** : vos deux films (institutionnel, Essaouira El Jadida), puis la chronologie,
-    de 1948 au label HQE de 2025.
+1. **L'accueil est une page de recherche.** « Trouvez votre adresse. » — taper une phrase comme on
+   la dirait : *3 chambres à Agadir moins de 1,2 million*. Les filtres compris apparaissent en
+   puces, le compteur, les vignettes et les résultats suivent à chaque lettre.
+2. **Elle comprend votre langue et vos habitudes.** *près de Casablanca* devient « Région
+   Casablanca-Settat » (Mohammedia, Had Soualem, Sidi Rahal) ; *terrain 50 millions* se lit en
+   centimes (500 000 DH) ; en arabe : *شقة بمراكش مع مسبح* ; en darija : *bghit appart f Marrakech*.
+3. **Le concierge IA.** Appuyer sur Entrée après une vraie phrase (*je cherche pour ma famille près de
+   la plage, pas trop cher*) : une réponse d'une ligne, les programmes classés comme le ferait un
+   conseiller, et pour chacun ce qui correspond (✓) ou non (✕). Il ne peut proposer que vos 23
+   programmes et n'affiche aucun chiffre absent de vos fiches.
+4. **Sans taper.** Les sélecteurs Ville · Budget · Statut · Chambres, ou les idées
+   (*Livraison immédiate*, *Près de Casablanca*, *Terrains*).
+5. **La carte du Maroc** (la section que vous aimez) suit la recherche : cliquer une ville, puis
+   *Voir ces programmes*.
+6. **« Partez de ce que vous payez chaque mois. »** Bouger la mensualité, puis *Voir les N
+   programmes* : les résultats de la page se filtrent sur ce budget.
+7. **La recherche est partout** : le bouton *Rechercher* de l'en-tête (ou Ctrl K) depuis n'importe
+   quelle page ; sur la page Projets, la phrase remplit les filtres.
+8. **Une page programme** — Massylia (Agadir) ou Patio Verde (Mohammedia) : la galerie, le film du
+   programme, la visite 360° de l'appartement témoin.
+9. **Riad Garden II** : le film en 3D qui suit le défilement, une visite 360°, le simulateur de
+   crédit, puis *Prendre rendez-vous* — le formulaire arrive pré-rempli.
+10. **Passer en arabe** (bouton العربية) **sur la même page** : tout bascule en droite à gauche,
+    recherche comprise.
 
 ## Si la question vient — ce qui reste à valider avec Chaabi
 
@@ -92,6 +87,8 @@ Présentation du 6 octobre 2026.
 
 ## Ce qui a changé depuis la v1
 
+- **L'accueil est devenu une page de recherche** en langage naturel (français, arabe, darija), avec un
+  concierge IA qui ne peut proposer que vos programmes, la carte et le budget reliés à la recherche.
 - **Tout le contenu de votre site est repris** : 23 programmes (la v1 en montrait 14), 152 de vos
   photographies et rendus en galeries, 12 visites 360°, et vos films YouTube — sur les pages
   programme, sur l'accueil, À propos et Actualités.

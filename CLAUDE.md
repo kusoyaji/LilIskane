@@ -63,12 +63,35 @@ images — regenerate with the scratch generator rather than hand-reordering (th
 picture is deliberately never a gallery's lead tile). `coreRef()` narrows a gallery image to one
 `Figure` can draw.
 
-**Home** (`src/components/home-v2`) — scroll-scrubbed opening film (`Film`/`FilmScrub`, the
-AI camera move through Riad Garden II) → Heritage (ink; founding year as architecture, figures,
-key dates, the client's institutional film) → Flagship (Riad Garden II) → ProofCompare (render vs
-photograph slider, the "trust" device) → Showcase (pinned horizontal rail of all programmes) →
-MapSection (Morocco map with loupes) → BudgetFinder (monthly payment → /projets, shares
-`src/lib/credit.ts`) → Services → closing band.
+**Home = the search page** (client decision, 2026-10-06: "for real estate the home is a search
+page"). Search hero (`src/components/home-search`: one-line title, the concierge field + pickers,
+live count and thumbnails) → Résultats (all 23 `ProjectCard`s server-rendered, hidden/reordered on
+the client — no media manifest or card markup in the client bundle) → MapSection and BudgetFinder
+(`src/components/home-v2`, the two sections the client loves, kept as they look and wired into the
+same search) → footer. Nothing else belongs on the home. One `HomeSearchProvider`
+(`home-search/context.tsx`) holds the query; every tool writes into it, so the hero count, the
+results, the map and the budget always agree.
+
+**Concierge search** — natural-language search in French, Arabic (MSA + Darija) and
+transliterations. `src/lib/search` (node-importable — relative `.ts` imports only, no `@/`):
+`parse.ts` reads cities, administrative regions, bedrooms ("4 pièces" = 3 ch.), prices including
+the Moroccan centimes habit ("50 millions" = 500 000 DH), monthly budgets, standing, kinds,
+statuses, amenities, with character spans for every value; `rank.ts` filters/scores and relaxes
+least-important-first; `link.ts` maps a query to the /projets URL contract (`ville` list, `prix`,
+`type`, …); `docs.ts` builds the per-locale index served static at `/api/search/<locale>`.
+UIs share `search-concierge/query-state.ts` (typed text is the source of truth; removing a chip
+deletes the words that produced it). Entry points: the header pill / icon + Ctrl/⌘K + "/"
+(overlay, `search-concierge/`), the home hero, the /projets hero (`search/SmartQuery.tsx`).
+Hundreds of parser/ranker tests — run `npm test` after any lexicon change.
+
+**AI layer (Google Gemini)** — `POST /api/search/ai` (`src/lib/search/ai/*`, `@google/genai`,
+interactions API, `store: false`). The instant engine always answers first; Gemini refines real
+sentences on Enter/pause. The catalogue is a stable system-instruction prefix (implicit caching);
+output is a JSON schema whose enums are generated from the data (only real programmes); the
+server validator drops any figure/status/amenity claim the data doesn't support, and row ticks are
+rendered from the data, never from model text. Rate limit, cache, timeout, silent fallback.
+**Needs `GEMINI_API_KEY`** (`.env.local` locally — git- and Vercel-ignored; Vercel env for prod);
+`GEMINI_MODEL` / `GEMINI_THINKING` override the model. Dev-only mock: header `x-search-mock: 1`.
 
 **Project page** (`/projets/[slug]`, one template for all 23) — hero → cinematic sequence
 (Riad Garden II only) → overview + "En bref" → gallery (spread + `GalleryLightbox`, a native
@@ -97,7 +120,11 @@ prefilled from `?projet=`), legal pages.
   the fiches; Jasmin exteriors may show Bougainvillier; Al Maamora lot sizes disagree within its
   own fiche; shared map pins; hi-res façades needed for Massylia, Jnane Souss, Al Yassamine,
   Assalam; no Amaïa interiors).
-- **Video pipeline**: only clip 1 of the camera move exists. Clips 2–3 — `VIDEO-PROMPTS.md`.
+- **Video pipeline**: only clip 1 of the camera move exists (used on the Riad Garden II page,
+  no longer on the home). Clips 2–3 — `VIDEO-PROMPTS.md`.
+- **Deploys**: the Vercel project is `leadpal/chaabi-lil-iskane`, connected to
+  github.com/kusoyaji/LilIskane — **every push to `main` deploys production**
+  (https://chaabi-lil-iskane.vercel.app). Preview URLs sit behind Vercel Authentication.
 - **Route exit animation**: only enter exists (needs View Transitions or a motion library).
 - **Only Riad Garden II has plans, a proof set and a camera move.** Every other programme has the
   client's photographs, film and tour where they exist, and nothing invented beyond them.
