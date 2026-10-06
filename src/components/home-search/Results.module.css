@@ -6,6 +6,12 @@
   position: relative;
   padding-block: clamp(2.25rem, 6vh, 4rem) clamp(4.5rem, 11vh, 7.5rem);
   color: var(--color-ink);
+  /* Nothing in the answer paints past its own section (a card lifted out
+     to fade can never cover the map). clip, not hidden: no scroll
+     container, so the bar still sticks; the margin keeps a card's hover
+     lift and shadow. */
+  overflow: clip;
+  overflow-clip-margin: 24px;
 }
 
 /* --------------------------------------------------------------- the bar -- */
@@ -51,6 +57,21 @@
   font-size: 0.55em;
   color: var(--color-ochre-deep);
 }
+.titleText {
+  display: inline;
+}
+.titleTail {
+  display: inline-block;
+}
+/* The figure in "12 programmes": it rolls (Odometer) and, when a button
+   elsewhere on the page brings the visitor here, pulses once. */
+.titleFigure {
+  margin-inline-end: 0.22em;
+  transform-origin: center 70%;
+}
+:global([lang="ar"]) .titleFigure {
+  margin-inline: 0 0.22em;
+}
 
 .tools {
   display: flex;
@@ -86,11 +107,30 @@
 }
 
 .sort {
+  position: relative;
+  isolation: isolate;
   display: inline-flex;
   gap: 0.25rem;
   padding: 0.25rem;
   border-radius: 999px;
   border: 1px solid color-mix(in oklab, var(--color-ink) 16%, transparent);
+}
+/* One ink thumb that slides from option to option (transform; placed by
+   ResultsClient from the pressed option's box). Until it is placed — no JS
+   yet — the pressed option paints its own ground. */
+.sortThumb {
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  top: 0;
+  border-radius: 999px;
+  background: var(--color-ink);
+  transform-origin: 0 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.sort[data-thumb] .sortThumb {
+  opacity: 1;
 }
 .sortOption {
   min-block-size: 2.25rem;
@@ -103,10 +143,19 @@
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
+  transition:
+    transform var(--dur-release) var(--ease-reveal),
+    color 200ms var(--ease-ui);
 }
 .sortOption[aria-pressed="true"] {
   background: var(--color-ink);
   color: var(--color-paper);
+}
+.sort[data-thumb] .sortOption[aria-pressed="true"] {
+  background: none;
+}
+.sortOption:active {
+  transition-duration: var(--dur-press);
 }
 .clearAll:focus-visible,
 .sortOption:focus-visible,
@@ -136,6 +185,7 @@
 }
 
 .grid {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: clamp(2.25rem, 4vw, 3.25rem) clamp(1.25rem, 2.5vw, 2.25rem);
@@ -162,18 +212,45 @@
 .item[hidden] {
   display: none;
 }
-/* A card arriving in the answer (shown again after being hidden) rises in;
-   one already shown only moves. Restarted by display:none → shown. */
+/* The answer changes (ResultsClient):
+   - a card that joins (shown again after being hidden) fades in with a
+     short stagger — restarted by display:none → shown;
+   - a card that stays glides to its new place (FLIP, transform, 260 ms);
+   - a card that leaves is lifted out of the grid where it stood and fades
+     and shrinks to 0.98 (120 ms, faster than the entry), then is hidden.
+   backwards, not both: once in, a card's transform belongs to the glide. */
 @media (prefers-reduced-motion: no-preference) {
   .item {
-    animation: card-in 320ms var(--ease-reveal) both;
-    animation-delay: calc(var(--i) * 35ms);
+    animation: card-in 280ms var(--ease-reveal) backwards;
+    animation-delay: calc(var(--i) * 30ms);
+  }
+  /* After the first paint, a card joining the answer waits for the ones
+     leaving to clear (out, then in — never names over names). */
+  .grid[data-settled] .item {
+    animation-duration: 260ms;
+    animation-delay: calc(80ms + var(--i) * 30ms);
   }
 }
 @keyframes card-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(6px);
+  }
+}
+.item[data-leaving] {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  animation: card-out 110ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+/* Leaving where it could not be seen: gone at once (ResultsClient). */
+.item[data-gone] {
+  display: none;
+}
+@keyframes card-out {
+  to {
+    opacity: 0;
+    transform: scale(0.98);
   }
 }
 .ticks {
@@ -271,5 +348,15 @@
   }
   .more {
     inline-size: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item[data-leaving] {
+    animation: none;
+    opacity: 0;
+  }
+  .sortOption {
+    transition: none;
   }
 }

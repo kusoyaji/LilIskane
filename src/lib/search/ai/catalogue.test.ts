@@ -43,6 +43,17 @@ test("catalogue: every programme, its slug, both names and its entry price", () 
   assert.doesNotMatch(text, /undefined|NaN|\[object Object\]/);
 });
 
+test("catalogue: lean prefix — French summary only, everything a buyer names still in both scripts", () => {
+  const text = buildCatalogue();
+  // The Arabic summaries are translations of the French ones (no figure of their own) and were
+  // ~1 900 tokens of the prefix; names, cities and neighbourhoods keep their Arabic forms.
+  assert.doesNotMatch(text, /^ملخص/m);
+  for (const p of projects) {
+    assert.ok(text.includes(`Résumé : ${p.summary.fr}`), `${p.slug} summary`);
+    assert.ok(text.includes(p.neighbourhood.ar), `${p.slug} neighbourhood (ar)`);
+  }
+});
+
 test("catalogue: states no delivery year (none is published)", () => {
   // Years like 2024–2030 must not appear: the data carries no delivery year.
   assert.doesNotMatch(buildCatalogue(), /\b20[2-3]\d\b/);

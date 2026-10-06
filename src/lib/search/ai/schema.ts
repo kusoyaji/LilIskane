@@ -2,7 +2,6 @@ import { z } from "zod";
 import {
   AI_AMENITIES,
   AI_CITY_IDS,
-  AI_CRITERIA,
   AI_KINDS,
   AI_REGION_IDS,
   AI_SEGMENTS,
@@ -25,19 +24,19 @@ import {
 
 const enumOf = (values: readonly string[]) => z.enum(values as [string, ...string[]]);
 
-const CRITERION = z.object({
-  key: enumOf(AI_CRITERIA).describe("Which of the visitor's criteria this is."),
-  ok: z.boolean().describe("Whether this programme meets it, according to the catalogue."),
-});
-
+/**
+ * A result is a slug and a fit — nothing more. The per-criterion ticks
+ * (AiResult.criteria) are computed by validate.ts from the DATA, and the UI
+ * only ever renders those: asking the model for them cost ~40 % of the output
+ * tokens (445 → 269 on average) and ~0.3–0.5 s per answer for nothing the
+ * visitor sees (benchmark of 2026-10-06). validate.ts still accepts and checks
+ * a `criteria` array if a model sends one.
+ */
 const RESULT = z.object({
   slug: enumOf(AI_SLUGS).describe("A programme slug from the catalogue."),
   fit: z
     .enum(["exact", "close"])
     .describe("exact: meets every criterion the visitor gave; close: misses at least one."),
-  // No .max() here: Gemini rejects (HTTP 400) a capped array nested in a capped
-  // array, measured 2026-10-06. validate.ts caps criteria at 8.
-  criteria: z.array(CRITERION).describe("The visitor's criteria, each checked against the catalogue (at most 8)."),
 });
 
 const FILTERS = z.object({

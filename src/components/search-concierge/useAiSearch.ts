@@ -26,10 +26,25 @@ import { isAiWorthy } from "@/lib/search/ai/worthy";
  */
 
 const DEBOUNCE_MS = 900;
-const CLIENT_TIMEOUT_MS = 15_000;
+/**
+ * How long the page waits for an answer: the server's Gemini budget (9.5 s,
+ * lib/search/ai/config.ts DEFAULT_BUDGET_MS) plus ~1.5 s for the round trip
+ * and validation. Past it the request is aborted and the state turns
+ * "unavailable" — the visitor keeps the instant results, nothing jumps under
+ * them later. (The server still caches an answer that completes, so asking
+ * the same thing again is instant.)
+ */
+export const AI_PATIENCE_MS = 11_000;
 
 type Entry = AiAnswer | "unavailable";
+/** Answers per normalised query + locale, for the page's life; oldest dropped past this many. */
+const MAX_ANSWERS = 200;
 const answers = new Map<string, Entry>();
+function remember(key: string, entry: Entry): void {
+  answers.delete(key);
+  answers.set(key, entry);
+  if (answers.size > MAX_ANSWERS) answers.delete(answers.keys().next().value!);
+}
 const inflight = new Map<string, { promise: Promise<AiAnswer | null>; controller: AbortController; waiters: number }>();
 let pausedUntil = 0;
 
@@ -70,7 +85,7 @@ function withTimeout(signal: AbortSignal, ms: number): { signal: AbortSignal; do
 async function request(raw: string, locale: Locale, key: string, signal: AbortSignal): Promise<AiAnswer | null> {
   const headers: Record<string, string> = { "content-type": "application/json" };
   if (mockRequested()) headers["x-search-mock"] = "1";
-  const limited = withTimeout(signal, CLIENT_TIMEOUT_MS);
+  const limited = withTimeout(signal, AI_PATIENCE_MS);
   let response: Response;
   try {
     response = await fetch("/api/search/ai", {
@@ -94,13 +109,13 @@ async function request(raw: string, locale: Locale, key: string, signal: AbortSi
   const failure = body && typeof body === "object" && "reason" in body ? (body as AiError) : null;
   if (response.ok && body && !failure) {
     const answer = body as AiAnswer;
-    answers.set(key, answer);
+    remember(key, answer);
     return answer;
   }
   const reason: AiError["reason"] = failure?.reason ?? "error";
   if (reason === "no-key") pausedUntil = Number.POSITIVE_INFINITY;
   else if (reason === "rate-limited") pausedUntil = Date.now() + 60_000;
-  else if (reason === "refusal" || reason === "invalid" || reason === "too-long") answers.set(key, "unavailable");
+  else if (reason === "refusal" || reason === "invalid" || reason === "too-long") remember(key, "unavailable");
   return null;
 }
 

@@ -2,12 +2,30 @@
   min-inline-size: 0;
 }
 
+/* Hover and keyboard focus are the same gesture here: the card lifts 4px
+   with a soft shadow under its picture (the shadow's opacity, never the
+   shadow itself, is what animates), the picture drifts in slowly (camera
+   timing), and the arrow beside the name travels in the reading direction. */
 .link {
+  position: relative;
   display: flex;
   flex-direction: column;
   block-size: 100%;
   color: inherit;
   text-decoration: none;
+  transition: transform 300ms var(--ease-reveal);
+}
+.link::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 0;
+  aspect-ratio: 4 / 3;
+  border-radius: 2px;
+  box-shadow: 0 22px 40px -20px rgb(28 30 20 / 0.5), 0 6px 14px -8px rgb(28 30 20 / 0.25);
+  opacity: 0;
+  transition: opacity 300ms var(--ease-reveal);
+  pointer-events: none;
 }
 
 .media {
@@ -20,12 +38,32 @@
   inline-size: 100%;
   block-size: 100%;
   object-fit: cover;
-  transition: transform 900ms var(--ease-camera);
+  transition: transform var(--dur-camera) var(--ease-camera);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .link:focus-visible .img,
+  .link:focus-visible .landPlan {
+    transform: scale(1.035);
+  }
+  .link:focus-visible {
+    transform: translateY(-4px);
+  }
+}
+.link:focus-visible::before {
+  opacity: 1;
 }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
   .link:hover .img,
   .link:hover .landPlan {
-    transform: scale(1.04);
+    transform: scale(1.035);
+  }
+  .link:hover {
+    transform: translateY(-4px);
+  }
+}
+@media (hover: hover) {
+  .link:hover::before {
+    opacity: 1;
   }
 }
 
@@ -41,7 +79,7 @@
 }
 .landPlan {
   inline-size: 58%;
-  transition: transform 900ms var(--ease-camera);
+  transition: transform var(--dur-camera) var(--ease-camera);
 }
 
 .status {
@@ -86,12 +124,56 @@
   line-height: 1.4;
 }
 
+.nameRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
 .name {
+  min-inline-size: 0;
   font-size: clamp(1.45rem, 2vw, 1.9rem);
+  transition: color 200ms var(--ease-ui);
+}
+.go {
+  flex: none;
+  align-self: center;
+  color: var(--color-ink-mute);
+  transition:
+    transform 240ms var(--ease-reveal),
+    color 200ms var(--ease-ui);
+}
+:global([dir="rtl"]) .go {
+  transform: scaleX(-1);
+}
+.link:focus-visible .name,
+.link:focus-visible .go {
+  color: var(--color-ochre-deep);
+}
+.link:focus-visible .go {
+  transform: translateX(4px);
+}
+:global([dir="rtl"]) .link:focus-visible .go {
+  transform: scaleX(-1) translateX(4px);
 }
 @media (hover: hover) {
-  .link:hover .name {
+  .link:hover .name,
+  .link:hover .go {
     color: var(--color-ochre-deep);
+  }
+  .link:hover .go {
+    transform: translateX(4px);
+  }
+  :global([dir="rtl"]) .link:hover .go {
+    transform: scaleX(-1) translateX(4px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .link,
+  .link::before,
+  .go,
+  .name {
+    transition: none;
   }
 }
 

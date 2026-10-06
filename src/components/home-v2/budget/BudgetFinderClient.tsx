@@ -149,8 +149,10 @@ export function BudgetFinderClient({
       ? `${formatNumber(p.amount, locale)} ${t.perSqm}`
       : `${formatNumber(p.amount, locale)} ${t.currency}`;
 
-  const ctaLabel =
-    linkCount === 1
+  // Relaxed (nothing within the ceiling): no count the results would not keep.
+  const ctaLabel = relaxed
+    ? t.ctaClosest
+    : linkCount === 1
       ? t.ctaOne
       : t.cta.replace("{n}", formatNumber(linkCount, locale));
   const listKey = top.map((p) => p.slug).join("|");

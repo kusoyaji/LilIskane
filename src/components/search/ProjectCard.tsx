@@ -72,7 +72,13 @@ export function ProjectCard({
           <p className={`u-eyebrow ${s.place}`}>
             {item.cityName} <span aria-hidden>·</span> {item.neighbourhood}
           </p>
-          <h3 className={`u-display-tight ${s.name}`}>{item.name}</h3>
+          <div className={s.nameRow}>
+            <h3 className={`u-display-tight ${s.name}`}>{item.name}</h3>
+            {/* "Voir": the whole card is the link; the arrow says so, and travels on hover / focus. */}
+            <svg className={s.go} width="18" height="18" viewBox="0 0 24 24" aria-hidden focusable="false">
+              <path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
 
           <div className={s.priceRow}>
             <p className={s.priceLabel}>{land ? c.perSqm : c.fromPrice}</p>

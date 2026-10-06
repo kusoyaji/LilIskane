@@ -9,6 +9,7 @@ import { homeSearchCopy } from "@/content/home-search";
 import { programmeCount } from "@/content/home-portfolio";
 import type { ResolvedMediaRef } from "@/data/types";
 import { formatNumber, type Locale } from "@/i18n/config";
+import { pulse } from "@/components/home-search/motion";
 import s from "./Map.module.css";
 
 export type MapDot = {
@@ -147,6 +148,22 @@ export function MapExplorer({
     }
     if (best) setActiveId(best);
   }, [answerKey, matched, activeId, cities]);
+
+  // A city whose figure changed with the answer pulses once (scale 1 → 1.2
+  // → 1, 300 ms, added onto whatever scale the pin already has), so the map
+  // visibly answers. Transform only, through the Web Animations API.
+  const discs = useRef(new Map<string, HTMLSpanElement>());
+  const countsKey = live.map((city) => `${city.id}:${city.n}`).join("|");
+  const lastCounts = useRef<Map<string, number> | null>(null);
+  useEffect(() => {
+    const before = lastCounts.current;
+    lastCounts.current = new Map(live.map((city) => [city.id, city.n]));
+    if (!before) return;
+    for (const city of live) {
+      if (before.get(city.id) !== city.n) pulse(discs.current.get(city.id), 1.2, 300);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countsKey]);
 
   // What the panel's button would show: the very pipeline the results run.
   const target = active ? search.preview({ city: active.id }) : null;
@@ -304,10 +321,20 @@ export function MapExplorer({
                 onPointerEnter={(e) => e.pointerType === "mouse" && setActiveId(city.id)}
                 onFocus={() => setActiveId(city.id)}
               >
-                <span className={s.pinDisc}>
+                <span
+                  className={s.pinDisc}
+                  ref={(el) => {
+                    if (el) discs.current.set(city.id, el);
+                    else discs.current.delete(city.id);
+                  }}
+                >
                   <span key={city.n} className={s.pinFigure}>
                     {fmt(city.n)}
                   </span>
+                  {/* The chosen city's ring is drawn around it (from the top, clockwise). */}
+                  <svg className={s.ring} viewBox="0 0 40 40" aria-hidden focusable="false">
+                    <circle cx="20" cy="20" r="19" pathLength={1} />
+                  </svg>
                 </span>
                 <span className={s.pinLabel} dir={dir}>
                   {city.name}

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { Locale } from "@/i18n/config";
 import { searchCopy } from "@/content/search";
 import { parseQuery, searchDocs, type ParsedQuery, type SearchDoc, type SearchOutcome } from "@/lib/search";
@@ -30,6 +30,7 @@ import {
 } from "@/components/search-concierge/query-state";
 import { useAiSearch } from "@/components/search-concierge/useAiSearch";
 import { MAP_ID, RESULTS_ID } from "./ids";
+import { keepInPlace, pulse } from "./motion";
 
 /**
  * The home's one search.
@@ -117,9 +118,23 @@ function scrollToSection(id: string, focusHeading: boolean) {
   requestAnimationFrame(() => requestAnimationFrame(() => scrollNow(id, focusHeading)));
 }
 
+/** A scroll to a section (showResults / showMap) is under way: it re-aims itself on landing. */
+let aiming = 0;
+export function isAiming(): boolean {
+  return aiming > 0;
+}
+
 function scrollNow(id: string, focusHeading: boolean) {
   const target = document.getElementById(id);
   if (!target) return;
+  aiming += 1;
+  let landed = false;
+  // A glide the visitor interrupts never "completes": stop counting it as ours anyway.
+  window.setTimeout(() => {
+    if (landed) return;
+    landed = true;
+    aiming = Math.max(0, aiming - 1);
+  }, 1800);
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const navH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-h")) * 16 || 72;
   const lenis = (window as Window & { __lenis?: Lenis }).__lenis;
@@ -131,12 +146,39 @@ function scrollNow(id: string, focusHeading: boolean) {
     if (lenis) lenis.scrollTo(window.scrollY + off, { immediate: true });
     else window.scrollTo({ top: window.scrollY + off, behavior: "instant" as ScrollBehavior });
   };
-  if (lenis && !reduced) lenis.scrollTo(target, { offset: -navH, duration: 1.1, onComplete: reaim });
+  // Landed: the results' count pulses once, so the eye finds the figure the
+  // button promised (the budget's "Voir les 17 programmes" → "17 programmes").
+  const land = () => {
+    if (landed) return;
+    landed = true;
+    aiming = Math.max(0, aiming - 1);
+    reaim();
+    if (focusHeading) pulse(target.querySelector("[data-results-count]"), 1.12, 320);
+  };
+  if (lenis && !reduced) lenis.scrollTo(target, { offset: -navH, duration: 1.1, onComplete: land });
   else {
     window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - navH, behavior: reduced ? "auto" : "smooth" });
-    window.setTimeout(reaim, reduced ? 50 : 900);
+    window.setTimeout(land, reduced ? 50 : 900);
   }
   if (focusHeading) target.querySelector<HTMLElement>("[data-results-heading], h2")?.focus({ preventScroll: true });
+}
+
+type Anchor = { el: Element; top: number; scrollY: number };
+
+/**
+ * The home's block (one of the grounds: hero, results, map, budget — or the
+ * footer) under the middle of the screen, with its place in the page.
+ */
+function pickAnchor(): Anchor | null {
+  const hero = document.querySelector("section[data-nav-media]");
+  const ground = hero?.parentElement;
+  const blocks = [...(ground?.parentElement?.children ?? []), ...document.querySelectorAll("footer")];
+  const mid = window.innerHeight / 2;
+  for (const el of blocks) {
+    const r = el.getBoundingClientRect();
+    if (r.top <= mid && r.bottom > mid) return { el, top: r.top + window.scrollY, scrollY: window.scrollY };
+  }
+  return null;
 }
 
 export function HomeSearchProvider({
@@ -208,6 +250,57 @@ export function HomeSearchProvider({
     },
     [raw, extra, parsed, docs, answer, dismissed],
   );
+
+  /* ----------------------------------------------------------- anchor ---- */
+  // The answer can change with no keystroke at all — the concierge lands
+  // seconds after the visitor stopped typing, by which time they may be on
+  // the results, the map, the budget or the footer. Every section reads this
+  // one search, so any of them above the reader can change height in that
+  // commit. This effect runs after all of theirs (a parent's layout effects
+  // run after its children's): it finds the block the reader had at the
+  // middle of the screen, sees how far it moved in the page, and moves the
+  // scroll by the same amount before anything is painted — what they are
+  // reading stays still (manual scroll anchoring; the native one is undone
+  // by the smooth-scroll's own writes). Our own scrolls to a section re-aim
+  // themselves instead.
+  //
+  // The browser's own scroll anchoring is switched off on this page: it
+  // would move the scroll for the same change during layout, and this effect
+  // would then add the same delta again (the page jumped by twice the change).
+  // The browser may also have clamped the scroll to the new, shorter page
+  // before this runs: the correction starts from the scroll the anchor was
+  // read at, unless a smoothed glide is legitimately moving it.
+  const anchor = useRef<Anchor | null>(null);
+  useLayoutEffect(() => {
+    const held = anchor.current;
+    if (held && held.el.isConnected && !isAiming()) {
+      const delta = held.el.getBoundingClientRect().top + window.scrollY - held.top;
+      if (Math.abs(delta) >= 1) keepInPlace(delta, held.scrollY);
+    }
+    anchor.current = pickAnchor();
+  });
+  useEffect(() => {
+    const html = document.documentElement;
+    const before = html.style.overflowAnchor;
+    html.style.overflowAnchor = "none";
+    return () => {
+      html.style.overflowAnchor = before;
+    };
+  }, []);
+  useEffect(() => {
+    let frame = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => (anchor.current = pickAnchor()));
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
 
   const value: HomeSearch = {
     locale,

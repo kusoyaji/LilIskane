@@ -49,7 +49,7 @@
   font-weight: 600;
   letter-spacing: 0.04em;
   line-height: 1;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 @media (min-width: 80rem) {
@@ -116,6 +116,34 @@
   }
 }
 
+/* Hover (and keyboard focus): the border brightens, the magnifier leans in
+   (scale + a slight turn), the shortcut hint comes forward. Transform and
+   opacity for what moves; ≤ 200 ms. The hint is never hidden at rest — it
+   is how people learn the shortcut — it only steps back. */
+.bar {
+  transition:
+    border-color 160ms var(--ease-ui),
+    background-color 160ms var(--ease-ui),
+    color var(--dur-release) var(--ease-reveal),
+    transform var(--dur-release) var(--ease-reveal);
+}
+.bar:active {
+  transition-duration: var(--dur-press);
+}
+.bar .glyph,
+.icon .glyph {
+  transition: transform 200ms var(--ease-reveal);
+}
+.kbd {
+  transition: opacity 160ms var(--ease-ui);
+}
+.bar:focus-visible .glyph,
+.icon:focus-visible .glyph {
+  transform: scale(1.12) rotate(-8deg);
+}
+.bar:focus-visible .kbd {
+  opacity: 0.95;
+}
 @media (hover: hover) {
   .bar:hover {
     border-color: var(--color-ink);
@@ -124,6 +152,21 @@
   .bar[data-light]:hover {
     border-color: var(--color-paper);
     background: color-mix(in oklab, var(--color-paper) 14%, transparent);
+  }
+  .bar:hover .glyph,
+  .icon:hover .glyph {
+    transform: scale(1.12) rotate(-8deg);
+  }
+  .bar:hover .kbd {
+    opacity: 0.95;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bar,
+  .bar .glyph,
+  .icon .glyph,
+  .kbd {
+    transition: none;
   }
 }
 

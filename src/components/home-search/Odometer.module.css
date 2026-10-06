@@ -1,0 +1,71 @@
+/* The rolling count. One line-box tall window per digit (1lh: it takes the
+   line-height of wherever it is set, so the hero's 0.82 figure and the
+   results heading's 0.9 keep their own rhythm); the reel inside moves by a
+   tenth of its height per digit. Transform only. */
+.odo {
+  position: relative;
+  display: inline-flex;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.digits {
+  display: inline-flex;
+}
+/* inline-flex, so the window's baseline is its first digit line (an
+   inline-block would take the reel's last line, "9", ten lines down);
+   clipped with clip-path, which — unlike overflow — leaves the baseline alone. */
+.col {
+  display: inline-flex;
+  align-items: flex-start;
+  block-size: 1lh;
+  clip-path: inset(-0.06em 0);
+}
+.reel {
+  display: flex;
+  flex-direction: column;
+  transition: transform 240ms var(--ease-reveal);
+}
+/* Each digit sits at the top of a taller box: 0.3em of air between one
+   digit and the next on the reel, so the end of a roll never shows a bar of
+   the neighbouring digit in the window. */
+.digit {
+  display: block;
+  block-size: calc(1lh + 0.3em);
+  text-align: center;
+}
+/* A digit that joins (9 → 10) fades in rather than rolling from nowhere. */
+.col[data-new] {
+  animation: odo-in 200ms var(--ease-reveal) 60ms backwards;
+}
+/* A digit that goes (23 → 2): lifted out of the flow where it stood
+   (Odometer sets its left), it fades up and out while the rest glide. */
+.gone {
+  position: absolute;
+  inset-block-start: 0;
+  display: inline-flex;
+  pointer-events: none;
+  animation: odo-out 140ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+@keyframes odo-out {
+  to {
+    opacity: 0;
+    transform: translateY(-0.15em);
+  }
+}
+@keyframes odo-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.2em);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reel {
+    transition: none;
+  }
+  .col[data-new] {
+    animation: none;
+  }
+  .gone {
+    display: none;
+  }
+}

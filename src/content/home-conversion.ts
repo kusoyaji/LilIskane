@@ -46,6 +46,8 @@ export type BudgetCopy = {
   /** `{n}` = count. */
   cta: string;
   ctaOne: string;
+  /** Nothing in reach: the button shows the closest matches, without a count it could not keep. */
+  ctaClosest: string;
   disclaimer: string;
   /** `{rate}`, `{ins}` are filled from CREDIT_DEFAULTS. */
   basis: string;
@@ -85,6 +87,7 @@ export const budgetCopy: Copy<BudgetCopy> = {
       "Aucun programme ne tient encore dans ce budget. Voici les plus accessibles — un apport plus élevé ou une durée plus longue les rapproche.",
     cta: "Voir les {n} programmes",
     ctaOne: "Voir le programme",
+    ctaClosest: "Voir les plus proches",
     disclaimer:
       "Simulation indicative, sans valeur d'offre de crédit. Les conditions réelles dépendent de votre banque et de votre dossier. Visuels marqués « Rendu » : images non contractuelles.",
     basis: "Base de calcul : taux {rate} %, assurance {ins} % par an incluse.",
@@ -122,6 +125,7 @@ export const budgetCopy: Copy<BudgetCopy> = {
       "لا يوجد بعد مشروع ضمن هذه الميزانية. إليكم الأقل ثمناً — مساهمة أكبر أو مدة أطول تقرّبكم منها.",
     cta: "عرض المشاريع ({n})",
     ctaOne: "عرض المشروع",
+    ctaClosest: "عرض الأقرب إلى ميزانيتكم",
     disclaimer:
       "محاكاة إرشادية لا تُعدّ عرض قرض. تتوقف الشروط الفعلية على بنككم وملفكم. الصور المعلَّمة «تصوّر»: صور غير تعاقدية.",
     basis: "أساس الحساب: نسبة فائدة {rate}٪، مع احتساب تأمين {ins}٪ سنوياً.",

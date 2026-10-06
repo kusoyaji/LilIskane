@@ -89,9 +89,16 @@ export function sanitizeFilters(v: unknown, vocab: Vocabulary): AiFilters {
   };
 }
 
-/** Strips URLs, markup and control characters; collapses spaces; caps at a word boundary. */
+/** A letter of any script but Latin and Arabic: the faster models occasionally slip one into an Arabic sentence. */
+const FOREIGN_LETTER = /(?![\p{Script=Latin}\p{Script=Arabic}])\p{L}/u;
+
+/**
+ * Strips URLs, markup and control characters; collapses spaces; caps at a word
+ * boundary. Text carrying letters of another script (a garbled word, e.g. Hebrew
+ * letters inside Arabic) is dropped whole.
+ */
 export function sanitizeText(v: unknown, max: number): string | null {
-  if (typeof v !== "string") return null;
+  if (typeof v !== "string" || FOREIGN_LETTER.test(v)) return null;
   let text = v
     // Bidi overrides and zero-width characters can reorder what is displayed (isolates are harmless).
     .replace(/[\u200b-\u200f\u202a-\u202e\ufeff]/g, "")

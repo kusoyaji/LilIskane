@@ -14,7 +14,8 @@ import { AI_AMENITIES, AI_CITY_IDS, AI_KINDS, AI_SEGMENTS, AI_SLUGS, AI_STATUSES
 
 /**
  * The catalogue the concierge reads: ONE text block describing all 23
- * programmes from src/data, in both languages, plus the rules a Moroccan
+ * programmes from src/data (names, places and labels in both languages; the
+ * descriptive summary in French only — see block()), plus the rules a Moroccan
  * buyer's sentence needs (regions, centimes, monthly payments, Darija).
  *
  * It is the prompt's stable prefix, sent first on every request so Gemini's
@@ -110,8 +111,10 @@ function block(p: Project): string {
   lines.push(`Équipements : ${p.amenities.length > 0 ? p.amenities.join(", ") : "aucun publié"}`);
   lines.push(`Visites 360° : ${p.tours.length} · Film : ${WITH_FILM.has(p.slug) ? "oui" : "non"}`);
   if (p.previousPhaseSlug) lines.push(`Phase précédente : ${p.previousPhaseSlug}`);
+  // FR summary only: the Arabic one is its translation (no figure or fact of its own — measured
+  // 2026-10-06), and dropping it cut the prefix from 11 668 to 9 740 tokens, still well over the
+  // 4 096-token implicit-cache floor. Names, cities and neighbourhoods stay bilingual above.
   lines.push(`Résumé : ${p.summary.fr}`);
-  lines.push(`ملخص : ${p.summary.ar}`);
   return lines.join("\n");
 }
 

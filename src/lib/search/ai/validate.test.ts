@@ -368,3 +368,12 @@ test("summary: two kinds of product in one sentence are not one impossible progr
     null,
   );
 });
+
+test("text with letters of another script is dropped whole (a garbled word from a fast model)", () => {
+  // Measured on gemini-3.5-flash-lite, 2026-10-06: Hebrew letters inside an Arabic sentence.
+  assert.equal(sanitizeText("נציترح عليكم مشاريعنا الاقتصادية بالقرب من الدار البيضاء.", 240), null);
+  assert.equal(sanitizeText("Résidence Привет à Agadir", 240), null);
+  assert.equal(sanitizeText("Massylia, à Agadir, dès 1 045 000 DH (80 à 96 m²).", 240), "Massylia, à Agadir, dès 1 045 000 DH (80 à 96 m²).");
+  assert.equal(sanitizeText("نقترح عليكم ماسيليا بأكادير ابتداءً من 1 045 000 درهم.", 240), "نقترح عليكم ماسيليا بأكادير ابتداءً من 1 045 000 درهم.");
+  assert.equal(sanitizeText("Océane · œuvre · Ça · L'Aïn", 240), "Océane · œuvre · Ça · L'Aïn");
+});

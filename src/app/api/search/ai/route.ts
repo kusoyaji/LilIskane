@@ -24,6 +24,7 @@ import { validateAnswer } from "@/lib/search/ai/validate";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// The Gemini budget is 9.5 s by default (lib/search/ai/config.ts, at most 25 s via GEMINI_TIMEOUT_MS).
 export const maxDuration = 30;
 
 const MAX_Q = 400;

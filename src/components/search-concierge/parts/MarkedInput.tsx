@@ -53,7 +53,10 @@ export function MarkedInput({
   }, [cycle, value, animated, placeholders.length]);
 
   const parts = useMemo(() => markParts(spansFor, spans), [spansFor, spans]);
-  const showMarks = spansFor === value && parts.some((part) => part.mark);
+  // Kept mounted while the spans lag a keystroke behind (hidden, not removed), so a word already
+  // understood is not unmounted and redrawn on every keystroke.
+  const hasMarks = parts.some((part) => part.mark);
+  const stale = spansFor !== value;
 
   // The input's own horizontal scroll (long queries) is mirrored by the underline layer.
   const sync = () => {
@@ -65,15 +68,21 @@ export function MarkedInput({
 
   return (
     <div className={p.inputWrap}>
-      {showMarks && (
-        <div ref={mirrorRef} className={`${p.layer} ${p.mirror} ${className ?? ""}`} aria-hidden dir="auto">
-          {parts.map((part, i) =>
+      {hasMarks && (
+        <div
+          ref={mirrorRef}
+          className={`${p.layer} ${p.mirror} ${className ?? ""}`}
+          aria-hidden
+          dir="auto"
+          data-stale={stale || undefined}
+        >
+          {keyed(parts).map(({ part, key }) =>
             part.mark ? (
-              <mark key={i} className={p.mark}>
+              <mark key={key} className={p.mark}>
                 {part.text}
               </mark>
             ) : (
-              <span key={i}>{part.text}</span>
+              <span key={key}>{part.text}</span>
             ),
           )}
         </div>
@@ -103,4 +112,21 @@ export function MarkedInput({
       )}
     </div>
   );
+}
+
+/**
+ * Stable keys for the mirror's runs: an understood span is keyed by where it
+ * starts in the text, not by its words, so a span that grows as the visitor
+ * types it out ("3 chamb" → "3 chambres") keeps its node — its underline,
+ * already drawn, just gets longer — and typing after it does not remount it
+ * either. The stroke is drawn once, when the span is first understood, not
+ * on every keystroke.
+ */
+function keyed(parts: Array<{ text: string; mark: boolean }>) {
+  let at = 0;
+  return parts.map((part, i) => {
+    const start = at;
+    at += part.text.length;
+    return { part, key: part.mark ? `m@${start}` : `t${i}` };
+  });
 }

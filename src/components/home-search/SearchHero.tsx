@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { AiAnswerCard } from "@/components/search-concierge/AiAnswerCard";
 import { registerHeroTarget } from "@/components/search-concierge/hero-target";
-import { ChipList } from "@/components/search-concierge/parts/ChipList";
+import { ChipList, useChipListShown } from "@/components/search-concierge/parts/ChipList";
 import { FacetButton } from "@/components/search-concierge/parts/FacetButton";
 import { MarkedInput } from "@/components/search-concierge/parts/MarkedInput";
 import { relaxedSentence, type FacetGroup } from "@/components/search-concierge/parts/model";
@@ -14,9 +14,14 @@ import { homeSearchCopy } from "@/content/home-search";
 import { searchCopy } from "@/content/search";
 import { formatNumber, type Locale } from "@/i18n/config";
 import { useHomeSearch } from "./context";
+import { currentTranslate, glideFrom, reducedMotion, slideIndicator } from "./motion";
+import { Odometer } from "./Odometer";
+import { SwapText } from "./SwapText";
 import { Thumbs } from "./Thumbs";
-import { useTween } from "./useTween";
 import s from "./Hero.module.css";
+
+/** A picker closes faster than it opens (120 vs 160 ms). */
+const POP_OUT_MS = 120;
 
 type PickerId = "city" | "budget" | "status" | "bedrooms";
 
@@ -40,12 +45,17 @@ export function SearchHero({ locale, founded }: { locale: Locale; founded: numbe
   const inputRef = useRef<HTMLInputElement>(null);
   const fieldRef = useRef<HTMLDivElement>(null);
   const pickersRef = useRef<HTMLDivElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
+  const hiliteRef = useRef<HTMLSpanElement>(null);
   const [picker, setPicker] = useState<PickerId | null>(null);
+  const [closing, setClosing] = useState(false);
+  const closeTimer = useRef(0);
   const [announce, setAnnounce] = useState("");
   const lastAsked = useRef<string | null>(null);
 
   const count = rows.length;
-  const shown = Math.round(useTween(count));
+  // The understood row stays until its last chip has faded out; then the ideas come back.
+  const [chipsShown, releaseChips] = useChipListShown(chips.length);
 
   /* ------------------------------------------- one search, not two ---- */
   // While this field is on screen, the header's search trigger and Ctrl/⌘K
@@ -76,41 +86,139 @@ export function SearchHero({ locale, founded }: { locale: Locale; founded: numbe
   }, []);
 
   /* ------------------------------------------- no shift below it ---- */
-  // The concierge's answer lands 5–7 s after Enter, often once the visitor
-  // has gone down to the results: the hero then grows above what they are
-  // reading. While the hero is mostly above the viewport, a change of its
-  // height is taken back by the scroll position in the same commit — before
-  // the browser paints, so no frame shows the results moving (a
-  // ResizeObserver fires too late: the shift is already counted).
-  const heroHeight = useRef<number | null>(null);
+  // The concierge answers seconds after the last keystroke, often once the
+  // visitor has gone further down: this hero (and the results) then change
+  // height above what they are reading. The provider keeps the block they
+  // are reading in place for every section at once (context.tsx, "anchor").
+  //
+  // When the visitor is reading this hero, though, there is nothing to
+  // compensate: the answer card (or the "élargi" note) takes its height and
+  // what follows has to make room. It makes room smoothly: every part of the
+  // answer column that moved, and the results below, are played from where
+  // they stood to their new place (FLIP, transform only, 260 ms). The results
+  // glide over the hero's newly grown edge, so the hero seems to open up
+  // rather than the page to jump.
+  const answerRef = useRef<HTMLDivElement>(null);
+  const placedY = useRef(new WeakMap<Element, number>());
   useLayoutEffect(() => {
-    const section = sectionRef.current;
-    if (!section) return;
-    const next = section.offsetHeight;
-    const before = heroHeight.current;
-    heroHeight.current = next;
-    if (before === null || next === before) return;
-    const delta = next - before;
-    // Judged on where the hero ended before this change.
-    if (section.getBoundingClientRect().bottom - delta > window.innerHeight * 0.5) return;
-    const lenis = (window as Window & { __lenis?: { isScrolling?: unknown; scrollTo: (y: number, o?: { immediate?: boolean }) => void } }).__lenis;
-    // A scroll to the results is in flight: it re-aims itself when it lands (context.tsx).
-    if (lenis?.isScrolling === "smooth") return;
-    const y = window.scrollY + delta;
-    window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior });
-    lenis?.scrollTo(y, { immediate: true });
+    const hero = sectionRef.current;
+    const answer = answerRef.current;
+    if (!hero || !answer) return;
+    const ground = hero.parentElement;
+    const below = ground?.nextElementSibling as HTMLElement | null;
+    const tracked = [...answer.children, ...(below ? [below] : [])] as HTMLElement[];
+    const box = ground?.getBoundingClientRect();
+    const mid = window.innerHeight / 2;
+    const reading = Boolean(box && box.top <= mid && box.bottom > mid);
+    const animate = reading && !reducedMotion();
+    for (const el of tracked) {
+      const r = el.getBoundingClientRect();
+      const shown = currentTranslate(el).y;
+      const y = r.top + window.scrollY - shown;
+      const was = placedY.current.get(el);
+      placedY.current.set(el, y);
+      if (!animate || was === undefined || Math.abs(was - y) < 0.5) continue;
+      // Off screen before and after: nothing to see move.
+      const h = r.height;
+      const seen = (top: number) => top < window.innerHeight && top + h > 0;
+      if (!seen(r.top - shown) && !seen(was - window.scrollY)) continue;
+      const anim = glideFrom(el, 0, was - y + shown, 260);
+      if (anim && el === below) {
+        // Over the hero (z 5) while it travels, so its own ground covers the
+        // hero's grown edge until it has moved down past it.
+        el.style.position = "relative";
+        el.style.zIndex = "6";
+        const done = () => {
+          el.style.position = "";
+          el.style.zIndex = "";
+        };
+        anim.addEventListener("finish", done);
+        anim.addEventListener("cancel", done);
+      }
+    }
   });
+  // A resize re-flows everything: remember the new places, nothing glides.
+  useEffect(() => {
+    const onResize = () => (placedY.current = new WeakMap());
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   /* ------------------------------------------------------- pickers ---- */
+  // Closing is a quick fade (120 ms), then the panel goes; opening is
+  // immediate and grows from its trigger (see the layout effect below).
+  const closePicker = useCallback((refocus = false) => {
+    const trigger = pickersRef.current?.querySelector<HTMLElement>(`[aria-expanded="true"]`);
+    window.clearTimeout(closeTimer.current);
+    if (reducedMotion()) {
+      setPicker(null);
+      setClosing(false);
+    } else {
+      setClosing(true);
+      closeTimer.current = window.setTimeout(() => {
+        setPicker(null);
+        setClosing(false);
+      }, POP_OUT_MS);
+    }
+    if (refocus) trigger?.focus();
+  }, []);
+  const togglePicker = (id: PickerId) => {
+    if (picker === id && !closing) return closePicker();
+    window.clearTimeout(closeTimer.current);
+    setClosing(false);
+    setPicker(id);
+  };
+  useEffect(() => () => window.clearTimeout(closeTimer.current), []);
+
+  // The panel opens out of its trigger: its transform-origin is the
+  // trigger's centre, measured before the first frame of the scale-in.
+  useLayoutEffect(() => {
+    const pop = popRef.current;
+    const trigger = pickersRef.current?.querySelector<HTMLElement>(`[aria-expanded="true"]`);
+    if (!picker || !pop || !trigger) return;
+    const t = trigger.getBoundingClientRect();
+    const p = pop.getBoundingClientRect();
+    pop.style.transformOrigin = `${Math.round(t.left + t.width / 2 - p.left)}px -0.6rem`;
+    const hilite = hiliteRef.current;
+    if (hilite) {
+      delete hilite.dataset.box;
+      hilite.dataset.on = "false";
+    }
+  }, [picker]);
+
+  // One soft highlight slides between the options under the pointer or the
+  // keyboard's focus (transform only; offsets are layout values, so the
+  // panel's own scale-in does not skew them).
+  const hilite = (target: EventTarget | null, animate: boolean) => {
+    const el = (target as HTMLElement | null)?.closest?.("button");
+    const box = hiliteRef.current;
+    if (!el || !box || !popRef.current?.contains(el)) return;
+    // It slides along a row; to another row (Budget, then Mensualité) it does
+    // not cut diagonally through the gap: it is placed there and fades in.
+    const prevY = box.dataset.box ? (JSON.parse(box.dataset.box) as { y: number }).y : null;
+    const sameRow = prevY === el.offsetTop;
+    const wasOn = box.dataset.on === "true";
+    slideIndicator(box, { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight }, { animate: animate && wasOn && sameRow, duration: 180 });
+    if (wasOn && !sameRow && prevY !== null && !reducedMotion()) {
+      box.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 120, easing: "cubic-bezier(0.23, 1, 0.32, 1)" });
+    }
+    box.dataset.on = "true";
+  };
+  const unhilite = () => {
+    const box = hiliteRef.current;
+    if (!box) return;
+    box.dataset.on = "false";
+    delete box.dataset.box;
+  };
+
   useEffect(() => {
     if (!picker) return;
     const onDown = (event: PointerEvent) => {
-      if (!pickersRef.current?.contains(event.target as Node)) setPicker(null);
+      if (!pickersRef.current?.contains(event.target as Node)) closePicker();
     };
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
-      setPicker(null);
-      pickersRef.current?.querySelector<HTMLElement>(`[aria-expanded="true"]`)?.focus();
+      closePicker(true);
     };
     document.addEventListener("pointerdown", onDown);
     document.addEventListener("keydown", onKey);
@@ -118,7 +226,7 @@ export function SearchHero({ locale, founded }: { locale: Locale; founded: numbe
       document.removeEventListener("pointerdown", onDown);
       document.removeEventListener("keydown", onKey);
     };
-  }, [picker]);
+  }, [picker, closePicker]);
 
   const group = (id: FacetGroup["id"]) => facets.find((g) => g.id === id);
   const pickers: Array<{ id: PickerId; label: string; groups: FacetGroup[] }> = [
@@ -176,7 +284,7 @@ export function SearchHero({ locale, founded }: { locale: Locale; founded: numbe
             <label htmlFor={`${uid}-q`} className="u-visually-hidden">
               {t.fieldLabel}
             </label>
-            <div ref={fieldRef} className={s.field}>
+            <div ref={fieldRef} className={s.field} data-filled={raw !== "" || undefined}>
               <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden focusable="false" className={s.glyph}>
                 <circle cx="10.5" cy="10.5" r="6.75" fill="none" stroke="currentColor" strokeWidth="1.6" />
                 <path d="M15.5 15.5L21 21" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
@@ -219,11 +327,12 @@ export function SearchHero({ locale, founded }: { locale: Locale; founded: numbe
           </form>
 
           <div className={s.chipsRow}>
-            {chips.length > 0 ? (
+            {chipsShown ? (
               <>
                 <span className="u-visually-hidden">{t.understood}</span>
                 <ChipList
                   chips={chips}
+                  onEmpty={releaseChips}
                   onRemove={(chip) => {
                     search.removeChip(chip);
                     refocus();
@@ -269,7 +378,7 @@ export function SearchHero({ locale, founded }: { locale: Locale; founded: numbe
                     aria-expanded={picker === p.id}
                     aria-controls={`${uid}-picker`}
                     data-active={on > 0 || undefined}
-                    onClick={() => setPicker((current) => (current === p.id ? null : p.id))}
+                    onClick={() => togglePicker(p.id)}
                   >
                     {p.label}
                     {on > 0 && <span className={`u-numeric ${s.pickerCount}`}>{formatNumber(on, locale)}</span>}
@@ -281,18 +390,38 @@ export function SearchHero({ locale, founded }: { locale: Locale; founded: numbe
               })}
             </div>
             <div
+              // Keyed on the picker: switching from one to another plays the opening again, from the new trigger.
+              key={picker ?? "none"}
+              ref={popRef}
               id={`${uid}-picker`}
               className={s.pop}
               role="group"
               aria-label={openPicker?.label}
               hidden={!openPicker}
+              data-closing={closing || undefined}
+              onPointerOver={(event) => event.pointerType === "mouse" && hilite(event.target, true)}
+              onPointerLeave={unhilite}
+              onFocus={(event) => event.target.matches(":focus-visible") && hilite(event.target, true)}
+              onBlur={(event) => {
+                if (!popRef.current?.contains(event.relatedTarget as Node | null)) unhilite();
+              }}
             >
+              <span ref={hiliteRef} className={s.hilite} aria-hidden />
               {openPicker?.groups.map((g) => (
                 <div key={g.id} className={s.popGroup}>
                   {openPicker.groups.length > 1 && <p className={s.popTitle}>{g.title}</p>}
                   <div className={s.popChips}>
                     {g.chips.map((chip) => (
-                      <FacetButton key={chip.key} chip={chip} locale={locale} onPick={(picked) => search.apply(picked.toggle())} />
+                      <FacetButton
+                        key={chip.key}
+                        chip={chip}
+                        locale={locale}
+                        onPick={(picked) => {
+                          search.apply(picked.toggle());
+                          // A choice made, the panel steps aside (quick fade) and the answer shows.
+                          closePicker(true);
+                        }}
+                      />
                     ))}
                   </div>
                 </div>
@@ -301,16 +430,22 @@ export function SearchHero({ locale, founded }: { locale: Locale; founded: numbe
           </div>
         </div>
 
-        <div className={s.answer}>
+        <div ref={answerRef} className={s.answer}>
           <p className={`u-eyebrow ${s.answerEyebrow}`}>{t.answerEyebrow}</p>
           <p className={s.count}>
-            <span className={`u-numeric ${s.countFigure}`} dir="ltr">
-              {formatNumber(shown, locale)}
-            </span>
+            <Odometer value={count} className={s.countFigure} />
             <span className={s.countWords}>
-              <span>{t.countWords(count)}</span>
-              <span className={s.countCities}>
-                {exact ? t.cities(search.cityCount, formatNumber(search.cityCount, locale)) : t.closest}
+              <SwapText text={t.countWords(count)} />
+              {/* While the concierge reads the sentence, its quiet line takes the place of "dans N villes"
+                  — in the line that is already there, so nothing below moves when it comes and goes. */}
+              <span className={s.countSub} data-thinking={ai.state === "thinking" || undefined}>
+                <SwapText
+                  className={s.countCities}
+                  text={exact ? t.cities(search.cityCount, formatNumber(search.cityCount, locale)) : t.closest}
+                />
+                {ai.state === "thinking" && (
+                  <AiAnswerCard locale={locale} state="thinking" answer={null} onQuery={search.setRaw} inline className={s.countThinking} />
+                )}
               </span>
             </span>
           </p>
@@ -324,7 +459,7 @@ export function SearchHero({ locale, founded }: { locale: Locale; founded: numbe
             </p>
           )}
 
-          {(ai.state === "thinking" || ai.answer) && (
+          {ai.state === "ready" && ai.answer && (
             <div className={s.aiSlot}>
               <AiAnswerCard locale={locale} state={ai.state} answer={ai.answer} onQuery={(text) => search.setRaw(text)} compact />
             </div>

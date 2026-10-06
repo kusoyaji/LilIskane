@@ -50,7 +50,13 @@ export function CriteriaTicks({ locale, doc, ai = null, query, max = 4, tone = "
   return (
     <ul className={`${s.ticks} ${className ?? ""}`} data-tone={tone} aria-label={c.ticksLabel}>
       {shown.map((check, i) => (
-        <li key={`${check.key}-${i}`} className={s.tick} data-ok={check.ok ? "" : undefined}>
+        <li
+          // By criterion only: a criterion added elsewhere does not replay every tick in every card.
+          key={check.key === "amenity" ? `amenity:${check.amenity}` : check.key}
+          className={s.tick}
+          data-ok={check.ok ? "" : undefined}
+          style={{ ["--i" as string]: i } as React.CSSProperties}
+        >
           <span className={s.glyph} aria-hidden>
             {check.ok ? "✓" : "✕"}
           </span>

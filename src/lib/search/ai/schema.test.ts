@@ -46,7 +46,8 @@ test("schema enums: exactly the programmes, cities and values in the data", () =
   assert.deepEqual(new Set(AI_AMENITIES).size, AI_AMENITIES.length);
   assert.deepEqual(enumOf(at(props, "intent")), ["search", "question", "compare", "other"]);
   assert.deepEqual(enumOf(at(result, "fit")), ["exact", "close"]);
-  assert.ok(enumOf(at(result, "criteria", "items", "properties", "key")).includes("budget"));
+  // Lean result: slug + fit only — the ticks are computed from the data (validate.ts).
+  assert.deepEqual(Object.keys(at(props, "results", "items", "properties")), ["slug", "fit"]);
   assert.deepEqual(AI_SEGMENTS.includes("commercial"), false);
 });
 
@@ -80,8 +81,7 @@ test("schema: within Gemini's structured-output subset, caps stated", () => {
   walk(schema, "$");
   assert.equal(at(schema, "properties", "results").maxItems, 8);
   assert.equal(at(schema, "properties", "suggestions").maxItems, 3);
-  // Gemini answers HTTP 400 to a capped array nested in a capped array: criteria stay uncapped here.
-  assert.equal(at(schema, "properties", "results", "items", "properties", "criteria").maxItems, undefined);
+  assert.equal(at(schema, "properties", "results", "items", "properties", "criteria"), undefined);
   assert.deepEqual(
     new Set(at(schema).required as string[]),
     new Set(["intent", "language", "summary", "clarify", "filters", "results", "suggestions"]),

@@ -10,6 +10,7 @@ import {
   useId,
   useMemo,
   useRef,
+  useLayoutEffect,
   useState,
   useTransition,
   type RefObject,
@@ -21,10 +22,12 @@ import { formatNumber, type Locale } from "@/i18n/config";
 import { formatRange } from "@/lib/format";
 import { parseQuery, searchDocs, toProjetsHref, type ParsedQuery, type SearchDoc, type SearchOutcome } from "@/lib/search";
 import type { AiResult } from "@/lib/search/ai/types";
+import { reducedMotion, slideIndicator } from "@/components/home-search/motion";
 import { AiAnswerCard } from "./AiAnswerCard";
+import { aiCopy } from "@/lib/search/ai/copy";
 import { CriteriaTicks } from "./CriteriaTicks";
 import { loadIndex } from "./index-cache";
-import { ChipList } from "./parts/ChipList";
+import { ChipList, useChipListShown } from "./parts/ChipList";
 import { FacetButton } from "./parts/FacetButton";
 import { MarkedInput } from "./parts/MarkedInput";
 import { buildChips, buildFacetGroups, cityNamer, relaxedSentence, removeChip, resolveSearch, type ChipModel, type FacetGroup, type QueryState } from "./parts/model";
@@ -292,6 +295,57 @@ export function ConciergeOverlay({
 
   // Keep the active row visible, and warm its route.
   const activeOption = active >= 0 ? options[active] : undefined;
+
+  /* ------------------------------------------------------------ motion ---- */
+  // The rows arrive with a short stagger only when the overlay opens and on
+  // the first paint of a new query (the list going from ideas to answers,
+  // or the index arriving) — never on each keystroke. Set before paint, so
+  // no frame shows the rows before they fade in.
+  const listboxRef = useRef<HTMLDivElement>(null);
+  const indicatorRef = useRef<HTMLSpanElement>(null);
+  const [entering, setEntering] = useState(false);
+  // (Keyed on "a query started", not on the list's mode: the mode can flip
+  // between ideas and pages from one letter to the next.)
+  const enterKey = `${open}|${hasQuery}|${docs ? 1 : 0}`;
+  useLayoutEffect(() => {
+    if (!open || reducedMotion()) return;
+    setEntering(true);
+    const timer = window.setTimeout(() => setEntering(false), 520);
+    return () => window.clearTimeout(timer);
+  }, [enterKey, open]);
+
+  // One field slides from row to row as ↑/↓ (or the pointer) move the active
+  // option: transform only. Anything else (a new query, the list changing
+  // under it) snaps it into place — there is nothing to travel along.
+  const navigated = useRef(false);
+  const placeIndicator = useCallback(
+    (animate: boolean) => {
+      const box = indicatorRef.current;
+      const list = listboxRef.current;
+      if (!box || !list) return;
+      const row = activeOption ? document.getElementById(optionId(activeOption.key)) : null;
+      if (!row || !list.contains(row)) {
+        box.dataset.on = "false";
+        delete box.dataset.box;
+        return;
+      }
+      slideIndicator(box, { x: row.offsetLeft, y: row.offsetTop, w: row.offsetWidth, h: row.offsetHeight }, { animate: animate && box.dataset.on === "true", duration: 160 });
+      box.dataset.on = "true";
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [activeOption?.key],
+  );
+  useLayoutEffect(() => {
+    placeIndicator(navigated.current);
+    navigated.current = false;
+  });
+  useEffect(() => {
+    const list = listboxRef.current;
+    if (!list) return;
+    const ro = new ResizeObserver(() => placeIndicator(false));
+    ro.observe(list);
+    return () => ro.disconnect();
+  }, [placeIndicator]);
   useEffect(() => {
     if (!activeOption) return;
     document.getElementById(optionId(activeOption.key))?.scrollIntoView({ block: "nearest" });
@@ -302,7 +356,8 @@ export function ConciergeOverlay({
 
   // Announced politely, after typing settles, so a screen reader is not
   // interrupted on every keystroke.
-  const message = !docs || !hasQuery || mode !== "results" ? "" : exact ? c.count(docList.length, formatNumber(docList.length, locale)) : c.countRelaxed;
+  const countMessage = !docs || !hasQuery || mode !== "results" ? "" : exact ? c.count(docList.length, formatNumber(docList.length, locale)) : c.countRelaxed;
+  const message = countMessage && ai.state === "thinking" ? `${countMessage} ${aiCopy[locale].thinking}` : countMessage;
   useEffect(() => {
     if (!open) return;
     const timer = window.setTimeout(() => setAnnounce(message), 450);
@@ -354,9 +409,11 @@ export function ConciergeOverlay({
     const n = options.length;
     if (event.key === "ArrowDown") {
       event.preventDefault();
+      navigated.current = true;
       if (n) setActive((i) => (i + 1) % n);
     } else if (event.key === "ArrowUp") {
       event.preventDefault();
+      navigated.current = true;
       if (n) setActive((i) => (i <= 0 ? n - 1 : i - 1));
     } else if (event.key === "Enter") {
       event.preventDefault();
@@ -374,6 +431,8 @@ export function ConciergeOverlay({
     [userQuery, query, deferredRaw, parsed, deferredExtra, locale, c, cityName],
   );
   const onRemoveChip = (chip: ChipModel) => applyAndRefocus(removeChip(chip, { raw, extra }, dismissed));
+  // The row stays until its last chip has faded out.
+  const [chipsShown, releaseChips] = useChipListShown(chips.length);
 
   /* ------------------------------------------------------------- facets ---- */
   const facetGroups: FacetGroup[] = useMemo(
@@ -404,6 +463,7 @@ export function ConciergeOverlay({
     const common = {
       id,
       role: "option" as const,
+      style: { ["--i" as string]: Math.min(index, 10) } as React.CSSProperties,
       "aria-selected": selected,
       "data-pending": pending === option.href ? "" : undefined,
       onPointerMove: (event: React.PointerEvent) => {
@@ -413,7 +473,10 @@ export function ConciergeOverlay({
         pointer.current = { x: event.clientX, y: event.clientY };
         // A row sliding under a still cursor (keyboard scrolling) is not a hover.
         if (last && last.x === event.clientX && last.y === event.clientY) return;
-        if (index !== active) setActive(index);
+        if (index !== active) {
+          navigated.current = true;
+          setActive(index);
+        }
       },
       onPointerEnter: () => router.prefetch(option.href),
       onClick: (event: React.MouseEvent) => choose(option, event),
@@ -528,8 +591,17 @@ export function ConciergeOverlay({
   );
   const docGroup = docOptions.length > 0 && (
     <Fragment key="docs">
-      <p className={s.groupHead} aria-hidden>
-        {docGroupTitle}
+      {/* While the concierge reads the sentence, its quiet line takes the place of this heading —
+          in a line that is already there, so the rows below never move when it comes and goes. */}
+      {/* Decoration inside the listbox (which may hold only options and groups): hidden from
+          assistive tech; the thinking line is announced through the overlay's live region. */}
+      <p className={s.groupHead} aria-hidden data-thinking={(hasQuery && ai.state === "thinking") || undefined}>
+        <span className={s.groupTitle} aria-hidden>
+          {docGroupTitle}
+        </span>
+        {hasQuery && ai.state === "thinking" && (
+          <AiAnswerCard locale={locale} state="thinking" answer={null} onQuery={() => {}} inline className={s.groupThinking} />
+        )}
       </p>
       <ul role="group" aria-label={docGroupTitle} className={s.options}>
         {docOptions.map(([o, i]) => renderOption(o, i))}
@@ -608,12 +680,13 @@ export function ConciergeOverlay({
             )}
           </div>
 
-          {chips.length > 0 && (
+          {chipsShown && (
             <div className={s.chipsRow}>
               <span className={`u-eyebrow ${s.chipsLabel}`}>{parsed.spans.length ? c.understood : c.criteria}</span>
               <ChipList
                 chips={chips}
                 onRemove={onRemoveChip}
+                onEmpty={releaseChips}
                 removeLabel={c.removeChip}
                 aiMark={c.aiMark}
                 aiTitle={c.aiTitle}
@@ -681,7 +754,7 @@ export function ConciergeOverlay({
               </section>
             )}
 
-            {hasQuery && (ai.state === "thinking" || answer) && (
+            {hasQuery && ai.state === "ready" && answer && (
               <div className={s.aiSlot}>
                 <AiAnswerCard
                   locale={locale}
@@ -716,7 +789,15 @@ export function ConciergeOverlay({
               </div>
             ) : null}
 
-            <div id={listboxId} role="listbox" aria-label={c.dialog} className={s.listbox}>
+            <div
+              ref={listboxRef}
+              id={listboxId}
+              role="listbox"
+              aria-label={c.dialog}
+              className={s.listbox}
+              data-entering={entering || undefined}
+            >
+              <span ref={indicatorRef} className={s.indicator} aria-hidden />
               {mode === "results" ? [docGroup, pageGroup] : [pageGroup, docGroup]}
             </div>
           </div>

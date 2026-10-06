@@ -1,0 +1,40 @@
+/* Old wording out (fast, ease-in), then the new in (ease-out, after a short
+   beat) — sequential, never both legible at once. The new wording is the
+   only one in the flow; the old is lifted out where it stood. Opacity only. */
+.swap {
+  position: relative;
+  display: inline-grid;
+}
+.layer {
+  grid-area: 1 / 1;
+}
+.layer[data-in] {
+  animation: swap-in 160ms var(--ease-reveal) 70ms backwards;
+}
+.layer[data-out] {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: swap-out 100ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+@keyframes swap-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes swap-out {
+  to {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .layer[data-in],
+  .layer[data-out] {
+    animation: none;
+  }
+  .layer[data-out] {
+    opacity: 0;
+  }
+}

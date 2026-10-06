@@ -580,6 +580,14 @@
 .cta {
   margin-block-start: 2.25rem;
 }
+/* The arrow's nudge on hover (v2 .btn) has its keyboard twin here: focus
+   moves it the same 4px in the reading direction. */
+.cta > button:focus-visible svg {
+  transform: translateX(4px);
+}
+:global([dir="rtl"]) .cta > button:focus-visible svg {
+  transform: scaleX(-1) translateX(4px);
+}
 @media (max-width: 40rem) {
   .cta > :is(a, button) { inline-size: 100%; justify-content: space-between; }
 }

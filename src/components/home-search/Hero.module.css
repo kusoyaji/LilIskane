@@ -11,6 +11,9 @@
   isolation: isolate;
   color: var(--color-paper);
   padding-block: calc(var(--nav-h) + clamp(2.25rem, 7vh, 5rem)) clamp(3rem, 8vh, 5.5rem);
+  /* Sideways only: a thumbnail's label can never widen the page; an open
+     picker still hangs down over the results. */
+  overflow-x: clip;
 }
 /* Read from the corner on the reading side, like the overlay. */
 .hero > svg:first-child {
@@ -83,7 +86,14 @@
   margin-block-start: 0.6rem;
   padding-block: 0.35rem 0.7rem;
   border-block-end: 2px solid color-mix(in oklab, var(--color-paper) 30%, transparent);
+  /* As tall as its round buttons from the start: on phones (no submit
+     button) the clear button appearing at the first keystroke must not
+     push the words, the chips and the answer down. */
+  min-block-size: calc(2.75rem + 1.05rem + 2px);
 }
+/* Focus draws the ochre rule from the reading-start edge (280 ms, ease-out);
+   leaving the field takes it back, faster — unless there is text in it,
+   which keeps the field lit as "this is your search". */
 .field::after {
   content: "";
   position: absolute;
@@ -93,18 +103,28 @@
   background: var(--color-ochre-bright);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 280ms var(--ease-reveal);
+  transition: transform 200ms var(--ease-ui);
 }
 :global([dir="rtl"]) .field::after {
   transform-origin: right;
 }
-.field:focus-within::after {
+.field:focus-within::after,
+.field[data-filled]::after {
   transform: scaleX(1);
+  transition: transform 280ms var(--ease-reveal);
 }
 .glyph {
   inline-size: clamp(1.3rem, 2vw, 1.7rem);
   block-size: auto;
   color: var(--color-ochre-bright);
+  transition: transform 200ms var(--ease-reveal);
+}
+/* …and the magnifier leans 2px towards the words. */
+.field:focus-within .glyph {
+  transform: translateX(2px);
+}
+:global([dir="rtl"]) .field:focus-within .glyph {
+  transform: translateX(-2px);
 }
 .input {
   color: var(--color-paper);
@@ -143,6 +163,17 @@
   background: var(--color-ochre-bright);
   color: var(--color-ink);
 }
+/* The arrow travels 3px in the reading direction on hover / keyboard focus,
+   and back; the press is the site's asymmetric .u-press (down 100, up 180). */
+.submit svg {
+  transition: transform 200ms var(--ease-reveal);
+}
+.submit:focus-visible svg {
+  transform: translateX(3px);
+}
+:global([dir="rtl"]) .submit:focus-visible svg {
+  transform: scaleX(-1) translateX(3px);
+}
 .clear:focus-visible,
 .submit:focus-visible,
 .idea:focus-visible,
@@ -176,6 +207,14 @@
   margin: 0;
   padding: 0;
   list-style: none;
+  /* Back once the last chip has faded out (the field emptied): in, not cut. */
+  animation: ideas-in 180ms var(--ease-reveal) backwards;
+}
+@keyframes ideas-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
 }
 .idea {
   min-block-size: 2.25rem;
@@ -232,7 +271,7 @@
   font-size: 0.6875rem;
 }
 .chevron {
-  transition: transform var(--dur-ui) var(--ease-ui);
+  transition: transform 160ms var(--ease-reveal);
 }
 .picker[aria-expanded="true"] .chevron {
   transform: rotate(180deg);
@@ -251,16 +290,45 @@
   border-radius: 6px;
   background: color-mix(in oklab, var(--color-ink) 92%, var(--color-paper));
   box-shadow: 0 24px 60px rgb(0 0 0 / 0.38), 0 0 0 1px color-mix(in oklab, var(--color-paper) 14%, transparent);
-  animation: pop-in 180ms var(--ease-ui) both;
+  /* Grows out of its trigger: transform-origin is set to the trigger's
+     centre by SearchHero before the first frame. */
+  animation: pop-in 160ms var(--ease-reveal) backwards;
 }
 .pop[hidden] {
   display: none;
 }
+.pop[data-closing] {
+  pointer-events: none;
+  animation: pop-out 120ms var(--ease-ui) forwards;
+}
 @keyframes pop-in {
   from {
     opacity: 0;
-    transform: translateY(-4px);
+    transform: scale(0.97);
   }
+}
+@keyframes pop-out {
+  to {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+}
+/* One soft field slides under the option being pointed at or focused.
+   Physical left/top: SearchHero positions it from offsetLeft/Top. */
+.hilite {
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  top: 0;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-paper) 11%, transparent);
+  transform-origin: 0 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms var(--ease-ui);
+}
+.hilite[data-on="true"] {
+  opacity: 1;
 }
 .popGroup {
   display: grid;
@@ -275,6 +343,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
+}
+/* In the picker the sliding field is the one hover signal: an option does
+   not also light its own border (keyboard focus keeps its outline). */
+@media (hover: hover) {
+  .popChips > button:not([aria-pressed="true"]):hover {
+    border-color: color-mix(in oklab, var(--color-paper) 22%, transparent);
+  }
 }
 
 /* --------------------------------------------------------------- answer -- */
@@ -320,6 +395,24 @@
   font-weight: 400;
   color: color-mix(in oklab, var(--color-paper) 62%, transparent);
 }
+/* "dans N villes", or the concierge's thinking line over it (one cell). */
+.countSub {
+  display: grid;
+  min-inline-size: 0;
+  font-size: var(--text-small);
+  font-weight: 400;
+  line-height: 1.35;
+}
+.countSub > * {
+  grid-area: 1 / 1;
+  min-inline-size: 0;
+}
+.countSub > .countCities {
+  transition: opacity 140ms var(--ease-ui);
+}
+.countSub[data-thinking] > .countCities {
+  opacity: 0;
+}
 
 /* The top matches, six slots that cross-fade. */
 .thumbs {
@@ -332,35 +425,125 @@
 }
 .slot {
   position: relative;
+  min-inline-size: 0;
+}
+.slotLink {
+  position: relative;
+  display: block;
+  border-radius: 3px;
+  color: inherit;
+  transition: transform 200ms var(--ease-reveal);
+}
+.slotFrame {
+  position: relative;
+  display: block;
   aspect-ratio: 1;
   overflow: hidden;
   border-radius: 3px;
-  background: color-mix(in oklab, var(--color-paper) 7%, transparent);
 }
 /* Fewer matches than slots: the spare slots are simply empty, never grey
    squares that read as pictures failing to load; the last picture fades out. */
-.slot[data-empty] {
+.slot[data-empty] .slotFrame {
   background: transparent;
 }
-.slot[data-empty] .layer:not([data-fresh]) {
-  animation: thumb-out 280ms var(--ease-ui) both;
+/* The ground is on the picture's own layer, not the frame: a slot filling
+   up fades in with its picture, never as an empty grey square first. */
+.layer {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in oklab, var(--color-paper) 8%, transparent);
+}
+/* The answer changed: the old picture shrinks a little and fades (180 ms),
+   the new one fades in over it, slot after slot (40 ms apart). */
+.layer[data-out] {
+  animation: thumb-out 180ms var(--ease-ui) calc(var(--i) * 40ms) forwards;
 }
 @keyframes thumb-out {
   to {
     opacity: 0;
+    transform: scale(0.92);
   }
 }
-.layer {
-  position: absolute;
-  inset: 0;
-}
 .layer[data-fresh] {
-  animation: thumb-in 280ms var(--ease-ui) both;
-  animation-delay: calc(var(--i) * 30ms);
+  animation: thumb-in 240ms var(--ease-reveal) calc(var(--i) * 40ms) backwards;
 }
 @keyframes thumb-in {
   from {
     opacity: 0;
+    transform: scale(1.06);
+  }
+}
+/* The programme's name, in a small label above the picture. */
+.tip {
+  position: absolute;
+  z-index: 2;
+  inset-block-end: calc(100% + 0.45rem);
+  inset-inline-start: 50%;
+  max-inline-size: 13rem;
+  padding: 0.3rem 0.55rem;
+  border-radius: 4px;
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-size: var(--text-label);
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translate(-50%, 3px);
+  pointer-events: none;
+  transition:
+    opacity 120ms var(--ease-ui),
+    transform 120ms var(--ease-ui);
+}
+:global([dir="rtl"]) .tip {
+  transform: translate(50%, 3px);
+}
+.tip[data-side="start"],
+.tip[data-side="end"] {
+  transform: translate(0, 3px);
+}
+.tip[data-side="start"] {
+  inset-inline-start: 0;
+}
+.tip[data-side="end"] {
+  inset-inline-start: auto;
+  inset-inline-end: 0;
+}
+.slotLink:focus-visible {
+  outline: 2px solid var(--color-ochre-bright);
+  outline-offset: 3px;
+}
+/* Hover or keyboard focus: the picture lifts 2px and says its name. */
+.slotLink:focus-visible {
+  transform: translateY(-2px);
+}
+.slotLink:focus-visible .tip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  transition-duration: 180ms;
+}
+:global([dir="rtl"]) .slotLink:focus-visible .tip {
+  transform: translate(50%, 0);
+}
+.slotLink:focus-visible .tip:is([data-side="start"], [data-side="end"]) {
+  transform: none;
+}
+@media (hover: hover) {
+  .slotLink:hover {
+    transform: translateY(-2px);
+  }
+  .slotLink:hover .tip {
+    opacity: 1;
+    transform: translate(-50%, 0);
+    transition-duration: 180ms;
+  }
+  :global([dir="rtl"]) .slotLink:hover .tip {
+    transform: translate(50%, 0);
+  }
+  .slotLink:hover .tip:is([data-side="start"], [data-side="end"]) {
+    transform: none;
   }
 }
 .thumbImg {
@@ -424,6 +607,13 @@
   gap: 0.75rem 1.5rem;
   margin-block-start: clamp(1.75rem, 4vh, 2.5rem);
 }
+/* Keyboard twin of the v2 button's hover nudge. */
+.ctas > button:first-child:focus-visible svg {
+  transform: translateX(4px);
+}
+:global([dir="rtl"]) .ctas > button:first-child:focus-visible svg {
+  transform: scaleX(-1) translateX(4px);
+}
 .mapLink {
   display: inline-flex;
   align-items: center;
@@ -452,6 +642,12 @@
   }
   .submit:hover {
     background: var(--color-paper);
+  }
+  .submit:hover svg {
+    transform: translateX(3px);
+  }
+  :global([dir="rtl"]) .submit:hover svg {
+    transform: scaleX(-1) translateX(3px);
   }
   .mapLink:hover {
     color: var(--color-paper);
@@ -535,12 +731,27 @@
 
 @media (prefers-reduced-motion: reduce) {
   .field::after,
-  .chevron {
+  .chevron,
+  .glyph,
+  .submit svg,
+  .slotLink,
+  .tip,
+  .hilite {
     transition: none;
   }
   .pop,
+  .pop[data-closing],
+  .ideas,
   .layer[data-fresh],
-  .slot[data-empty] .layer {
+  .layer[data-out] {
     animation: none;
+  }
+  .layer[data-out] {
+    opacity: 0;
+  }
+  .field:focus-within .glyph,
+  .slotLink:focus-visible,
+  .slotLink:hover {
+    transform: none;
   }
 }

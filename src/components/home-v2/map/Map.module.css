@@ -70,6 +70,11 @@
 .index::-webkit-scrollbar { display: none; }
 .index > li { flex: none; }
 .row {
+  /* Positioned: the visually-hidden count of a city with no match is
+     absolute, and must stay inside the sideways-scrolling row — not escape
+     to the page and widen it (it did at 390 under reduced motion, where no
+     reveal transform happened to contain it). */
+  position: relative;
   display: inline-flex;
   align-items: baseline;
   gap: 0.6rem;
@@ -324,7 +329,37 @@
   font-variant-numeric: tabular-nums;
 }
 .pin[data-active] .pinDisc { background: var(--color-ink); transform: scale(1.12); }
-.pin[data-active] .pinDisc::after { opacity: 1; transform: scale(1); animation: ping 2.4s var(--ease-reveal) 600ms infinite; }
+/* The chosen city: its ring is drawn around the disc (from the top,
+   clockwise, 320 ms) — then, once drawn, a slow ping keeps it findable. */
+.ring {
+  position: absolute;
+  inset: -0.45rem;
+  inline-size: calc(100% + 0.9rem);
+  block-size: calc(100% + 0.9rem);
+  overflow: visible;
+  transform: rotate(-90deg);
+  pointer-events: none;
+}
+.ring circle {
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  transition:
+    stroke-dashoffset 120ms var(--ease-ui),
+    opacity 120ms var(--ease-ui);
+}
+.pin[data-active] .ring circle {
+  stroke-dashoffset: 0;
+  opacity: 1;
+  transition:
+    stroke-dashoffset 320ms var(--ease-reveal),
+    opacity 80ms linear;
+}
+.pin[data-active] .pinDisc::after { animation: ping 2.4s var(--ease-reveal) 700ms infinite; }
 @keyframes ping {
   0% { opacity: 0.9; transform: scale(1); }
   70%, 100% { opacity: 0; transform: scale(1.7); }
@@ -385,6 +420,7 @@
   .pinFigure { display: none; }
   .pinDisc { box-shadow: 0 0 0 2px var(--color-sand); }
   .pinDisc::after { inset: -0.3rem; }
+  .ring { inset: -0.3rem; inline-size: calc(100% + 0.6rem); block-size: calc(100% + 0.6rem); }
   .pinLabel { display: none; font-size: 0.8rem; }
   .pin[data-active] .pinLabel { display: block; }
   /* Only the active label shows, so phones take their own sides. */
@@ -557,7 +593,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pin, .dot, .lens, .loupeLabel { transition: none; }
+  .pin, .dot, .lens, .loupeLabel, .ring circle, .pin[data-active] .ring circle { transition: none; }
   .panelInner { animation: none; }
   .pin[data-active] .pinDisc::after { animation: none; }
 }

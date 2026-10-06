@@ -32,18 +32,28 @@ export type AiAnswerCardProps = {
   tone?: "ink" | "paper";
   /** Tighter spacing, no disclosure line break — for narrow columns. */
   compact?: boolean;
+  /** "thinking" only: render as a span inside an existing line (no box of its own). */
+  inline?: boolean;
   className?: string;
 };
 
-export function AiAnswerCard({ locale, state, answer, onQuery, tone = "ink", compact = false, className }: AiAnswerCardProps) {
+export function AiAnswerCard({ locale, state, answer, onQuery, tone = "ink", compact = false, inline = false, className }: AiAnswerCardProps) {
   const c = aiCopy[locale];
 
   if (state === "thinking") {
+    // `inline`: set inside a line that already exists (the home hero's count), so it takes no height.
+    const Line = inline ? "span" : "p";
     return (
-      <p className={`${s.thinking} ${className ?? ""}`} data-tone={tone} role="status">
+      <Line className={`${s.thinking} ${className ?? ""}`} data-tone={tone} data-inline={inline || undefined} role="status">
         <Spark className={s.thinkingSpark} />
-        <span className={s.thinkingText}>{c.thinking}</span>
-      </p>
+        <span className={s.thinkingText}>
+          {c.thinking}
+          {/* The light that crosses the line: a bright copy of the words, seen through a moving window. */}
+          <span className={s.sweep} aria-hidden>
+            <span className={s.sweepText}>{c.thinking}</span>
+          </span>
+        </span>
+      </Line>
     );
   }
 

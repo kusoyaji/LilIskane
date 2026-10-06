@@ -430,7 +430,7 @@ export const AMENITY_ALIASES: Partial<Record<Amenity, string[]>> = {
 
 /** Words that count bedrooms after a number: "3 chambres", "3ch", "3 غرف", "3 بيوت". */
 export const BEDROOM_WORDS = new Set(
-  ["chambre", "chambres", "ch", "chb", "chbr", "chbre", "chbres", "chamb", "bedroom", "bedrooms", "غرف", "غرفة", "غرفات", "بيوت", "بيت", "byout", "biout", "byut", "bit", "bayt", "beit"].flatMap(
+  ["chambre", "chambres", "ch", "cha", "cham", "chamb", "chambr", "chb", "chbr", "chbre", "chbres", "bedroom", "bedrooms", "غرف", "غرفة", "غرفا", "غرفات", "بيوت", "بيو", "بيت", "byout", "biout", "byut", "bit", "bayt", "beit"].flatMap(
     (w) => words(w),
   ),
 );

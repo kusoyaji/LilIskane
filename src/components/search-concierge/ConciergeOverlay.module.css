@@ -27,6 +27,10 @@
 .dialog[open] {
   opacity: 1;
 }
+/* Leaving is quicker than arriving. */
+.dialog:not([open]) {
+  transition-duration: 150ms;
+}
 @starting-style {
   .dialog[open] {
     opacity: 0;
@@ -366,8 +370,49 @@
 
 /* ------------------------------------------------------------ listbox ---- */
 .listbox {
+  position: relative;
+  isolation: isolate;
   display: grid;
   gap: 0.6rem;
+}
+/* The active row's field: one element that slides from row to row (placed
+   by ConciergeOverlay from the row's box — transform only), with the ochre
+   stile on the reading side. Behind the rows' content. */
+.indicator {
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  top: 0;
+  background: color-mix(in oklab, var(--color-paper) 7%, transparent);
+  transform-origin: 0 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms var(--ease-ui);
+}
+.indicator[data-on="true"] {
+  opacity: 1;
+}
+.indicator::before {
+  content: "";
+  position: absolute;
+  inset-block: 0.85rem;
+  inset-inline-start: 0;
+  inline-size: 2px;
+  background: var(--color-ochre-bright);
+}
+/* Opening, and the first paint of a new query: the rows arrive one after
+   another (30 ms apart, from the top). Never per keystroke. */
+.listbox[data-entering] :is(.option, .page) {
+  animation: row-in 220ms var(--ease-reveal) calc(var(--i, 0) * 30ms) backwards;
+}
+.listbox[data-entering] .groupHead {
+  animation: row-in 220ms var(--ease-reveal) backwards;
+}
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
 }
 .groupHead {
   margin: 0.9rem 0 0.15rem;
@@ -378,8 +423,34 @@
   line-height: 1;
   color: color-mix(in oklab, var(--color-paper) 56%, transparent);
 }
-.listbox > .groupHead:first-child {
+.listbox > .groupHead:first-child,
+.listbox > .indicator + .groupHead {
   margin-block-start: 0;
+}
+/* The heading, or the concierge's thinking line over it (one cell, no
+   height added: the rows below never move when it comes and goes). */
+.groupHead {
+  display: grid;
+  /* One line of the heading's own size, whatever is shown in it. */
+  grid-template-rows: 1em;
+}
+.groupHead > * {
+  grid-area: 1 / 1;
+  min-inline-size: 0;
+}
+.groupTitle {
+  transition: opacity 140ms var(--ease-ui);
+}
+.groupHead[data-thinking] > .groupTitle {
+  opacity: 0;
+}
+.groupThinking {
+  align-self: center;
+  font-size: var(--text-small);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1;
 }
 :global([lang="ar"]) .groupHead {
   text-transform: none;
@@ -410,25 +481,10 @@
   border-block-start-color: transparent;
 }
 /* The active row: a lit field and an ochre stile on the reading side. */
-.option::before,
-.page::before {
-  content: "";
-  position: absolute;
-  inset-block: 0.85rem;
-  inset-inline-start: 0;
-  inline-size: 2px;
-  background: var(--color-ochre-bright);
-  transform: scaleY(0);
-  transition: transform 160ms var(--ease-ui);
-}
-.option[aria-selected="true"],
-.page[aria-selected="true"] {
-  background: color-mix(in oklab, var(--color-paper) 7%, transparent);
-}
-.option[aria-selected="true"]::before,
-.page[aria-selected="true"]::before {
-  transform: scaleY(1);
-}
+/* The active row: a lit field and an ochre stile on the reading side —
+   drawn by the listbox's sliding indicator (see .indicator). */
+/* (Selected: the listbox's sliding .indicator paints the field and the
+   stile; the row itself stays clear, so the two never double up.) */
 
 .thumb {
   display: block;
@@ -862,11 +918,13 @@
   .field::after,
   .option,
   .page,
-  .option::before,
-  .page::before,
+  .indicator,
   .thumbImg,
   .catChevron {
     transition: none;
+  }
+  .listbox[data-entering] :is(.option, .page, .groupHead) {
+    animation: none;
   }
   .shell,
   .dialog[open] .shell {
