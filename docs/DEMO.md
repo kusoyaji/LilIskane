@@ -108,5 +108,5 @@ Présentation du 6 octobre 2026.
 
 ## Adresses
 
-- v2 : https://chaabi-lil-iskane-h1d6ki88g-leadpal.vercel.app (aperçu — accès réservé à l'équipe Vercel « leadpal » tant que la protection des aperçus est active)
-- v1 (conservée) : https://chaabi-lil-iskane.vercel.app (public)
+- v2 : https://chaabi-lil-iskane.vercel.app (public, déployé automatiquement depuis la branche main de github.com/kusoyaji/LilIskane)
+- v1 (conservée) : tag git maquette-v1-deployed ; restaurable en un clic dans Vercel (Deployments → Instant Rollback)
